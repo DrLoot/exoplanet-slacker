@@ -1,39 +1,25 @@
-# 🌌 NASA Exoplanet Watch Community Hub
+# 🌌 Exoplanet Slacker
 
-Welcome to the unofficial **Exoplanet Watch Community Hub** — a space for citizen scientists, students, and enthusiasts to connect with the NASA Exoplanet Watch project, share resources, and keep up with exoplanet discoveries.
+**Exoplanet Slacker** is a community-built hub for participants of [NASA Exoplanet Watch](https://exoplanets.nasa.gov/exoplanet-watch/).  
+It extends the project’s Slack community, providing tutorials, news, and mission info in one easy-to-browse GitHub Pages site.
 
----
-
-## 🔭 About NASA Exoplanet Watch
-Exoplanet Watch (NEW) is a citizen science project that invites you to help study planets around other stars by observing their **transits** — when a planet passes in front of its host star, causing a tiny dip in brightness.
-
-- [Official NASA Exoplanet Watch page](https://exoplanets.nasa.gov/exoplanet-watch/)
-- [Exoplanet Archive](https://exoplanetarchive.ipac.caltech.edu/)
+🌐 **Live site:** [https://<your-username>.github.io/exoplanet-slacker](https://<your-username>.github.io/exoplanet-slacker)
 
 ---
 
-## 📢 Slack Community
-Our Slack server is where members share light curves, troubleshoot software, and discuss the latest exoplanet science.  
-➡️ **Check the [Slack Hub](slack-hub.md)** for news, FAQs, and digest highlights.
+## 📖 What’s Inside
+- **Citizen Science Overview** → Learn about NASA Exoplanet Watch and how to contribute  
+- **Slack Hub** → Curated highlights, FAQs, and news from the Slack server  
+- **News** → General exoplanet discoveries and mission updates  
+- **EXOTIC Tutorials** → Docs and video guides for the EXOTIC software  
+- **AAVSO Tutorials** → How to submit data to the American Association of Variable Star Observers  
+- **Video Archive** → Recordings of biweekly Teams calls with historical context  
+- **Pandora Mission** → Overview of NASA’s Pandora mission and (coming soon) a list of its top 20 exoplanet targets  
 
 ---
 
-## 📰 News
-Stay up to date with:
-- [General Exoplanet News](news.md)  
-- [Pandora Mission Updates](pandora.md)  
-
----
-
-## 📚 Tutorials
-- [EXOTIC Tutorial](exotic.md) – Learn the software that powers Exoplanet Watch.  
-- [AAVSO Tutorial](aavso.md) – Submit your data to the American Association of Variable Star Observers.  
-
----
-
-## 🎥 Video Archive
-Catch up on our biweekly Teams meetings, including recordings and highlights:  
-➡️ [Teams Video Archive](videos.md)
-
----
-⭐ This is a community resource — contributions welcome! Submit a Pull Request on GitHub to help improve the site.
+## 🛠️ Local Development
+1. Clone this repo:
+   ```bash
+   git clone https://github.com/<your-username>/exoplanet-slacker.git
+   cd exoplanet-slacker
