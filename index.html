@@ -7,8 +7,19 @@
   <meta name="description" content="Exoplanet Slacker — a community hub for NASA Exoplanet Watch participants: tutorials, news, Slack digests, mission highlights, interactive games, and trivia." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Orbitron:wght@700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Orbitron:wght@700&display=swap" rel="stylesheet" />  
   <style>
+    .logo {
+      display: block;
+      margin: 0 auto 20px;
+      max-width: 160px;
+      transition: filter 0.6s ease-in-out; /* smooth fade */
+    }
+
+    .logo:hover {
+      filter: drop-shadow(0 0 15px #1e90ff) drop-shadow(0 0 40px #1e90ff);
+    }
+
     :root{
       --bg:#05060b; --bg-dim:#0a0c14; --card:#0f1220; --glow:#5bc0ff; --accent:#FF6F00; --text:#EAEAEA; --muted:#A9B1C3; --link:#79c8ff; --radius:16px; --shadow:0 10px 40px rgba(0,0,0,.45);
     }
@@ -37,6 +48,9 @@
   <div class="starfield" aria-hidden="true"><div class="stars"></div></div>
 
   <header>
+    <img src="ESlogo.png"  
+       alt="Exoplanet Slacker Logo" 
+       class="logo" />
     <h1>Exoplanet Slacker</h1>
     <p class="subtitle">Your community hub for <strong>NASA Exoplanet Watch</strong> — tutorials, Slack digests, mission highlights, interactive games, and trivia.</p>
     <nav class="cta" aria-label="Primary">
