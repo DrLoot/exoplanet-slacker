@@ -1,66 +1,226 @@
 <!doctype html>
 <html lang="en">
+
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Exoplanet News | Exoplanet Slacker</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Orbitron:wght@700&display=swap" rel="stylesheet" />  
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Orbitron:wght@700&display=swap"
+    rel="stylesheet" />
   <style>
-    :root{
-      --bg:#05060b; --bg-dim:#0a0c14; --card:#0f1220; --glow:#5bc0ff; --accent:#FF6F00; --text:#EAEAEA; --muted:#A9B1C3; --link:#79c8ff; --radius:16px; --shadow:0 10px 40px rgba(0,0,0,.45);
+    :root {
+      --bg: #05060b;
+      --bg-dim: #0a0c14;
+      --card: #0f1220;
+      --glow: #5bc0ff;
+      --accent: #FF6F00;
+      --text: #EAEAEA;
+      --muted: #A9B1C3;
+      --link: #79c8ff;
+      --radius: 16px;
+      --shadow: 0 10px 40px rgba(0, 0, 0, .45);
     }
-    html,body{height:100%;background:var(--bg);color:var(--text);} body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;line-height:1.6;}
-    .starfield{position:fixed;inset:0;z-index:-2;overflow:hidden;background:radial-gradient(1200px 800px at 80% -10%, rgba(91,192,255,.12), transparent 60%), radial-gradient(1000px 700px at 10% 120%, rgba(255,111,0,.08), transparent 60%), linear-gradient(180deg,#070910 0%,#04050a 100%);}    
-    .stars,.stars:before,.stars:after{content:"";position:absolute;inset:-2000px;background-repeat:repeat;} .stars{background-image:radial-gradient(2px 2px at 20px 30px, rgba(255,255,255,.7) 50%, transparent 51%), radial-gradient(1.5px 1.5px at 100px 80px, rgba(255,255,255,.5) 50%, transparent 51%), radial-gradient(1px 1px at 50px 140px, rgba(255,255,255,.4) 50%, transparent 51%);animation:drift 160s linear infinite;opacity:.85;} .stars:before{background-image:radial-gradient(1.5px 1.5px at 40px 60px, rgba(255,255,255,.35) 50%, transparent 51%), radial-gradient(1px 1px at 80px 120px, rgba(255,255,255,.25) 50%, transparent 51%);animation:drift 220s linear infinite;} .stars:after{background-image:radial-gradient(1px 1px at 70px 90px, rgba(123,198,255,.4) 50%, transparent 51%), radial-gradient(1px 1px at 140px 30px, rgba(255,171,64,.35) 50%, transparent 51%);animation:drift 300s linear infinite;} @keyframes drift{from{transform:translate3d(0,0,0)}to{transform:translate3d(2000px,2000px,0)}}
-    header{padding: clamp(36px, 7vw, 72px) 24px 40px;text-align:center;background: radial-gradient(900px 600px at 80% 20%, rgba(91,192,255,.12), transparent 60%);} 
-    h1{font-family:Orbitron, Inter, sans-serif; font-size: clamp(28px, 5.5vw, 52px); margin:0; letter-spacing:.02em;}
-    .subtitle{max-width:860px;margin:14px auto 0;color:var(--muted);font-size:clamp(14px,2.2vw,18px)}
-    main{padding:24px;max-width:1000px;margin:0 auto;}
-    .card{background:linear-gradient(180deg,rgba(16,20,40,.7),rgba(10,12,20,.8));border:1px solid rgba(123,198,255,.14);border-radius:var(--radius);padding:18px 18px;box-shadow:var(--shadow);position:relative;overflow:hidden;}
-    .list{display:grid;gap:14px;margin-top:16px;}
-    .item{display:grid;gap:6px;background:var(--card);border:1px solid rgba(123,198,255,.12);border-radius:12px;padding:14px;}
-    .item a{color:var(--link);font-weight:600;text-decoration:none;}
-    .item p{margin:0;color:var(--muted);font-size:14px;}
-    nav.breadcrumb{font-size:14px;margin-top:8px;}
-    nav.breadcrumb a{color:var(--link);text-decoration:none;}
-    footer{margin:56px 0 24px;padding:0 24px;color:var(--muted);font-size:14px;text-align:center;}
+
+    html,
+    body {
+      height: 100%;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    body {
+      margin: 0;
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      line-height: 1.6;
+    }
+
+    .starfield {
+      position: fixed;
+      inset: 0;
+      z-index: -2;
+      overflow: hidden;
+      background: radial-gradient(1200px 800px at 80% -10%, rgba(91, 192, 255, .12), transparent 60%), radial-gradient(1000px 700px at 10% 120%, rgba(255, 111, 0, .08), transparent 60%), linear-gradient(180deg, #070910 0%, #04050a 100%);
+    }
+
+    .stars,
+    .stars:before,
+    .stars:after {
+      content: "";
+      position: absolute;
+      inset: -2000px;
+      background-repeat: repeat;
+    }
+
+    .stars {
+      background-image: radial-gradient(2px 2px at 20px 30px, rgba(255, 255, 255, .7) 50%, transparent 51%), radial-gradient(1.5px 1.5px at 100px 80px, rgba(255, 255, 255, .5) 50%, transparent 51%), radial-gradient(1px 1px at 50px 140px, rgba(255, 255, 255, .4) 50%, transparent 51%);
+      animation: drift 160s linear infinite;
+      opacity: .85;
+    }
+
+    .stars:before {
+      background-image: radial-gradient(1.5px 1.5px at 40px 60px, rgba(255, 255, 255, .35) 50%, transparent 51%), radial-gradient(1px 1px at 80px 120px, rgba(255, 255, 255, .25) 50%, transparent 51%);
+      animation: drift 220s linear infinite;
+    }
+
+    .stars:after {
+      background-image: radial-gradient(1px 1px at 70px 90px, rgba(123, 198, 255, .4) 50%, transparent 51%), radial-gradient(1px 1px at 140px 30px, rgba(255, 171, 64, .35) 50%, transparent 51%);
+      animation: drift 300s linear infinite;
+    }
+
+    @keyframes drift {
+      from {
+        transform: translate3d(0, 0, 0)
+      }
+
+      to {
+        transform: translate3d(2000px, 2000px, 0)
+      }
+    }
+
+    header {
+      padding: clamp(36px, 7vw, 72px) 24px 40px;
+      text-align: center;
+      background: radial-gradient(900px 600px at 80% 20%, rgba(91, 192, 255, .12), transparent 60%);
+    }
+
+    h1 {
+      font-family: Orbitron, Inter, sans-serif;
+      font-size: clamp(28px, 5.5vw, 52px);
+      margin: 0;
+      letter-spacing: .02em;
+    }
+
+    .subtitle {
+      max-width: 860px;
+      margin: 14px auto 0;
+      color: var(--muted);
+      font-size: clamp(14px, 2.2vw, 18px)
+    }
+
+    main {
+      padding: 24px;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    .card {
+      background: linear-gradient(180deg, rgba(16, 20, 40, .7), rgba(10, 12, 20, .8));
+      border: 1px solid rgba(123, 198, 255, .14);
+      border-radius: var(--radius);
+      padding: 18px 18px;
+      box-shadow: var(--shadow);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .list {
+      display: grid;
+      gap: 14px;
+      margin-top: 16px;
+    }
+
+    .item {
+      display: grid;
+      gap: 6px;
+      background: var(--card);
+      border: 1px solid rgba(123, 198, 255, .12);
+      border-radius: 12px;
+      padding: 14px;
+    }
+
+    .item a {
+      color: var(--link);
+      font-weight: 600;
+      text-decoration: none;
+    }
+
+    .item p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    nav.breadcrumb {
+      font-size: 14px;
+      margin-top: 8px;
+    }
+
+    nav.breadcrumb a {
+      color: var(--link);
+      text-decoration: none;
+    }
+
+    footer {
+      margin: 56px 0 24px;
+      padding: 0 24px;
+      color: var(--muted);
+      font-size: 14px;
+      text-align: center;
+    }
   </style>
 </head>
+
 <body>
-  <div class="starfield" aria-hidden="true"><div class="stars"></div></div>
+  <div class="starfield" aria-hidden="true">
+    <div class="stars"></div>
+  </div>
   <header>
     <h1>Exoplanet News</h1>
     <p class="subtitle">Authoritative sources for discoveries, mission updates, and community highlights.</p>
     <nav class="breadcrumb"><a href="index.html">← Back to Home</a></nav>
   </header>
   <main>
+    <!-- Exoplanet News Section -->
     <section class="card">
+      <h2>Exoplanet News</h2>
       <div class="list">
         <div class="item">
           <a href="https://exoplanets.nasa.gov/exep/news/" target="_blank" rel="noopener">NASA ExEP – News</a>
-          <p>Official updates from NASA’s Exoplanet Exploration Program (ExEP): mission milestones, technology developments, and program announcements.</p>
+          <p>Official updates from NASA’s Exoplanet Exploration Program (ExEP): mission milestones, technology
+            developments, and program announcements.</p>
         </div>
         <div class="item">
           <a href="https://science.nasa.gov/exoplanets/" target="_blank" rel="noopener">NASA Science – Exoplanets</a>
-          <p>NASA’s central exoplanet portal: beginner-friendly explainers, latest discoveries, features, and links to current missions.</p>
+          <p>NASA’s central exoplanet portal: beginner-friendly explainers, latest discoveries, features, and links to
+            current missions.</p>
         </div>
         <div class="item">
-          <a href="https://exoplanetarchive.ipac.caltech.edu/docs/exonews_archive.html" target="_blank" rel="noopener">NASA Exoplanet Archive – ExoNews</a>
-          <p>A curated stream of exoplanet-related press releases and articles, aggregated by the Exoplanet Archive team at Caltech/IPAC.</p>
+          <a href="https://exoplanetarchive.ipac.caltech.edu/docs/exonews_archive.html" target="_blank"
+            rel="noopener">NASA Exoplanet Archive – ExoNews</a>
+          <p>A curated stream of exoplanet-related press releases and articles, aggregated by the Exoplanet Archive team
+            at Caltech/IPAC.</p>
         </div>
         <div class="item">
-          <a href="https://science.nasa.gov/exoplanets/stories/" target="_blank" rel="noopener">NASA Exoplanet Stories</a>
-          <p>Human-centered stories and features from NASA highlighting the people, methods, and breakthroughs behind exoplanet science.</p>
+          <a href="https://science.nasa.gov/exoplanets/stories/" target="_blank" rel="noopener">NASA Exoplanet
+            Stories</a>
+          <p>Human-centered stories and features from NASA highlighting the people, methods, and breakthroughs behind
+            exoplanet science.</p>
         </div>
         <div class="item">
-          <a href="https://www.space.com/astronomy/exoplanets/" target="_blank" rel="noopener">Space.com – Exoplanets</a>
-          <p>News and explainers from Space.com covering exoplanet discoveries, telescope updates, and interview features.</p>
+          <a href="https://www.space.com/astronomy/exoplanets/" target="_blank" rel="noopener">Space.com –
+            Exoplanets</a>
+          <p>News and explainers from Space.com covering exoplanet discoveries, telescope updates, and interview
+            features.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Telescope News Section -->
+    <section class="card" style="margin-top: 32px;">
+      <h2>Telescope News</h2>
+      <div class="list">
+        <div class="item">
+          <a href="https://smallsat.wff.nasa.gov/missions/pandora.php" target="_blank" rel="noopener">NASA Pandora
+            Mission</a>
+          <p>Pandora is a SmallSat telescope launching in 2025 to study 20+ exoplanets, separating stellar variability
+            from planetary atmospheric signals.</p>
         </div>
         <div class="item">
-          <a href="https://smallsat.wff.nasa.gov/missions/pandora.php" target="_blank" rel="noopener">NASA Pandora Information</a>
-          <p>Pandora is a SmallSat telescope launching in 2025 to study 20+ exoplanets, separating stellar variability from planetary atmospheric signals.</p>
+          <a href="https://tess.mit.edu/" target="_blank" rel="noopener">NASA TESS Mission</a>
+          <p>The Transiting Exoplanet Survey Satellite (TESS) is scanning nearly the entire sky to discover thousands of
+            exoplanets around nearby bright stars.</p>
         </div>
       </div>
     </section>
@@ -70,4 +230,5 @@
   </footer>
   <script>document.getElementById('y').textContent = new Date().getFullYear();</script>
 </body>
+
 </html>
