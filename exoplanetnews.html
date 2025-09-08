@@ -10,6 +10,20 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Orbitron:wght@700&display=swap"
     rel="stylesheet" />
   <style>
+    .list {
+      display: grid;
+      gap: 14px;
+      margin-top: 16px;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    }
+
+    .item {
+      background: rgba(15, 18, 32, .6);
+      border: 1px solid rgba(123, 198, 255, .12);
+      padding: 12px;
+      border-radius: 12px;
+    }
+
     :root {
       --bg: #05060b;
       --bg-dim: #0a0c14;
@@ -178,31 +192,21 @@
       <div class="list">
         <div class="item">
           <a href="https://exoplanets.nasa.gov/exep/news/" target="_blank" rel="noopener">NASA ExEP – News</a>
-          <p>Official updates from NASA’s Exoplanet Exploration Program (ExEP): mission milestones, technology
-            developments, and program announcements.</p>
+          <p>Official updates from NASA’s Exoplanet Exploration Program (ExEP).</p>
         </div>
         <div class="item">
           <a href="https://science.nasa.gov/exoplanets/" target="_blank" rel="noopener">NASA Science – Exoplanets</a>
-          <p>NASA’s central exoplanet portal: beginner-friendly explainers, latest discoveries, features, and links to
-            current missions.</p>
+          <p>NASA’s central portal: explainers, discoveries, and missions.</p>
         </div>
         <div class="item">
           <a href="https://exoplanetarchive.ipac.caltech.edu/docs/exonews_archive.html" target="_blank"
             rel="noopener">NASA Exoplanet Archive – ExoNews</a>
-          <p>A curated stream of exoplanet-related press releases and articles, aggregated by the Exoplanet Archive team
-            at Caltech/IPAC.</p>
+          <p>Press releases and news curated by the Exoplanet Archive team at Caltech/IPAC.</p>
         </div>
         <div class="item">
           <a href="https://science.nasa.gov/exoplanets/stories/" target="_blank" rel="noopener">NASA Exoplanet
             Stories</a>
-          <p>Human-centered stories and features from NASA highlighting the people, methods, and breakthroughs behind
-            exoplanet science.</p>
-        </div>
-        <div class="item">
-          <a href="https://www.space.com/astronomy/exoplanets/" target="_blank" rel="noopener">Space.com –
-            Exoplanets</a>
-          <p>News and explainers from Space.com covering exoplanet discoveries, telescope updates, and interview
-            features.</p>
+          <p>Stories highlighting the people, methods, and breakthroughs in exoplanet science.</p>
         </div>
       </div>
     </section>
@@ -212,19 +216,23 @@
       <h2>Telescope News</h2>
       <div class="list">
         <div class="item">
+          <a href="https://www.space.com/astronomy/exoplanets/" target="_blank" rel="noopener">Space.com –
+            Exoplanets</a>
+          <p>Coverage of exoplanet discoveries and telescope updates from Space.com.</p>
+        </div>
+        <div class="item">
           <a href="https://smallsat.wff.nasa.gov/missions/pandora.php" target="_blank" rel="noopener">NASA Pandora
             Mission</a>
-          <p>Pandora is a SmallSat telescope launching in 2025 to study 20+ exoplanets, separating stellar variability
-            from planetary atmospheric signals.</p>
+          <p>A SmallSat telescope launching in 2025 to study exoplanet atmospheres.</p>
         </div>
         <div class="item">
           <a href="https://tess.mit.edu/" target="_blank" rel="noopener">NASA TESS Mission</a>
-          <p>The Transiting Exoplanet Survey Satellite (TESS) is scanning nearly the entire sky to discover thousands of
-            exoplanets around nearby bright stars.</p>
+          <p>The Transiting Exoplanet Survey Satellite scanning the sky for thousands of exoplanets.</p>
         </div>
       </div>
     </section>
   </main>
+
   <footer>
     <p>© <span id="y"></span> Exoplanet Slacker — A community resource. <em>Not an official NASA site.</em></p>
   </footer>
