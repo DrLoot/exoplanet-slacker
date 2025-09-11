@@ -1,60 +1,262 @@
 <!doctype html>
 <html lang="en">
+
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Exoplanet Slacker | NASA Exoplanet Watch Community Hub</title>
-  <meta name="description" content="Exoplanet Slacker — a community hub for NASA Exoplanet Watch participants: tutorials, news, Slack digests, mission highlights, interactive games, and trivia." />
+  <meta name="description"
+    content="Exoplanet Slacker — a community hub for NASA Exoplanet Watch participants: tutorials, news, Slack digests, mission highlights, interactive games, and trivia." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Orbitron:wght@700&display=swap" rel="stylesheet" />  
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Orbitron:wght@700&display=swap"
+    rel="stylesheet" />
   <style>
     .logo {
       display: block;
       margin: 0 auto 20px;
       max-width: 80px;
-      transition: filter 0.6s ease-in-out; /* smooth fade */
+      transition: filter 0.6s ease-in-out;
+      /* smooth fade */
     }
 
     .logo:hover {
       filter: drop-shadow(0 0 15px #1e90ff) drop-shadow(0 0 40px #1e90ff);
     }
 
-    :root{
-      --bg:#05060b; --bg-dim:#0a0c14; --card:#0f1220; --glow:#5bc0ff; --accent:#FF6F00; --text:#EAEAEA; --muted:#A9B1C3; --link:#79c8ff; --radius:16px; --shadow:0 10px 40px rgba(0,0,0,.45);
+    :root {
+      --bg: #05060b;
+      --bg-dim: #0a0c14;
+      --card: #0f1220;
+      --glow: #5bc0ff;
+      --accent: #FF6F00;
+      --text: #EAEAEA;
+      --muted: #A9B1C3;
+      --link: #79c8ff;
+      --radius: 16px;
+      --shadow: 0 10px 40px rgba(0, 0, 0, .45);
     }
-    html,body{height:100%;background:var(--bg);color:var(--text);} body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;line-height:1.6;}
 
-    .starfield{position:fixed;inset:0;z-index:-2;overflow:hidden;background:radial-gradient(1200px 800px at 80% -10%, rgba(91,192,255,.12), transparent 60%), radial-gradient(1000px 700px at 10% 120%, rgba(255,111,0,.08), transparent 60%), linear-gradient(180deg,#070910 0%,#04050a 100%);}    
-    .stars,.stars:before,.stars:after{content:"";position:absolute;inset:-2000px;background-repeat:repeat;} .stars{background-image:radial-gradient(2px 2px at 20px 30px, rgba(255,255,255,.7) 50%, transparent 51%), radial-gradient(1.5px 1.5px at 100px 80px, rgba(255,255,255,.5) 50%, transparent 51%), radial-gradient(1px 1px at 50px 140px, rgba(255,255,255,.4) 50%, transparent 51%);animation:drift 160s linear infinite;opacity:.85;} .stars:before{background-image:radial-gradient(1.5px 1.5px at 40px 60px, rgba(255,255,255,.35) 50%, transparent 51%), radial-gradient(1px 1px at 80px 120px, rgba(255,255,255,.25) 50%, transparent 51%);animation:drift 220s linear infinite;} .stars:after{background-image:radial-gradient(1px 1px at 70px 90px, rgba(123,198,255,.4) 50%, transparent 51%), radial-gradient(1px 1px at 140px 30px, rgba(255,171,64,.35) 50%, transparent 51%);animation:drift 300s linear infinite;} @keyframes drift{from{transform:translate3d(0,0,0)}to{transform:translate3d(2000px,2000px,0)}}
+    html,
+    body {
+      height: 100%;
+      background: var(--bg);
+      color: var(--text);
+    }
 
-    header{padding: clamp(48px, 8vw, 96px) 24px 64px;text-align:center;background: radial-gradient(900px 600px at 80% 20%, rgba(91,192,255,.12), transparent 60%);} h1{font-family:Orbitron, Inter, sans-serif; font-size: clamp(32px, 6vw, 64px); margin:0; letter-spacing:.02em;} .subtitle{max-width:860px;margin:16px auto 28px;color:var(--muted);font-size:clamp(16px,2.2vw,18px)}
-    .cta{display:flex;flex-wrap:wrap; gap:12px; justify-content:center;}
-    .btn{display:inline-flex;align-items:center;gap:10px;padding:12px 18px;border-radius:999px;border:1px solid #1f2a44;background:linear-gradient(180deg,#133252,#0c1b2e);color:var(--text);text-decoration:none;box-shadow:var(--shadow);transition:transform .15s ease, box-shadow .15s ease;} .btn:hover{transform:translateY(-1px);box-shadow:0 12px 50px rgba(91,192,255,.18);} 
+    body {
+      margin: 0;
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      line-height: 1.6;
+    }
 
-    main{padding:24px;max-width:1100px;margin:0 auto;}
-    .grid{display:grid;gap:18px;grid-template-columns:repeat(12,1fr);} 
-    .card{grid-column:span 12;background:linear-gradient(180deg,rgba(16,20,40,.7),rgba(10,12,20,.8));border:1px solid rgba(123,198,255,.14);border-radius:var(--radius);padding:22px;box-shadow:var(--shadow);position:relative;overflow:hidden;}
-    @media (min-width: 720px){.tile{grid-column:span 6;}} @media (min-width: 980px){.tile{grid-column:span 3;}}
-    .tile h3{margin:0 0 6px;font-size:18px} .tile p{margin:0;color:var(--muted);font-size:14px} .tile a.card-link{position:absolute;inset:0;border-radius:inherit;}
+    .starfield {
+      position: fixed;
+      inset: 0;
+      z-index: -2;
+      overflow: hidden;
+      background: radial-gradient(1200px 800px at 80% -10%, rgba(91, 192, 255, .12), transparent 60%), radial-gradient(1000px 700px at 10% 120%, rgba(255, 111, 0, .08), transparent 60%), linear-gradient(180deg, #070910 0%, #04050a 100%);
+    }
 
-    .section-title{margin:36px 0 8px;font-weight:800;letter-spacing:.02em;} .kicker{color:var(--glow);font-weight:600;text-transform:uppercase;letter-spacing:.12em;font-size:12px;}
-    .feature-list{display:grid;gap:12px;} .feature-item{display:flex;gap:12px;align-items:flex-start;background:var(--card);border:1px solid rgba(123,198,255,.12);border-radius:12px;padding:14px;} .feature-item .badge{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:rgba(91,192,255,.18);border:1px solid rgba(123,198,255,.25);} 
+    .stars,
+    .stars:before,
+    .stars:after {
+      content: "";
+      position: absolute;
+      inset: -2000px;
+      background-repeat: repeat;
+    }
 
-    footer{margin:56px 0 24px;padding:0 24px;color:var(--muted);font-size:14px;text-align:center;} footer a{color:var(--link);}
+    .stars {
+      background-image: radial-gradient(2px 2px at 20px 30px, rgba(255, 255, 255, .7) 50%, transparent 51%), radial-gradient(1.5px 1.5px at 100px 80px, rgba(255, 255, 255, .5) 50%, transparent 51%), radial-gradient(1px 1px at 50px 140px, rgba(255, 255, 255, .4) 50%, transparent 51%);
+      animation: drift 160s linear infinite;
+      opacity: .85;
+    }
+
+    .stars:before {
+      background-image: radial-gradient(1.5px 1.5px at 40px 60px, rgba(255, 255, 255, .35) 50%, transparent 51%), radial-gradient(1px 1px at 80px 120px, rgba(255, 255, 255, .25) 50%, transparent 51%);
+      animation: drift 220s linear infinite;
+    }
+
+    .stars:after {
+      background-image: radial-gradient(1px 1px at 70px 90px, rgba(123, 198, 255, .4) 50%, transparent 51%), radial-gradient(1px 1px at 140px 30px, rgba(255, 171, 64, .35) 50%, transparent 51%);
+      animation: drift 300s linear infinite;
+    }
+
+    @keyframes drift {
+      from {
+        transform: translate3d(0, 0, 0)
+      }
+
+      to {
+        transform: translate3d(2000px, 2000px, 0)
+      }
+    }
+
+    header {
+      padding: clamp(48px, 8vw, 96px) 24px 64px;
+      text-align: center;
+      background: radial-gradient(900px 600px at 80% 20%, rgba(91, 192, 255, .12), transparent 60%);
+    }
+
+    h1 {
+      font-family: Orbitron, Inter, sans-serif;
+      font-size: clamp(32px, 6vw, 64px);
+      margin: 0;
+      letter-spacing: .02em;
+    }
+
+    .subtitle {
+      max-width: 860px;
+      margin: 16px auto 28px;
+      color: var(--muted);
+      font-size: clamp(16px, 2.2vw, 18px)
+    }
+
+    .cta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: center;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 18px;
+      border-radius: 999px;
+      border: 1px solid #1f2a44;
+      background: linear-gradient(180deg, #133252, #0c1b2e);
+      color: var(--text);
+      text-decoration: none;
+      box-shadow: var(--shadow);
+      transition: transform .15s ease, box-shadow .15s ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 12px 50px rgba(91, 192, 255, .18);
+    }
+
+    main {
+      padding: 24px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .grid {
+      display: grid;
+      gap: 18px;
+      grid-template-columns: repeat(12, 1fr);
+    }
+
+    .card {
+      grid-column: span 12;
+      background: linear-gradient(180deg, rgba(16, 20, 40, .7), rgba(10, 12, 20, .8));
+      border: 1px solid rgba(123, 198, 255, .14);
+      border-radius: var(--radius);
+      padding: 22px;
+      box-shadow: var(--shadow);
+      position: relative;
+      overflow: hidden;
+    }
+
+    @media (min-width: 720px) {
+      .tile {
+        grid-column: span 6;
+      }
+    }
+
+    @media (min-width: 980px) {
+      .tile {
+        grid-column: span 3;
+      }
+    }
+
+    .tile h3 {
+      margin: 0 0 6px;
+      font-size: 18px
+    }
+
+    .tile p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px
+    }
+
+    .tile a.card-link {
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+    }
+
+    .section-title {
+      margin: 36px 0 8px;
+      font-weight: 800;
+      letter-spacing: .02em;
+    }
+
+    .kicker {
+      color: var(--glow);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .12em;
+      font-size: 12px;
+    }
+
+    .feature-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .feature-item {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      background: var(--card);
+      border: 1px solid rgba(123, 198, 255, .12);
+      border-radius: 12px;
+      padding: 14px;
+    }
+
+    .feature-item .badge {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: rgba(91, 192, 255, .18);
+      border: 1px solid rgba(123, 198, 255, .25);
+    }
+
+    footer {
+      margin: 56px 0 24px;
+      padding: 0 24px;
+      color: var(--muted);
+      font-size: 14px;
+      text-align: center;
+    }
+
+    footer a {
+      color: var(--link);
+    }
   </style>
 </head>
+
 <body>
-  <div class="starfield" aria-hidden="true"><div class="stars"></div></div>
+  <div class="starfield" aria-hidden="true">
+    <div class="stars"></div>
+  </div>
 
   <header>
-    <img src="ESlogo1.png"  
-       alt="Exoplanet Slacker Logo" 
-       class="logo" />
+    <img src="ESlogo1.png" alt="Exoplanet Slacker Logo" class="logo" />
     <h1>Exoplanet Slacker</h1>
-    <p class="subtitle">Your community hub for <strong>NASA Exoplanet Watch</strong> — tutorials, Slack digests, mission highlights, interactive games, and trivia.</p>
+    <p class="subtitle">Your community hub for <strong>NASA Exoplanet Watch</strong> — tutorials, Slack digests, mission
+      highlights, interactive games, and trivia.</p>
     <nav class="cta" aria-label="Primary">
-      <a class="btn" href="https://exoplanets.nasa.gov/exoplanet-watch/about-exoplanet-watch/overview/">Learn about the project</a>
+      <a class="btn" href="https://exoplanets.nasa.gov/exoplanet-watch/about-exoplanet-watch/overview/">Learn about the
+        project</a>
       <a class="btn" href="exotic.html">EXOTIC tutorials</a>
       <a class="btn" href="https://exoplanets.nasa.gov/exoplanet-watch/recordings/">Slack Meeting Archive</a>
       <a class="btn" href="https://science.nasa.gov/mission/pandora/">Pandora mission</a>
@@ -62,33 +264,81 @@
   </header>
 
   <main>
-    <h2 class="section-title"><span class="kicker">Navigate</span><br/> Explore the Hub</h2>
+    <h2 class="section-title"><span class="kicker">Navigate</span><br /> Explore the Hub</h2>
     <section class="grid">
-      <article class="card tile"><h3>Citizen Science</h3><p>What is Exoplanet Watch and how you can contribute.</p><a class="card-link" href="https://exoplanets.nasa.gov/exoplanet-watch/about-exoplanet-watch/overview/"></a></article>
-      <article class="card tile"><h3>Slack Hub</h3><p>Community news, FAQs, and curated highlights from Slack.</p><a class="card-link" href="slack-hub.html"></a></article>
-      <article class="card tile"><h3>Exoplanet News</h3><p>Curated exoplanet discoveries and mission updates.</p><a class="card-link" href="exoplanetnews.html"></a></article>
-      <article class="card tile"><h3>Pandora</h3><p>The current list of targets (as of July 30, 2025). The list will be updated as the mission launch date nears.</p><a class="card-link" href="https://pandorasat.com/targets/"></a></article>
+      <article class="card tile">
+        <h3>Citizen Science</h3>
+        <p>What is Exoplanet Watch and how you can contribute.</p><a class="card-link"
+          href="https://exoplanets.nasa.gov/exoplanet-watch/about-exoplanet-watch/overview/"></a>
+      </article>
+      <article class="card tile">
+        <h3>Slack Hub</h3>
+        <p>Community news, FAQs, and curated highlights from Slack.</p><a class="card-link" href="slack-hub.html"></a>
+      </article>
+      <article class="card tile">
+        <h3>Exoplanet News</h3>
+        <p>Curated exoplanet discoveries and mission updates.</p><a class="card-link" href="exoplanetnews.html"></a>
+      </article>
+      <article class="card tile">
+        <h3>Pandora</h3>
+        <p>The current list of targets (as of July 30, 2025). The list will be updated as the mission launch date nears.
+        </p><a class="card-link" href="https://pandorasat.com/targets/"></a>
+      </article>
     </section>
 
-    <h2 class="section-title"><span class="kicker">Fun Zone</span><br/> Interactive Learning</h2>
+    <h2 class="section-title"><span class="kicker">Fun Zone</span><br /> Interactive Learning</h2>
     <section class="grid">
-      <article class="card tile"><h3>Find the Transit</h3><p>Play the game, spot the dip, and test your exoplanet detective skills.</p><a class="card-link" href="https://drloot.github.io/find-the-transit/" target="_blank" rel="noopener"></a></article>
-      <article class="card tile"><h3>Trivia Tuesday</h3><p>Exoplanet & Astrophysics Trivia Tuesday — test your knowledge with weekly challenges.</p><a class="card-link" href="trivia.html"></a></article>
+      <article class="card tile">
+        <h3>Find the Transit</h3>
+        <p>Play the game, spot the dip, and test your exoplanet detective skills.</p><a class="card-link"
+          href="https://drloot.github.io/find-the-transit/" target="_blank" rel="noopener"></a>
+      </article>
+      <article class="card tile">
+        <h3>Trivia Tuesday</h3>
+        <p>Exoplanet & Astrophysics Trivia Tuesday — test your knowledge with weekly challenges.</p><a class="card-link"
+          href="trivia.html"></a>
+      </article>
     </section>
 
-    <h2 class="section-title"><span class="kicker">Updates</span><br/> Featured</h2>
+    <h2 class="section-title"><span class="kicker">Updates</span><br /> Featured</h2>
     <section class="feature-list">
-      <div class="feature-item"><div class="badge">📢</div><div><strong>Next Teams Meeting:</strong> <s>Friday, 12 September 2025 @ 1pm CT.</s><br> TBD<br><br>Latest Teams meeting:<br><a href="https://uol-ets.slack.com/files/U087U9HJL79/F09DZ1Q7B97/exoplanet_watch_meeting-20250829_141108-meeting_recording.mp4">29 Aug 2025</a></div></div>
-      <div class="feature-item"><div class="badge">🛠️</div><div><strong>EXOTIC Tutorial: </strong>Learn how to use <a href="https://exoplanets.nasa.gov/exoplanet-watch/exotic/user-guide/">EXOTIC.</a></div></div>
-      <div class="feature-item"><div class="badge">📰</div><div><strong>Discovery Highlight:</strong> Add a short note with link in <a href="news.html">News</a>.</div></div>
+      <div class="feature-item">
+        <div class="badge">📢</div>
+        <div><strong>Next Teams Meeting:</strong> <s>Friday, 12 September 2025 @ 1pm CT.</s><br> TBD<br><br>Latest Teams
+          meeting:<br><a
+            href="https://uol-ets.slack.com/files/U087U9HJL79/F09DZ1Q7B97/exoplanet_watch_meeting-20250829_141108-meeting_recording.mp4">29
+            Aug 2025</a></div>
+      </div>
+      <div class="feature-item">
+        <div class="badge">🛠️</div>
+        <div><strong>EXOTIC Tutorial: </strong>Learn how to use <a
+            href="https://exoplanets.nasa.gov/exoplanet-watch/exotic/user-guide/">EXOTIC.</a></div>
+      </div>
+      <div class="feature-item">
+        <div class="badge">📰</div>
+        <div><strong>Discovery Highlight:</strong> Add a short note with link in <a href="news.html">News</a>.</div>
+      </div>
     </section>
 
-    <h2 class="section-title"><span class="kicker">Start Here</span><br/> Get Involved in 3 Steps</h2>
+    <h2 class="section-title"><span class="kicker">Start Here</span><br /> Get Involved in 3 Steps</h2>
     <section class="grid">
       <article class="card" style="grid-column:span 12; display:grid; gap:10px;">
-        <div class="feature-item"><div class="badge">1</div><div><strong>Install EXOTIC</strong> — see <a href="https://exoplanets.nasa.gov/exoplanet-watch/exotic/install-locally/">Install</a>.</div></div>
-        <div class="feature-item"><div class="badge">2</div><div><strong>Join the community</strong> — check <a href="https://app.slack.com/client/TJDBFFLF4/CKUNBCY2K">Slack Hub</a>.</div></div>
-        <div class="feature-item"><div class="badge">3</div><div><strong>Contribute observations</strong> — learn to submit to AAVSO in <a href="https://exoplanets.nasa.gov/exoplanet-watch/how-to-contribute/how-to-submit-your-data/">AAVSO</a>.</div></div>
+        <div class="feature-item">
+          <div class="badge">1</div>
+          <div><strong>Install EXOTIC</strong> — see <a
+              href="https://exoplanets.nasa.gov/exoplanet-watch/exotic/install-locally/">Install</a>.</div>
+        </div>
+        <div class="feature-item">
+          <div class="badge">2</div>
+          <div><strong>Join the community</strong> — check <a
+              href="https://app.slack.com/client/TJDBFFLF4/CKUNBCY2K">Slack Hub</a>.</div>
+        </div>
+        <div class="feature-item">
+          <div class="badge">3</div>
+          <div><strong>Contribute observations</strong> — learn to submit to AAVSO in <a
+              href="https://exoplanets.nasa.gov/exoplanet-watch/how-to-contribute/how-to-submit-your-data/">AAVSO</a>.
+          </div>
+        </div>
       </article>
     </section>
   </main>
@@ -97,9 +347,9 @@
     <p>© <span id="y"></span> Exoplanet Slacker — A community resource. <em>Not an official NASA site.</em></p>
   </footer>
   <script>document.getElementById('y').textContent = new Date().getFullYear();</script>
+  <!-- Cloudflare Web Analytics -->
+  <script defer src='https://static.cloudflareinsights.com/beacon.min.js'
+    data-cf-beacon='{"token": "f0bfe483bc9649128eac59a192620efe"}'></script><!-- End Cloudflare Web Analytics -->
 </body>
+
 </html>
-
-
-
-
