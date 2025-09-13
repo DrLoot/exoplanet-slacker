@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Tutorials | Exoplanet Slacker</title>
+  <meta name="description" content="Tutorials hub for EXOTIC, VSX, MOBS, and AAVSO — Exoplanet Slacker." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Orbitron:wght@700&display=swap" rel="stylesheet" />
+  <style>
+    :root{
+      --bg:#05060b; --card:#0f1220; --glow:#5bc0ff; --accent:#FF6F00;
+      --text:#EAEAEA; --muted:#A9B1C3; --radius:16px; --shadow:0 10px 40px rgba(0,0,0,.45);
+      --border: rgba(123,198,255,.14);
+    }
+    html,body{height:100%;background:var(--bg);color:var(--text);}
+    body{margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;line-height:1.6;}
+
+    /* Starfield background (lightweight) */
+    .starfield{position:fixed;inset:0;z-index:-2;overflow:hidden;
+      background:radial-gradient(1200px 800px at 80% -10%, rgba(91,192,255,.12), transparent 60%),
+                 radial-gradient(1000px 700px at 10% 120%, rgba(255,111,0,.08), transparent 60%),
+                 linear-gradient(180deg,#070910 0%,#04050a 100%);}
+    .stars,.stars:before,.stars:after{content:"";position:absolute;inset:-2000px;background-repeat:repeat;}
+    .stars{background-image:
+      radial-gradient(2px 2px at 20px 30px, rgba(255,255,255,.7) 50%, transparent 51%),
+      radial-gradient(1.5px 1.5px at 100px 80px, rgba(255,255,255,.5) 50%, transparent 51%),
+      radial-gradient(1px 1px at 50px 140px, rgba(255,255,255,.4) 50%, transparent 51%);
+      animation:drift 160s linear infinite; opacity:.85;}
+    .stars:before{background-image:
+      radial-gradient(1.5px 1.5px at 40px 60px, rgba(255,255,255,.35) 50%, transparent 51%),
+      radial-gradient(1px 1px at 80px 120px, rgba(255,255,255,.25) 50%, transparent 51%);
+      animation:drift 220s linear infinite;}
+    .stars:after{background-image:
+      radial-gradient(1px 1px at 70px 90px, rgba(123,198,255,.4) 50%, transparent 51%),
+      radial-gradient(1px 1px at 140px 30px, rgba(255,171,64,.35) 50%, transparent 51%);
+      animation:drift 300s linear infinite;}
+    @keyframes drift{from{transform:translate3d(0,0,0)}to{transform:translate3d(2000px,2000px,0)}}
+
+    header{padding: clamp(48px, 8vw, 96px) 24px 32px; text-align:center;
+      background: radial-gradient(900px 600px at 80% 20%, rgba(91,192,255,.12), transparent 60%);}
+    h1{font-family:Orbitron,Inter,sans-serif; font-size:clamp(28px,5.6vw,56px); margin:0;}
+    .subtitle{max-width:900px;margin:12px auto 24px;color:var(--muted);}
+    .nav{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+    .btn{display:inline-flex;align-items:center;gap:10px;padding:10px 16px;border-radius:999px;
+      border:1px solid #1f2a44;background:linear-gradient(180deg,#133252,#0c1b2e);
+      color:var(--text);text-decoration:none;box-shadow:var(--shadow);}
+    .btn:hover{transform:translateY(-1px)}
+
+    main{padding:24px;max-width:1100px;margin:0 auto}
+    .card{background:linear-gradient(180deg,rgba(16,20,40,.7),rgba(10,12,20,.8));
+      border:1px solid var(--border); border-radius:var(--radius); padding:22px; box-shadow:var(--shadow); margin-bottom:28px;}
+    h2{margin:0 0 8px}
+    .muted{color:var(--muted)}
+
+    /* Multi-column responsive grid for link cards */
+    .list{display:grid; gap:14px; margin-top:16px;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));}
+    .item{background:rgba(15,18,32,.6); border:1px solid rgba(123,198,255,.12);
+      padding:12px; border-radius:12px;}
+    .item a{color:#79c8ff; text-decoration:none}
+    .placeholder{display:flex;align-items:center;justify-content:space-between;gap:10px;}
+    .tag{font-size:12px; color:#9ed1ff; background:rgba(91,192,255,.12);
+      border:1px solid rgba(123,198,255,.25); padding:2px 8px; border-radius:999px;}
+
+    /* Simple modal for Coming Soon */
+    #comingSoonModal{display:none; position:fixed; inset:0; z-index:9999;
+      background:rgba(0,0,0,.7); color:#fff; display:grid; place-items:center;}
+    .modal-card{background:rgba(10,12,20,.95); border:1px solid var(--border);
+      border-radius:14px; padding:20px 22px; max-width:440px; text-align:center; box-shadow:var(--shadow);}
+    .close-btn{margin-top:12px; display:inline-block; padding:8px 14px; border-radius:999px;
+      border:1px solid #1f2a44; background:linear-gradient(180deg,#133252,#0c1b2e); color:#fff; text-decoration:none;}
+  </style>
+</head>
+<body>
+  <div class="starfield" aria-hidden="true"><div class="stars"></div></div>
+
+  <header>
+    <h1>Tutorials</h1>
+    <p class="subtitle">Central hub for learning resources. Sections below will grow as we add videos, docs, and step-by-step guides.</p>
+    <nav class="nav" aria-label="Primary">
+      <a class="btn" href="index.html">← Back to Home</a>
+    </nav>
+  </header>
+
+  <main>
+    <!-- EXOTIC Tutorials -->
+    <section class="card">
+      <h2>EXOTIC Tutorials</h2>
+      <p class="muted">Data reduction & light-curve analysis with EXOTIC.</p>
+      <div class="list">
+        <div class="item">
+          <div class="placeholder">
+            <div><strong>Getting Started with EXOTIC</strong><br><span class="muted">Install, configure, and process your first dataset.</span></div>
+            <a href="#" onclick="showComingSoon(event)" class="tag">Coming Soon</a>
+          </div>
+        </div>
+        <div class="item">
+          <div class="placeholder">
+            <div><strong>Photometry Workflow</strong><br><span class="muted">Apertures, comparison stars, and error estimation.</span></div>
+            <a href="#" onclick="showComingSoon(event)" class="tag">Coming Soon</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- VSX Tutorials -->
+    <section class="card">
+      <h2>VSX Tutorials</h2>
+      <p class="muted">Submitting and exploring variables via the AAVSO VSX.</p>
+      <div class="list">
+        <div class="item">
+          <div class="placeholder">
+            <div><strong>VSX Basics</strong><br><span class="muted">Search, cross-check, and interpret entries.</span></div>
+            <a href="#" onclick="showComingSoon(event)" class="tag">Coming Soon</a>
+          </div>
+        </div>
+        <div class="item">
+          <div class="placeholder">
+            <div><strong>Submitting to VSX</strong><br><span class="muted">Formatting, metadata, and best practices.</span></div>
+            <a href="#" onclick="showComingSoon(event)" class="tag">Coming Soon</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- MOBS Tutorials -->
+    <section class="card">
+      <h2>MOBS Tutorials</h2>
+      <p class="muted">Managing Observations (MOBS) — planning and coordination.</p>
+      <div class="list">
+        <div class="item">
+          <div class="placeholder">
+            <div><strong>Scheduling & Targets</strong><br><span class="muted">Use MOBS to plan your next observing run.</span></div>
+            <a href="#" onclick="showComingSoon(event)" class="tag">Coming Soon</a>
+          </div>
+        </div>
+        <div class="item">
+          <div class="placeholder">
+            <div><strong>Sharing Campaigns</strong><br><span class="muted">Coordinate across teams and share results.</span></div>
+            <a href="#" onclick="showComingSoon(event)" class="tag">Coming Soon</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- AAVSO Tutorials -->
+    <section class="card">
+      <h2>AAVSO Tutorials</h2>
+      <p class="muted">Submitting observations and working with AAVSO tools.</p>
+      <div class="list">
+        <div class="item">
+          <div class="placeholder">
+            <div><strong>Submitting Light Curves</strong><br><span class="muted">Data prep and upload workflow.</span></div>
+            <a href="#" onclick="showComingSoon(event)" class="tag">Coming Soon</a>
+          </div>
+        </div>
+        <div class="item">
+          <div class="placeholder">
+            <div><strong>Using AAVSO Tools</strong><br><span class="muted">From finding charts to data retrieval.</span></div>
+            <a href="#" onclick="showComingSoon(event)" class="tag">Coming Soon</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Coming Soon Modal -->
+  <div id="comingSoonModal" aria-hidden="true">
+    <div class="modal-card" role="dialog" aria-modal="true" aria-label="Coming soon">
+      <div style="font-size:18px; font-weight:700; margin-bottom:6px;">Coming Soon</div>
+      <div class="muted">This tutorial is in progress. Check back shortly!</div>
+      <a href="#" class="close-btn" onclick="hideComingSoon(event)">Close</a>
+    </div>
+  </div>
+
+  <footer>
+    <p>© <span id="y"></span> Exoplanet Slacker — A community resource. <em>Not an official NASA site.</em></p>
+  </footer>
+
+  <script>
+    document.getElementById('y').textContent = new Date().getFullYear();
+    function showComingSoon(e){ e.preventDefault(); document.getElementById('comingSoonModal').style.display='grid'; }
+    function hideComingSoon(e){ e.preventDefault(); document.getElementById('comingSoonModal').style.display='none'; }
+    // Close modal on ESC
+    document.addEventListener('keydown', (ev)=>{ if(ev.key==='Escape') hideComingSoon(ev); });
+    // Close modal on background click
+    document.getElementById('comingSoonModal').addEventListener('click', (ev)=>{ if(ev.target.id==='comingSoonModal') hideComingSoon(ev); });
+  </script>
+</body>
+</html>
