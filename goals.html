@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Goals & Stickers | Exoplanet Slacker</title>
+  <meta name="description" content="Collectable goals for Exoplanet Slacker — earn stickers for contributions and milestones." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Orbitron:wght@700&display=swap" rel="stylesheet" />
+  <style>
+    :root{
+      --bg:#05060b; --card:#0f1220; --glow:#5bc0ff; --accent:#FF6F00;
+      --text:#EAEAEA; --muted:#A9B1C3; --radius:16px; --shadow:0 10px 40px rgba(0,0,0,.45);
+      --border: rgba(123,198,255,.14); --link:#79c8ff;
+    }
+    html,body{height:100%;background:var(--bg);color:var(--text);}
+    body{margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;line-height:1.6;}
+
+    /* background */
+    .starfield{position:fixed;inset:0;z-index:-2;overflow:hidden;
+      background:radial-gradient(1200px 800px at 80% -10%, rgba(91,192,255,.12), transparent 60%),
+                 radial-gradient(1000px 700px at 10% 120%, rgba(255,111,0,.08), transparent 60%),
+                 linear-gradient(180deg,#070910 0%,#04050a 100%);}
+    .stars,.stars:before,.stars:after{content:"";position:absolute;inset:-2000px;background-repeat:repeat;}
+    .stars{background-image:
+      radial-gradient(2px 2px at 20px 30px, rgba(255,255,255,.7) 50%, transparent 51%),
+      radial-gradient(1.5px 1.5px at 100px 80px, rgba(255,255,255,.5) 50%, transparent 51%),
+      radial-gradient(1px 1px at 50px 140px, rgba(255,255,255,.4) 50%, transparent 51%);
+      animation:drift 160s linear infinite; opacity:.85;}
+    .stars:before{background-image:
+      radial-gradient(1.5px 1.5px at 40px 60px, rgba(255,255,255,.35) 50%, transparent 51%),
+      radial-gradient(1px 1px at 80px 120px, rgba(255,255,255,.25) 50%, transparent 51%);
+      animation:drift 220s linear infinite;}
+    .stars:after{background-image:
+      radial-gradient(1px 1px at 70px 90px, rgba(123,198,255,.4) 50%, transparent 51%),
+      radial-gradient(1px 1px at 140px 30px, rgba(255,171,64,.35) 50%, transparent 51%);
+      animation:drift 300s linear infinite;}
+    @keyframes drift{from{transform:translate3d(0,0,0)}to{transform:translate3d(2000px,2000px,0)}}
+
+    /* header */
+    header{padding: clamp(48px, 8vw, 96px) 24px 32px; text-align:center;
+      background: radial-gradient(900px 600px at 80% 20%, rgba(91,192,255,.12), transparent 60%);}
+    h1{font-family:Orbitron,Inter,sans-serif; font-size:clamp(28px,5.6vw,56px); margin:0;}
+    .subtitle{max-width:900px;margin:12px auto 24px;color:var(--muted);}
+    .nav{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+    .btn{display:inline-flex;align-items:center;gap:10px;padding:10px 16px;border-radius:999px;
+      border:1px solid #1f2a44;background:linear-gradient(180deg,#133252,#0c1b2e);
+      color:var(--text);text-decoration:none;box-shadow:var(--shadow);}
+    .btn:hover{transform:translateY(-1px)}
+
+    /* layout */
+    main{padding:24px;max-width:1100px;margin:0 auto}
+    .card{background:linear-gradient(180deg,rgba(16,20,40,.7),rgba(10,12,20,.8));
+      border:1px solid var(--border); border-radius:var(--radius); padding:22px; box-shadow:var(--shadow); margin-bottom:28px;}
+    h2{margin:0 0 8px}
+    .muted{color:var(--muted)}
+
+    /* sticker grid */
+    .sticker-grid{
+      display:grid; gap:16px; margin-top:16px;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    }
+    .sticker{
+      display:grid; gap:10px; align-content:start;
+      background:rgba(15,18,32,.6); border:1px solid rgba(123,198,255,.12);
+      border-radius:14px; padding:12px;
+    }
+    .sticker figure{margin:0; display:grid; place-items:center;}
+    .sticker img{
+      width:100%; max-width:160px; aspect-ratio:1/1; object-fit:contain;
+      background:rgba(91,192,255,.06);
+      border:1px solid rgba(123,198,255,.18); border-radius:12px;
+      box-shadow:0 6px 18px rgba(0,0,0,.35);
+      transition:transform .12s ease, box-shadow .12s ease;
+      cursor:zoom-in;
+    }
+    .sticker img:hover{ transform:translateY(-2px) scale(1.02); box-shadow:0 10px 32px rgba(0,0,0,.45); }
+    .sticker h3{margin:0 0 4px; font-size:16px;}
+    .sticker p{margin:0; font-size:14px; color:var(--muted);}
+    .sticker .goal-link{color:var(--link); text-decoration:none; font-size:14px;}
+
+    /* image modal */
+    #imageModal{ display:none; position:fixed; inset:0; z-index:9999;
+      background:rgba(0,0,0,.75); color:#fff; place-items:center; }
+    #imageModal .modal-inner{
+      background:rgba(10,12,20,.95); border:1px solid var(--border);
+      border-radius:16px; padding:14px; max-width:min(92vw, 920px);
+      box-shadow:var(--shadow);
+    }
+    #imageModal img{ width:100%; height:auto; display:block; border-radius:12px; }
+    #imageModal .caption{ margin-top:8px; font-size:14px; color:#d9e6ff; }
+    #imageModal .close{
+      display:inline-block; margin-top:10px; padding:8px 14px; border-radius:999px;
+      border:1px solid #1f2a44; background:linear-gradient(180deg,#133252,#0c1b2e);
+      color:#fff; text-decoration:none;
+    }
+  </style>
+</head>
+<body>
+  <div class="starfield" aria-hidden="true"><div class="stars"></div></div>
+
+  <header>
+    <h1>Goals & Stickers</h1>
+    <p class="subtitle">Earn community stickers by hitting observing and participation milestones. Click a sticker to zoom; follow the goal link to learn how to qualify.</p>
+    <nav class="nav" aria-label="Primary">
+      <a class="btn" href="index.html">← Back to Home</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="card">
+      <h2>Goals</h2>
+      <p class="muted">A few examples below. Swap the placeholder images with your actual sticker PNGs (transparent preferred).</p>
+
+      <div class="sticker-grid">
+        <!-- Sticker 1 -->
+        <article class="sticker">
+          <figure>
+            <img src="stickers/100th-lightcurve.png" alt="Sticker: 100th Light Curve" 
+                 data-full="stickers/100th-lightcurve@2x.png" data-caption="100th Light Curve Submitted" />
+          </figure>
+          <div>
+            <h3>100th Light Curve</h3>
+            <p>Earn this by submitting your 100th validated exoplanet light curve to AAVSO/NASA Exoplanet Watch.</p>
+            <a class="goal-link" href="goal-100-lightcurve.html">How to earn this →</a>
+          </div>
+        </article>
+
+        <!-- Sticker 2 -->
+        <article class="sticker">
+          <figure>
+            <img src="stickers/first-detection.png" alt="Sticker: First Detection"
+                 data-full="stickers/first-detection@2x.png" data-caption="First Transit Detection" />
+          </figure>
+          <div>
+            <h3>First Transit Detection</h3>
+            <p>Capture and reduce your first transit with EXOTIC, including uncertainty estimates.</p>
+            <a class="goal-link" href="goal-first-detection.html">How to earn this →</a>
+          </div>
+        </article>
+
+        <!-- Sticker 3 -->
+        <article class="sticker">
+          <figure>
+            <img src="stickers/pandora-helper.png" alt="Sticker: Pandora Helper"
+                 data-full="stickers/pandora-helper@2x.png" data-caption="Pandora Helper" />
+          </figure>
+          <div>
+            <h3>Pandora Helper</h3>
+            <p>Contribute observations for targets on the Pandora top-20 list during an active campaign.</p>
+            <a class="goal-link" href="goal-pandora-helper.html">How to earn this →</a>
+          </div>
+        </article>
+
+        <!-- Sticker 4 -->
+        <article class="sticker">
+          <figure>
+            <img src="stickers/community-mentor.png" alt="Sticker: Community Mentor"
+                 data-full="stickers/community-mentor@2x.png" data-caption="Community Mentor" />
+          </figure>
+          <div>
+            <h3>Community Mentor</h3>
+            <p>Answer 10+ questions in Slack or pair-review three EXOTIC reductions with actionable feedback.</p>
+            <a class="goal-link" href="goal-community-mentor.html">How to earn this →</a>
+          </div>
+        </article>
+
+        <!-- Sticker 5 -->
+        <article class="sticker">
+          <figure>
+            <img src="stickers/multi-filter.png" alt="Sticker: Multi-Filter Pro"
+                 data-full="stickers/multi-filter@2x.png" data-caption="Multi-Filter Pro" />
+          </figure>
+          <div>
+            <h3>Multi-Filter Pro</h3>
+            <p>Submit a high-quality light curve set in two or more filters with consistent depths.</p>
+            <a class="goal-link" href="goal-multi-filter.html">How to earn this →</a>
+          </div>
+        </article>
+
+        <!-- Add more stickers by duplicating the block above -->
+      </div>
+    </section>
+  </main>
+
+  <!-- Image Zoom Modal -->
+  <div id="imageModal" aria-hidden="true">
+    <div class="modal-inner" role="dialog" aria-modal="true" aria-label="Sticker preview">
+      <img id="modalImg" src="" alt="Sticker preview" />
+      <div id="modalCaption" class="caption"></div>
+      <a href="#" class="close" onclick="closeImageModal(event)">Close</a>
+    </div>
+  </div>
+
+  <footer>
+    <p>© <span id="y"></span> Exoplanet Slacker — A community resource. <em>Not an official NASA site.</em></p>
+  </footer>
+
+  <script>
+    document.getElementById('y').textContent = new Date().getFullYear();
+
+    // Click-to-zoom for sticker images
+    const modal = document.getElementById('imageModal');
+    const modalImg = document.getElementById('modalImg');
+    const modalCaption = document.getElementById('modalCaption');
+
+    document.querySelectorAll('.sticker img').forEach(img => {
+      img.addEventListener('click', () => {
+        modal.style.display = 'grid';
+        modalImg.src = img.dataset.full || img.src;
+        modalCaption.textContent = img.dataset.caption || img.alt || '';
+      });
+    });
+
+    function closeImageModal(e){ e.preventDefault(); modal.style.display='none'; }
+
+    // Close with ESC or background click
+    document.addEventListener('keydown', (ev)=>{ if(ev.key==='Escape') modal.style.display='none'; });
+    modal.addEventListener('click', (ev)=>{ if(ev.target.id==='imageModal') modal.style.display='none'; });
+  </script>
+</body>
+</html>
