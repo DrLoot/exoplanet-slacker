@@ -445,6 +445,14 @@
       ['raHours','raMinutes','raSeconds','decDegrees','decMinutes','decSeconds','raDecimal','decDecimal']
         .forEach(id=>document.getElementById(id).addEventListener('input', calculateCoordinates));
     });
+    document.getElementById('y').textContent = new Date().getFullYear();
   </script>
+  <footer>
+  <p>
+    © <span id="y"></span> Exoplanet Slacker — A community resource. 
+    <em>Not an official NASA site.</em>
+    <br>Page authored by Slack Exoplanet Watch member <strong>Art Trail</strong>. All rights reserved.    
+  </p>
+</footer> 
 </body>
 </html>
