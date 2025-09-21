@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Exoplanet Parameter Calculator</title>
+  <style>
+    /* ===== Dark Mode Palette ===== */
+    :root{
+      --bg:#05060b;
+      --panel:#0f1220;
+      --panel-2:#0b0e1a;
+      --text:#EAEAEA;
+      --muted:#A9B1C3;
+      --border:rgba(123,198,255,.14);
+      --glow:#5bc0ff;
+      --accent:#FF6F00;
+
+      --btn-green:#1f8a5b;
+      --btn-green-h:#18724b;
+      --btn-red:#b43a2f;
+      --btn-red-h:#8f2f26;
+      --btn-amber:#b87412;
+      --btn-amber-h:#945f0f;
+    }
+
+    /* Page background and base text */
+    body{
+      font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin:15px;
+      min-height:100vh;
+      color:var(--text);
+      background:
+        radial-gradient(1000px 700px at 85% -10%, rgba(91,192,255,.12), transparent 60%),
+        radial-gradient(900px 600px at 10% 120%, rgba(255,111,0,.08), transparent 60%),
+        linear-gradient(180deg, #070910 0%, var(--bg) 100%);
+    }
+
+    /* Main container */
+    .container{
+      max-width:1200px;
+      margin:0 auto;
+      background:linear-gradient(180deg, rgba(16,20,40,.85), rgba(10,12,20,.9));
+      border:1px solid var(--border);
+      border-radius:12px;
+      padding:20px;
+      box-shadow:0 15px 30px rgba(0,0,0,.35);
+      backdrop-filter: blur(4px);
+    }
+
+    /* Title */
+    h1{
+      text-align:center;
+      color:#dfe9ff;
+      margin-bottom:20px;
+      font-size:2em;
+      text-shadow:0 0 24px rgba(91,192,255,.18);
+      display:flex; align-items:center; justify-content:center; gap:15px;
+    }
+    .transit-icon{ width:80px; height:80px; }
+
+    /* Grid layout (unchanged) */
+    .calculator-grid{
+      display:grid; grid-template-columns:1fr 1fr 1fr; gap:20px;
+    }
+    @media (max-width:900px){ .calculator-grid{ grid-template-columns:1fr; } }
+
+    /* Section cards */
+    .section{
+      background:var(--panel);
+      border:1px solid var(--border);
+      border-radius:8px;
+      padding:20px;
+      box-shadow:0 8px 18px rgba(0,0,0,.35);
+    }
+
+    h2{
+      color:var(--glow);
+      border-bottom:2px solid rgba(91,192,255,.25);
+      padding-bottom:8px; margin-bottom:15px;
+      font-size:1.3em;
+    }
+
+    .input-group{ margin-bottom:15px; }
+
+    label{
+      display:block; font-weight:600; margin-bottom:4px;
+      color:#d6e6ff; font-size:.9em;
+    }
+    .unit{ font-weight:400; color:var(--muted); font-size:.8em; }
+
+    /* Inputs (dark) */
+    input[type="number"]{
+      width:100%; padding:8px; box-sizing:border-box;
+      background:var(--panel-2);
+      color:var(--text);
+      border:1px solid rgba(200,220,255,.18);
+      border-radius:6px; font-size:14px;
+      transition:border-color .2s, box-shadow .2s;
+    }
+    input[type="number"]::placeholder{ color:#7f8aa3; }
+    input[type="number"]:focus{
+      outline:none;
+      border-color:var(--glow);
+      box-shadow:0 0 0 3px rgba(91,192,255,.18);
+    }
+
+    /* Result blocks */
+    .result-item{
+      background:rgba(20,24,44,.7);
+      padding:12px; border-radius:6px; margin-bottom:12px;
+      border-left:4px solid var(--glow);
+    }
+    .result-label{ font-weight:700; color:#d7e4ff; font-size:.9em; }
+    .result-value{
+      font-size:1.1em; color:#9ff0c9; margin-top:4px;
+      font-family:'Courier New', monospace;
+    }
+
+    /* Coord grid (unchanged layout, dark styles) */
+    .coord-grid{ display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; margin-bottom:10px; }
+    .coord-input{
+      width:100%; padding:6px; text-align:center; box-sizing:border-box;
+      background:var(--panel-2); color:var(--text);
+      border:1px solid rgba(200,220,255,.18); border-radius:4px; font-size:13px;
+    }
+    .coord-label{ font-size:.8em; text-align:center; margin-bottom:4px; color:var(--muted); }
+
+    /* Buttons */
+    .buttons{ display:flex; gap:8px; margin-top:15px; }
+    button{
+      padding:10px 15px; border:none; border-radius:6px; cursor:pointer; font-size:14px;
+      transition:filter .15s, transform .05s;
+      color:#fff;
+    }
+    button:active{ transform:translateY(1px); }
+
+    .load-btn{ background:var(--btn-green); flex:1; }
+    .load-btn:hover{ background:var(--btn-green-h); filter:brightness(1.05); }
+
+    .clear-btn{ background:var(--btn-red); flex:1; }
+    .clear-btn:hover{ background:var(--btn-red-h); filter:brightness(1.05); }
+
+    .export-btn{ background:var(--btn-amber); flex:1; }
+    .export-btn:hover{ background:var(--btn-amber-h); filter:brightness(1.05); }
+
+    /* Footer (if you add one later) */
+    footer{ text-align:center; font-size:14px; color:var(--muted); margin:40px 0 20px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>
+      <!-- Updated icon colors for dark mode -->
+      <svg class="transit-icon" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <circle cx="50" cy="50" r="30" fill="none" stroke="#87b4ff" stroke-width="8"/>
+        <line x1="5" y1="50" x2="95" y2="50" stroke="#36d1ff" stroke-width="6"/>
+        <circle cx="72" cy="50" r="8" fill="none" stroke="#9fe8ff" stroke-width="5"/>
+      </svg>
+      Exoplanet Parameter Calculator
+    </h1>
+
+    <!-- Layout/content unchanged below -->
+    <div class="calculator-grid">
+      <!-- Input Parameters Section -->
+      <div class="section">
+        <h2>Input Parameters</h2>
+
+        <div class="input-group">
+          <label for="transitDuration">Transit Duration <span class="unit">(hours)</span></label>
+          <input type="number" id="transitDuration" step="0.001" />
+        </div>
+
+        <div class="input-group">
+          <label for="orbitalPeriod">Orbital Period <span class="unit">(days)</span></label>
+          <input type="number" id="orbitalPeriod" step="0.000001" />
+        </div>
+
+        <div class="input-group">
+          <label for="planetRadius">Planet Radius <span class="unit">(R⊕)</span></label>
+          <input type="number" id="planetRadius" step="0.01" />
+        </div>
+
+        <div class="input-group">
+          <label for="starRadius">Star Radius <span class="unit">(R☉)</span></label>
+          <input type="number" id="starRadius" step="0.001" />
+        </div>
+
+        <div class="input-group">
+          <label for="gMag">G Magnitude</label>
+          <input type="number" id="gMag" step="0.001" />
+        </div>
+
+        <div class="input-group">
+          <label for="gBpMag">G_BP Magnitude</label>
+          <input type="number" id="gBpMag" step="0.001" />
+        </div>
+
+        <div class="input-group">
+          <label for="gRpMag">G_RP Magnitude</label>
+          <input type="number" id="gRpMag" step="0.001" />
+        </div>
+      </div>
+
+      <!-- Results Section -->
+      <div class="section">
+        <h2>Calculated Results</h2>
+
+        <div class="result-item">
+          <div class="result-label">Eclipse Duration (%)</div>
+          <div class="result-value" id="eclipseDuration">—</div>
+        </div>
+
+        <div class="result-item">
+          <div class="result-label">Depth Percent</div>
+          <div class="result-value" id="depthPercent">—</div>
+        </div>
+
+        <div class="result-item">
+          <div class="result-label">V Amplitude</div>
+          <div class="result-value" id="vAmplitudeResult">—</div>
+        </div>
+
+        <div class="result-item">
+          <div class="result-label">V Magnitude</div>
+          <div class="result-value" id="vMagnitude">—</div>
+        </div>
+
+        <div class="buttons">
+          <button class="load-btn" onclick="loadExample()">Load Example</button>
+          <button class="clear-btn" onclick="clearAll()">Clear All</button>
+        </div>
+      </div>
+
+      <!-- Coordinate Conversions Section -->
+      <div class="section">
+        <h2>Coordinate Conversions</h2>
+
+        <div class="input-group">
+          <label>Right Ascension (Sexagesimal)</label>
+          <div class="coord-grid">
+            <div>
+              <div class="coord-label">Hours</div>
+              <input type="number" class="coord-input" id="raHours" min="0" max="23" step="1" />
+            </div>
+            <div>
+              <div class="coord-label">Minutes</div>
+              <input type="number" class="coord-input" id="raMinutes" min="0" max="59" step="1" />
+            </div>
+            <div>
+              <div class="coord-label">Seconds</div>
+              <input type="number" class="coord-input" id="raSeconds" min="0" max="59.999" step="0.001" />
+            </div>
+          </div>
+        </div>
+
+        <div class="input-group">
+          <label>Declination (Sexagesimal)</label>
+          <div class="coord-grid">
+            <div>
+              <div class="coord-label">Degrees</div>
+              <input type="number" class="coord-input" id="decDegrees" min="-90" max="90" step="1" />
+            </div>
+            <div>
+              <div class="coord-label">Minutes</div>
+              <input type="number" class="coord-input" id="decMinutes" min="0" max="59" step="1" />
+            </div>
+            <div>
+              <div class="coord-label">Seconds</div>
+              <input type="number" class="coord-input" id="decSeconds" min="0" max="59.9" step="0.1" />
+            </div>
+          </div>
+        </div>
+
+        <div class="result-item">
+          <div class="result-label">Sexagesimal → Decimal</div>
+          <div class="result-value" id="sexToDecResult">—</div>
+        </div>
+
+        <div class="input-group">
+          <label for="raDecimal">RA Decimal <span class="unit">(degrees)</span></label>
+          <input type="number" id="raDecimal" step="0.000001" />
+        </div>
+
+        <div class="input-group">
+          <label for="decDecimal">Dec Decimal <span class="unit">(degrees)</span></label>
+          <input type="number" id="decDecimal" step="0.000001" min="-90" max="90" />
+        </div>
+
+        <div class="result-item">
+          <div class="result-label">Decimal → Sexagesimal</div>
+          <div class="result-value" id="decToSexResult">—</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Original JS (unchanged functionality) -->
+  <script>
+    function calculateParameters() {
+      const transitDuration = parseFloat(document.getElementById('transitDuration').value);
+      const orbitalPeriod = parseFloat(document.getElementById('orbitalPeriod').value);
+      const planetRadius = parseFloat(document.getElementById('planetRadius').value);
+      const starRadius = parseFloat(document.getElementById('starRadius').value);
+      const gMag = parseFloat(document.getElementById('gMag').value);
+      const gBpMag = parseFloat(document.getElementById('gBpMag').value);
+      const gRpMag = parseFloat(document.getElementById('gRpMag').value);
+
+      if (!isNaN(transitDuration) && !isNaN(orbitalPeriod)) {
+        const eclipseDuration = transitDuration / 24 / orbitalPeriod * 100;
+        document.getElementById('eclipseDuration').textContent = eclipseDuration.toFixed(6) + '%';
+      } else {
+        document.getElementById('eclipseDuration').textContent = '—';
+      }
+
+      if (!isNaN(planetRadius) && !isNaN(starRadius)) {
+        const depthPercent = Math.pow((planetRadius / 108.97 / starRadius), 2) * 100;
+        document.getElementById('depthPercent').textContent = depthPercent.toFixed(15);
+        const depthFraction = depthPercent / 100;
+        if (depthFraction < 1) {
+          const vAmplitude = -2.5 * Math.log10(1 - depthFraction);
+          document.getElementById('vAmplitudeResult').textContent = vAmplitude.toFixed(15);
+        } else {
+          document.getElementById('vAmplitudeResult').textContent = 'Error: Depth ≥ 100%';
+        }
+      } else {
+        document.getElementById('depthPercent').textContent = '—';
+        document.getElementById('vAmplitudeResult').textContent = '—';
+      }
+
+      if (!isNaN(gMag) && !isNaN(gBpMag) && !isNaN(gRpMag)) {
+        const bpRpDiff = gBpMag - gRpMag;
+        const vMagnitude = gMag - ((-0.02704 + 0.01424 * bpRpDiff - 0.2156 * Math.pow(bpRpDiff, 2)) + 0.01426 * Math.pow(bpRpDiff, 3));
+        document.getElementById('vMagnitude').textContent = vMagnitude.toFixed(6);
+      } else {
+        document.getElementById('vMagnitude').textContent = '—';
+      }
+    }
+
+    function calculateCoordinates() {
+      const raHours = parseFloat(document.getElementById('raHours').value);
+      const raMinutes = parseFloat(document.getElementById('raMinutes').value);
+      const raSeconds = parseFloat(document.getElementById('raSeconds').value);
+      const decDegrees = parseFloat(document.getElementById('decDegrees').value);
+      const decMinutes = parseFloat(document.getElementById('decMinutes').value);
+      const decSeconds = parseFloat(document.getElementById('decSeconds').value);
+      const raDecimal = parseFloat(document.getElementById('raDecimal').value);
+      const decDecimal = parseFloat(document.getElementById('decDecimal').value);
+
+      let sexToDecText = '';
+      let decToSexText = '';
+
+      if (!isNaN(raHours) && !isNaN(raMinutes) && !isNaN(raSeconds)) {
+        const raDecimalCalc = (raHours * 15) + (raMinutes * 0.25) + (raSeconds * 0.00416667);
+        sexToDecText += 'RA: ' + raDecimalCalc.toFixed(6) + '°<br>';
+      }
+
+      if (!isNaN(decDegrees) && !isNaN(decMinutes) && !isNaN(decSeconds)) {
+        const sign = decDegrees >= 0 ? 1 : -1;
+        const decDecimalCalc = Math.abs(decDegrees) + (decMinutes/60) + (decSeconds/3600);
+        const finalDec = sign * decDecimalCalc;
+        sexToDecText += 'Dec: ' + finalDec.toFixed(6) + '°';
+      }
+
+      if (!isNaN(raDecimal)) {
+        const totalHours = raDecimal / 15;
+        const hours = Math.floor(totalHours);
+        const remainingMinutes = (totalHours - hours) * 60;
+        const minutes = Math.floor(remainingMinutes);
+        const seconds = (remainingMinutes - minutes) * 60;
+
+        decToSexText += 'RA: ' +
+          String(hours).padStart(2, '0') + 'h ' +
+          String(minutes).padStart(2, '0') + 'm ' +
+          seconds.toFixed(2).padStart(5, '0') + 's<br>';
+      }
+
+      if (!isNaN(decDecimal)) {
+        const sign = decDecimal >= 0 ? '+' : '-';
+        const absDec = Math.abs(decDecimal);
+        const degrees = Math.floor(absDec);
+        const remainingMinutes = (absDec - degrees) * 60;
+        const minutes = Math.floor(remainingMinutes);
+        const seconds = (remainingMinutes - minutes) * 60;
+
+        decToSexText += 'Dec: ' + sign +
+          String(degrees).padStart(2, '0') + '° ' +
+          String(minutes).padStart(2, '0') + "' " +
+          seconds.toFixed(1).padStart(4, '0') + '"';
+      }
+
+      document.getElementById('sexToDecResult').innerHTML = sexToDecText || '—';
+      document.getElementById('decToSexResult').innerHTML = decToSexText || '—';
+    }
+
+    function loadExample(){
+      document.getElementById('transitDuration').value='3.245';
+      document.getElementById('orbitalPeriod').value='10.355235';
+      document.getElementById('planetRadius').value='2.39';
+      document.getElementById('starRadius').value='0.774';
+      document.getElementById('gMag').value='12.345';
+      document.getElementById('gBpMag').value='12.678';
+      document.getElementById('gRpMag').value='11.987';
+      document.getElementById('raHours').value='14';
+      document.getElementById('raMinutes').value='39';
+      document.getElementById('raSeconds').value='36.49';
+      document.getElementById('decDegrees').value='60';
+      document.getElementById('decMinutes').value='50';
+      document.getElementById('decSeconds').value='2.3';
+      document.getElementById('raDecimal').value='219.902037';
+      document.getElementById('decDecimal').value='60.833972';
+      calculateParameters();
+      calculateCoordinates();
+    }
+
+    function clearAll(){
+      ['transitDuration','orbitalPeriod','planetRadius','starRadius','gMag','gBpMag','gRpMag',
+       'raHours','raMinutes','raSeconds','decDegrees','decMinutes','decSeconds','raDecimal','decDecimal']
+       .forEach(id=>document.getElementById(id).value='');
+
+      ['eclipseDuration','depthPercent','vAmplitudeResult','vMagnitude','sexToDecResult','decToSexResult']
+       .forEach(id=>{ const el=document.getElementById(id); if(el) el.innerHTML='—'; });
+    }
+
+    function exportData(){
+      const data={
+        inputs:{
+          transitDuration:transitDuration.value, orbitalPeriod:orbitalPeriod.value,
+          planetRadius:planetRadius.value, starRadius:starRadius.value,
+          gMag:gMag.value, gBpMag:gBpMag.value, gRpMag:gRpMag.value
+        },
+        results:{
+          eclipseDuration:eclipseDuration.textContent, depthPercent:depthPercent.textContent,
+          vAmplitude:vAmplitudeResult.textContent, vMagnitude:vMagnitude.textContent
+        }
+      };
+      const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+      const url=URL.createObjectURL(blob); const a=document.createElement('a');
+      a.href=url; a.download='exoplanet_calculations.json'; a.click(); URL.revokeObjectURL(url);
+    }
+
+    document.addEventListener('DOMContentLoaded', ()=>{
+      ['transitDuration','orbitalPeriod','planetRadius','starRadius','gMag','gBpMag','gRpMag']
+        .forEach(id=>document.getElementById(id).addEventListener('input', calculateParameters));
+      ['raHours','raMinutes','raSeconds','decDegrees','decMinutes','decSeconds','raDecimal','decDecimal']
+        .forEach(id=>document.getElementById(id).addEventListener('input', calculateCoordinates));
+    });
+  </script>
+</body>
+</html>
