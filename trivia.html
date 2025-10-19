@@ -202,6 +202,34 @@
             font-size: 14px;
             text-align: center;
         }
+
+        details {
+            margin: 8px 0;
+            background: rgba(15, 18, 32, 0.5);
+            border: 1px solid rgba(123, 198, 255, 0.12);
+            border-radius: 12px;
+            padding: 10px 14px;
+        }
+
+        summary {
+            cursor: pointer;
+            font-weight: 700;
+            color: var(--glow);
+            list-style: none;
+        }
+
+        summary::-webkit-details-marker {
+            display: none;
+        }
+
+        details[open]>summary {
+            color: var(--accent);
+        }
+
+        details details {
+            margin-left: 16px;
+            background: rgba(15, 18, 32, 0.3);
+        }
     </style>
 </head>
 
@@ -254,94 +282,120 @@
         <h2 id="archive" class="section-title"><span class="kicker">History</span><br /> Trivia Archive</h2>
         <section class="grid">
             <article class="card" style="grid-column:span 12">
-                <div class="list">
-                    <div class="entry">
-                        <div>
-                            <strong>7 October 2025 — 51 Pegasi b, Rotating Black Holes, Biosignature Molecule, Hertzsprung–Russell Diagram, Spectrographs.</strong>
-                            <div class="muted">Questions (5) and answers</div>
+                <details open>
+                    <summary><strong>2025</strong></summary>
+
+                    <details>
+                        <summary><strong>October</strong></summary>
+                        <div class="list">
+                            <div class="entry">
+                                <div>
+                                    <strong>7 October 2025 — 51 Pegasi b, Rotating Black Holes, Biosignature Molecule,
+                                        Hertzsprung–Russell Diagram, Spectrographs.</strong>
+                                    <div class="muted">Questions (5) and answers</div>
+                                </div>
+                                <div>
+                                    <a href="archive/trivia-2025-10-07.html">View</a>
+                                </div>
+                            </div>
                         </div>
-                        <div>
-                            <a href="archive/trivia-2025-10-07.html">View</a>
+                    </details>
+                    <details>
+                        <summary><strong>September</strong></summary>
+                        <div class="list">
+                            <div class="entry">
+                                <div>
+                                    <strong>30 September 2025 — M Dwarf's, Inflation, HWO, Stellar Nucleosynthesis,
+                                        Cosmic Microwave Background.</strong>
+                                    <div class="muted">Questions (5) and answers</div>
+                                </div>
+                                <div>
+                                    <a href="archive/trivia-2025-09-30.html">View</a>
+                                </div>
+                            </div>
+                            <div class="entry">
+                                <div>
+                                    <strong>23 September 2025 — Mercury's Precession, Stellar Evolution, Dark Energy,
+                                        Lyman-Alpha Line,
+                                        Cosmic Distance Ladder.</strong>
+                                    <div class="muted">Questions (5) and answers</div>
+                                </div>
+                                <div>
+                                    <a href="archive/trivia-2025-09-23.html">View</a>
+                                </div>
+                            </div>
+                            <div class="entry">
+                                <div>
+                                    <strong>16 September 2025 — Chandrasekhar Mass Limit, Elliptical Galaxies,
+                                        Spectroscopy, Pulsar
+                                        Timing, Cosmic Microwave Background</strong>
+                                    <div class="muted">Questions (5) and answers</div>
+                                </div>
+                                <div>
+                                    <a href="archive/trivia-2025-09-16.html">View</a>
+                                </div>
+                            </div>
+                            <div class="entry">
+                                <div>
+                                    <strong>9 September 2025 — Gravitational Redshift, TRAPPIST, Transit Duration,
+                                        Globular Clusters,
+                                        Hubble's Law</strong>
+                                    <div class="muted">Questions (5) and answers</div>
+                                </div>
+                                <div>
+                                    <a href="archive/trivia-2025-09-09.html">View</a>
+                                </div>
+                            </div>
+                            <div class="entry">
+                                <div>
+                                    <strong>2 September 2025 — GPS, Amplitude, Einstein's Blunder, Milky Way,
+                                        Cosmological
+                                        Principle</strong>
+                                    <div class="muted">Questions (5) and answers</div>
+                                </div>
+                                <div>
+                                    <a href="archive/trivia-2025-09-02.html">View</a>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                    <div class="entry">
-                        <div>
-                            <strong>30 September 2025 — M Dwarf's, Inflation, HWO, Stellar Nucleosynthesis, Cosmic Microwave Background.</strong>
-                            <div class="muted">Questions (5) and answers</div>
+                    </details>
+                    <details>
+                        <summary><strong>August</strong></summary>
+                        <div class="list">
+                            <div class="entry">
+                                <div>
+                                    <strong>19 August 2025 — Exoplanet Categories, Designations, Legrange Points,
+                                        JWST</strong>
+                                    <div class="muted">Questions (4) and answers</div>
+                                </div>
+                                <div>
+                                    <a href="archive/trivia-2025-08-19.html">View</a>
+                                </div>
+                            </div>
+                            <div class="entry">
+                                <div>
+                                    <strong>18 August 2025 — Rossiter-McLaughlin, Phase Curve, Synchotron, Pop
+                                        I&II</strong>
+                                    <div class="muted">Questions (4) and answers</div>
+                                </div>
+                                <div>
+                                    <a href="archive/trivia-2025-08-18.html">View</a>
+                                </div>
+                            </div>
+                            <div class="entry">
+                                <div>
+                                    <strong>15 August 2025 — Orbital Inclination, Resonant Orbit, Supernovae, Active
+                                        Galactic
+                                        Nucleus</strong>
+                                    <div class="muted">Questions (5), answers; Pandora bonus question</div>
+                                </div>
+                                <div>
+                                    <a href="archive/trivia-2025-08-15.html">View</a>
+                                </div>
+                            </div>
                         </div>
-                        <div>
-                            <a href="archive/trivia-2025-09-30.html">View</a>
-                        </div>
-                    </div>
-                    <div class="entry">
-                        <div>
-                            <strong>23 September 2025 — Mercury's Precession, Stellar Evolution, Dark Energy, Lyman-Alpha Line,
-                                Cosmic Distance Ladder.</strong>
-                            <div class="muted">Questions (5) and answers</div>
-                        </div>
-                        <div>
-                            <a href="archive/trivia-2025-09-23.html">View</a>
-                        </div>
-                    </div>
-                    <div class="entry">
-                        <div>
-                            <strong>16 September 2025 — Chandrasekhar Mass Limit, Elliptical Galaxies, Spectroscopy, Pulsar
-                                Timing, Cosmic Microwave Background</strong>
-                            <div class="muted">Questions (5) and answers</div>
-                        </div>
-                        <div>
-                            <a href="archive/trivia-2025-09-16.html">View</a>
-                        </div>
-                    </div>
-                    <div class="entry">
-                        <div>
-                            <strong>9 September 2025 — Gravitational Redshift, TRAPPIST, Transit Duration, Globular Clusters,
-                                Hubble's Law</strong>
-                            <div class="muted">Questions (5) and answers</div>
-                        </div>
-                        <div>
-                            <a href="archive/trivia-2025-09-09.html">View</a>
-                        </div>
-                    </div>
-                    <div class="entry">
-                        <div>
-                            <strong>2 September 2025 — GPS, Amplitude, Einstein's Blunder, Milky Way, Cosmological
-                                Principle</strong>
-                            <div class="muted">Questions (5) and answers</div>
-                        </div>
-                        <div>
-                            <a href="archive/trivia-2025-09-02.html">View</a>
-                        </div>
-                    </div>
-                    <div class="entry">
-                        <div>
-                            <strong>19 August 2025 — Exoplanet Categories, Designations, Legrange Points, JWST</strong>
-                            <div class="muted">Questions (4) and answers</div>
-                        </div>
-                        <div>
-                            <a href="archive/trivia-2025-08-19.html">View</a>
-                        </div>
-                    </div>
-                    <div class="entry">
-                        <div>
-                            <strong>18 August 2025 — Rossiter-McLaughlin, Phase Curve, Synchotron, Pop I&II</strong>
-                            <div class="muted">Questions (4) and answers</div>
-                        </div>
-                        <div>
-                            <a href="archive/trivia-2025-08-18.html">View</a>
-                        </div>
-                    </div>
-                    <div class="entry">
-                        <div>
-                            <strong>15 August 2025 — Orbital Inclination, Resonant Orbit, Supernovae, Active Galactic
-                                Nucleus</strong>
-                            <div class="muted">Questions (5), answers; Pandora bonus question</div>
-                        </div>
-                        <div>
-                            <a href="archive/trivia-2025-08-15.html">View</a>
-                        </div>
-                    </div>
-                </div>
+                    </details>
+                </details>
             </article>
         </section>
 
