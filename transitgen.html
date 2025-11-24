@@ -1,0 +1,541 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Transit Post Generator | Exoplanet Slacker</title>
+  <meta name="description" content="Generate formatted Slack posts for transit light curve reductions." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Orbitron:wght@700&display=swap" rel="stylesheet" />
+  <style>
+    :root{
+      --bg:#05060b; --card:#0f1220; --glow:#5bc0ff; --accent:#FF6F00;
+      --text:#EAEAEA; --muted:#A9B1C3; --radius:16px; --shadow:0 10px 40px rgba(0,0,0,.45);
+      --border: rgba(123,198,255,.14); --link:#79c8ff;
+    }
+    html,body{height:100%;background:var(--bg);color:var(--text);}
+    body{margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;line-height:1.6;}
+
+    /* background */
+    .starfield{position:fixed;inset:0;z-index:-2;overflow:hidden;
+      background:radial-gradient(1200px 800px at 80% -10%, rgba(91,192,255,.12), transparent 60%),
+                 radial-gradient(1000px 700px at 10% 120%, rgba(255,111,0,.08), transparent 60%),
+                 linear-gradient(180deg,#070910 0%,#04050a 100%);}
+    .stars,.stars:before,.stars:after{content:"";position:absolute;inset:-2000px;background-repeat:repeat;}
+    .stars{background-image:
+      radial-gradient(2px 2px at 20px 30px, rgba(255,255,255,.7) 50%, transparent 51%),
+      radial-gradient(1.5px 1.5px at 100px 80px, rgba(255,255,255,.5) 50%, transparent 51%),
+      radial-gradient(1px 1px at 50px 140px, rgba(255,255,255,.4) 50%, transparent 51%);
+      animation:drift 160s linear infinite; opacity:.85;}
+    .stars:before{background-image:
+      radial-gradient(1.5px 1.5px at 40px 60px, rgba(255,255,255,.35) 50%, transparent 51%),
+      radial-gradient(1px 1px at 80px 120px, rgba(255,255,255,.25) 50%, transparent 51%);
+      animation:drift 220s linear infinite;}
+    .stars:after{background-image:
+      radial-gradient(1px 1px at 70px 90px, rgba(123,198,255,.4) 50%, transparent 51%),
+      radial-gradient(1px 1px at 140px 30px, rgba(255,171,64,.35) 50%, transparent 51%);
+      animation:drift 300s linear infinite;}
+    @keyframes drift{from{transform:translate3d(0,0,0)}to{transform:translate3d(2000px,2000px,0)}}
+
+    /* header */
+    header{padding: clamp(48px, 8vw, 96px) 24px 32px; text-align:center;
+      background: radial-gradient(900px 600px at 80% 20%, rgba(91,192,255,.12), transparent 60%);}
+    h1{font-family:Orbitron,Inter,sans-serif; font-size:clamp(28px,5.6vw,56px); margin:0;}
+    .subtitle{max-width:900px;margin:12px auto 24px;color:var(--muted);}
+    .nav{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+    .btn{display:inline-flex;align-items:center;gap:10px;padding:10px 16px;border-radius:999px;
+      border:1px solid #1f2a44;background:linear-gradient(180deg,#133252,#0c1b2e);
+      color:var(--text);text-decoration:none;box-shadow:var(--shadow);cursor:pointer;}
+    .btn:hover{transform:translateY(-1px)}
+
+    /* layout */
+    main{padding:24px;max-width:1100px;margin:0 auto}
+    .card{background:linear-gradient(180deg,rgba(16,20,40,.7),rgba(10,12,20,.8));
+      border:1px solid var(--border); border-radius:var(--radius); padding:22px; box-shadow:var(--shadow); margin-bottom:28px;}
+    h2{margin:0 0 8px}
+    .muted{color:var(--muted)}
+
+    /* form */
+    .form-grid{
+      display:grid;
+      grid-template-columns: repeat(auto-fit,minmax(220px,1fr));
+      gap:16px;
+      margin-top:16px;
+    }
+    label{font-size:14px;display:block;margin-bottom:3px;color:var(--muted);}
+    input,select,textarea{
+      width:100%;
+      padding:8px 10px;
+      border-radius:10px;
+      border:1px solid rgba(123,198,255,.2);
+      background:rgba(10,12,20,.9);
+      color:var(--text);
+      font-family:inherit;
+      font-size:14px;
+      box-sizing:border-box;
+    }
+    textarea{min-height:120px;resize:vertical;}
+    .inline-options{display:flex;flex-wrap:wrap;gap:10px;margin-top:8px;font-size:13px;}
+    .inline-options label{display:flex;align-items:center;gap:4px;margin:0;color:var(--muted);}
+    .inline-options input[type="checkbox"]{width:auto;}
+    .template-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px;}
+    .template-row select{max-width:220px;}
+    .buttons-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px;}
+    .pill{
+      font-size:11px;
+      padding:3px 8px;
+      border-radius:999px;
+      border:1px solid rgba(123,198,255,.35);
+      background:rgba(15,18,32,.9);
+      color:#9ed1ff;
+      display:inline-flex;
+      align-items:center;
+      gap:4px;
+      margin-right:6px;
+      margin-top:6px;
+    }
+
+    /* history */
+    .history-list{
+      display:grid;
+      gap:12px;
+      margin-top:12px;
+    }
+    .history-item{
+      background:rgba(15,18,32,.7);
+      border-radius:12px;
+      border:1px solid rgba(123,198,255,.18);
+      padding:10px 12px;
+      font-size:13px;
+    }
+    .history-header{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:6px;
+      margin-bottom:4px;
+      font-weight:600;
+    }
+    .history-meta{font-size:12px;color:var(--muted);}
+    .history-actions{
+      display:flex;
+      gap:6px;
+      margin-top:6px;
+      flex-wrap:wrap;
+    }
+    .mini-btn{
+      border-radius:999px;
+      border:1px solid #1f2a44;
+      background:linear-gradient(180deg,#133252,#0c1b2e);
+      color:#fff;
+      font-size:11px;
+      padding:3px 9px;
+      cursor:pointer;
+    }
+
+    @media (max-width:600px){
+      .buttons-row{flex-direction:column;align-items:stretch;}
+      .buttons-row .btn{justify-content:center;width:100%;}
+    }
+  </style>
+</head>
+<body>
+  <div class="starfield" aria-hidden="true"><div class="stars"></div></div>
+
+  <header>
+    <h1>Transit Post Generator</h1>
+    <p class="subtitle">
+      Build consistent Slack posts for your transit light curve reductions. Choose your format, add SNR &amp; rank flair, and keep a local history of your observations.
+    </p>
+    <nav class="nav" aria-label="Primary">
+      <a class="btn" href="index.html">← Back to Home</a>
+    </nav>
+  </header>
+
+  <main>
+    <!-- Builder -->
+    <section class="card" aria-labelledby="builder-heading">
+      <h2 id="builder-heading">1. Observation Details</h2>
+      <p class="muted">Fill in your transit info and choose what to include. The generator will create a ready-to-paste Slack post.</p>
+
+      <form id="transitForm" autocomplete="off">
+        <div class="form-grid">
+          <div>
+            <label for="target">Target name</label>
+            <input id="target" name="target" placeholder="HAT-P-32 b" required />
+          </div>
+
+          <div>
+            <label for="rank">Rank (NASA list)</label>
+            <input id="rank" name="rank" type="number" min="1" placeholder="900" />
+          </div>
+
+          <div>
+            <label for="snr">Transit SNR (σ)</label>
+            <input id="snr" name="snr" type="number" step="0.1" placeholder="21.3" />
+          </div>
+
+          <div>
+            <label for="obsDate">Observation date</label>
+            <input id="obsDate" name="obsDate" type="date" />
+          </div>
+
+          <div>
+            <label for="site">Site / instrument</label>
+            <input id="site" name="site" placeholder="MObs :microobservatory: or backyard rig" />
+          </div>
+
+          <div>
+            <label for="notes">Notes (directory, variables, uploads…)</label>
+            <input id="notes" name="notes" placeholder="MObs image directory. Transit + 32 stellar vars uploaded to AAVSO :aavso:." />
+          </div>
+        </div>
+
+        <div class="inline-options" aria-label="Content options">
+          <label><input type="checkbox" id="includeSNR" checked /> Include SNR line</label>
+          <label><input type="checkbox" id="includeRank" checked /> Include rank</label>
+          <label><input type="checkbox" id="includeSite" checked /> Include site</label>
+          <label><input type="checkbox" id="includeNotes" checked /> Include notes</label>
+        </div>
+
+        <div class="template-row">
+          <div>
+            <label for="template">Template style</label>
+            <select id="template" name="template">
+              <option value="short">Short hype (Slack-style)</option>
+              <option value="tech">Technical summary</option>
+              <option value="minimal">Minimal (one-liner)</option>
+            </select>
+          </div>
+        </div>
+
+        <div style="margin-top:10px;">
+          <span class="muted" style="font-size:13px;">Automatic flair based on SNR &amp; rank:</span><br/>
+          <span id="autoFlair" style="font-size:13px;"></span>
+        </div>
+
+        <div class="buttons-row">
+          <button type="button" class="btn" id="generateBtn">Generate Post</button>
+          <button type="button" class="btn" id="copyBtn">Copy to Clipboard</button>
+          <button type="button" class="btn" id="saveBtn">Save to History</button>
+        </div>
+      </form>
+    </section>
+
+    <!-- Output -->
+    <section class="card" aria-labelledby="output-heading">
+      <h2 id="output-heading">2. Generated Post</h2>
+      <p class="muted">Preview of what you’ll paste into Slack / Discord. Emojis are left as <code>:codes:</code>.</p>
+
+      <textarea id="output" spellcheck="false" placeholder="Fill in the form above and click &quot;Generate Post&quot; to see the result."></textarea>
+
+      <div style="margin-top:8px;font-size:12px;color:var(--muted);">
+        Tip: tweak wording directly here if you want, then hit “Save to History” again to capture the edited version.
+      </div>
+    </section>
+
+    <!-- History -->
+    <section class="card" aria-labelledby="history-heading">
+      <h2 id="history-heading">3. Local Observation History</h2>
+      <p class="muted">
+        Saved posts live in your browser only (via <code>localStorage</code>). Use this like a mini logbook of recent reductions.
+      </p>
+
+      <div id="historyEmpty" class="muted" style="font-size:13px;margin-top:6px;">
+        No saved observations yet. Generate a post and click “Save to History”.
+      </div>
+
+      <div id="historyList" class="history-list" aria-live="polite"></div>
+    </section>
+  </main>
+
+  <footer>
+    <p style="text-align:center; font-size:14px; color:var(--muted); margin:40px 0 20px;">
+      © <span id="y"></span> Exoplanet Slacker — A community resource. <em>Not an official NASA site.</em>
+    </p>
+  </footer>
+
+  <script>
+    document.getElementById('y').textContent = new Date().getFullYear();
+
+    const form = document.getElementById('transitForm');
+    const outputEl = document.getElementById('output');
+    const autoFlairEl = document.getElementById('autoFlair');
+    const historyList = document.getElementById('historyList');
+    const historyEmpty = document.getElementById('historyEmpty');
+
+    const STORAGE_KEY = 'transitgenHistory_v1';
+
+    function formatDateHuman(value){
+      if(!value) return '';
+      const d = new Date(value + 'T00:00:00');
+      if(isNaN(d.getTime())) return '';
+      const day = String(d.getDate()).padStart(2,'0');
+      const monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+      const mon = monthNames[d.getMonth()];
+      const year = d.getFullYear();
+      return `${day}-${mon}-${year}`;
+    }
+
+    function snrFlair(snr){
+      if(!snr && snr !== 0) return '';
+      const s = Number(snr);
+      if(isNaN(s)) return '';
+      if(s >= 20) return ':rocket:';
+      if(s >= 10) return ':sparkles:';
+      if(s >= 5)  return ':telescope:';
+      if(s > 0)   return ':warning:';
+      return '';
+    }
+
+    function rankFlair(rank){
+      if(!rank && rank !== 0) return '';
+      const r = Number(rank);
+      if(isNaN(r)) return '';
+      if(r <= 100)  return ':crown:';
+      if(r <= 500)  return ':first_quarter_moon_with_face:';
+      if(r <= 1000) return ':rocket:';
+      return ':milky_way:';
+    }
+
+    function updateAutoFlair(){
+      const snr = document.getElementById('snr').value.trim();
+      const rank = document.getElementById('rank').value.trim();
+      const snrText = snr ? `SNR ${snr}σ → ${snrFlair(snr) || 'no flair'}` : '';
+      const rankText = rank ? `Rank ${rank} → ${rankFlair(rank) || 'no flair'}` : '';
+      const bits = [];
+      if(snrText) bits.push(snrText);
+      if(rankText) bits.push(rankText);
+      autoFlairEl.textContent = bits.length ? bits.join(' | ') : 'Enter SNR and/or rank to see suggested flair.';
+    }
+
+    function buildPost(){
+      const target = document.getElementById('target').value.trim();
+      const rank = document.getElementById('rank').value.trim();
+      const snr = document.getElementById('snr').value.trim();
+      const obsDate = document.getElementById('obsDate').value;
+      const site = document.getElementById('site').value.trim();
+      const notes = document.getElementById('notes').value.trim();
+      const includeSNR = document.getElementById('includeSNR').checked;
+      const includeRank = document.getElementById('includeRank').checked;
+      const includeSite = document.getElementById('includeSite').checked;
+      const includeNotes = document.getElementById('includeNotes').checked;
+      const template = document.getElementById('template').value;
+
+      if(!target){
+        outputEl.value = 'Please enter at least a target name.';
+        return '';
+      }
+
+      const humanDate = formatDateHuman(obsDate);
+      const snrEmoji = snrFlair(snr);
+      const rankEmoji = rankFlair(rank);
+
+      let lines = [];
+
+      if(template === 'short'){
+        // Line 1: target + optional rank
+        let line1 = target;
+        if(includeRank && rank){
+          line1 += ` (rank ${rank})`;
+        }
+        if(includeRank && rankEmoji){
+          line1 += ` ${rankEmoji}`;
+        }
+        lines.push(line1);
+
+        // Line 2: SNR hype
+        if(includeSNR && snr){
+          let line2 = `${snr}σ SNR`;
+          if(snrEmoji) line2 += ` ${snrEmoji}`;
+          line2 += ' :eyes:';
+          lines.push(line2);
+        }
+
+        // Line 3: date + site + notes
+        let line3Parts = [];
+        if(humanDate) line3Parts.push(humanDate);
+        if(includeSite && site) line3Parts.push(site);
+        let line3 = line3Parts.join(', ');
+        if(includeNotes && notes){
+          if(line3) line3 += '. ';
+          line3 += notes;
+        }
+        if(line3) lines.push(line3);
+
+      } else if(template === 'tech'){
+        // Technical summary, 2–3 lines
+        let header = target;
+        if(includeRank && rank){
+          header += ` | rank ${rank}`;
+          if(rankEmoji) header += ` ${rankEmoji}`;
+        }
+        if(includeSNR && snr){
+          header += ` | SNR ${snr}σ`;
+          if(snrEmoji) header += ` ${snrEmoji}`;
+        }
+        lines.push(header);
+
+        let meta = [];
+        if(humanDate) meta.push(humanDate);
+        if(includeSite && site) meta.push(site);
+        if(meta.length) lines.push(meta.join(' — '));
+
+        if(includeNotes && notes) lines.push(notes);
+
+      } else if(template === 'minimal'){
+        let line = target;
+        if(includeRank && rank){
+          line += ` (rank ${rank}`;
+          if(rankEmoji) line += ` ${rankEmoji}`;
+          line += ')';
+        }
+        if(includeSNR && snr){
+          line += ` — ${snr}σ SNR`;
+          if(snrEmoji) line += ` ${snrEmoji}`;
+        }
+        if(humanDate) line += ` — ${humanDate}`;
+        if(includeSite && site) line += ` — ${site}`;
+        if(includeNotes && notes) line += ` — ${notes}`;
+        lines.push(line);
+      }
+
+      const post = lines.join('\n');
+      outputEl.value = post;
+      return post;
+    }
+
+    function copyToClipboard(){
+      const text = outputEl.value;
+      if(!text.trim()) return;
+      navigator.clipboard?.writeText(text).then(()=>{
+        // tiny visual cue
+        const original = document.getElementById('copyBtn').textContent;
+        document.getElementById('copyBtn').textContent = 'Copied!';
+        setTimeout(()=>{document.getElementById('copyBtn').textContent = original;}, 1000);
+      }).catch(()=>{});
+    }
+
+    function loadHistory(){
+      let items = [];
+      try{
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if(raw) items = JSON.parse(raw);
+      }catch(e){}
+      renderHistory(items);
+    }
+
+    function renderHistory(items){
+      historyList.innerHTML = '';
+      if(!items || !items.length){
+        historyEmpty.style.display = 'block';
+        return;
+      }
+      historyEmpty.style.display = 'none';
+      items.forEach((item, idx)=>{
+        const div = document.createElement('div');
+        div.className = 'history-item';
+
+        const header = document.createElement('div');
+        header.className = 'history-header';
+        header.innerHTML = `<span>${item.target || 'Unknown target'}</span><span class="history-meta">${item.date || ''}</span>`;
+        div.appendChild(header);
+
+        const meta = document.createElement('div');
+        let metaBits = [];
+        if(item.rank) metaBits.push(`rank ${item.rank}`);
+        if(item.snr) metaBits.push(`SNR ${item.snr}σ`);
+        if(item.template) metaBits.push(item.template);
+        meta.textContent = metaBits.join(' • ');
+        meta.className = 'history-meta';
+        div.appendChild(meta);
+
+        const preview = document.createElement('div');
+        preview.style.marginTop = '4px';
+        preview.style.whiteSpace = 'pre-wrap';
+        preview.style.fontSize = '12px';
+        preview.textContent = item.post;
+        div.appendChild(preview);
+
+        const actions = document.createElement('div');
+        actions.className = 'history-actions';
+        const copyBtn = document.createElement('button');
+        copyBtn.type = 'button';
+        copyBtn.className = 'mini-btn';
+        copyBtn.textContent = 'Copy';
+        copyBtn.addEventListener('click', ()=>navigator.clipboard?.writeText(item.post || ''));
+
+        const loadBtn = document.createElement('button');
+        loadBtn.type = 'button';
+        loadBtn.className = 'mini-btn';
+        loadBtn.textContent = 'Load into editor';
+        loadBtn.addEventListener('click', ()=>{
+          outputEl.value = item.post || '';
+        });
+
+        const deleteBtn = document.createElement('button');
+        deleteBtn.type = 'button';
+        deleteBtn.className = 'mini-btn';
+        deleteBtn.textContent = 'Delete';
+        deleteBtn.addEventListener('click', ()=>{
+          let arr = [];
+          try{
+            const raw = localStorage.getItem(STORAGE_KEY);
+            if(raw) arr = JSON.parse(raw);
+          }catch(e){}
+          arr.splice(idx,1);
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(arr));
+          renderHistory(arr);
+        });
+
+        actions.appendChild(copyBtn);
+        actions.appendChild(loadBtn);
+        actions.appendChild(deleteBtn);
+        div.appendChild(actions);
+
+        historyList.appendChild(div);
+      });
+    }
+
+    function saveToHistory(){
+      const post = buildPost();
+      if(!post.trim()) return;
+      const target = document.getElementById('target').value.trim();
+      const rank = document.getElementById('rank').value.trim();
+      const snr = document.getElementById('snr').value.trim();
+      const obsDate = document.getElementById('obsDate').value;
+      const template = document.getElementById('template').value;
+
+      let items = [];
+      try{
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if(raw) items = JSON.parse(raw);
+      }catch(e){}
+      const entry = {
+        target,
+        rank,
+        snr,
+        date: formatDateHuman(obsDate),
+        template,
+        post
+      };
+      items.unshift(entry);
+      // keep last 30
+      if(items.length > 30) items = items.slice(0,30);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+      renderHistory(items);
+    }
+
+    document.getElementById('generateBtn').addEventListener('click', buildPost);
+    document.getElementById('copyBtn').addEventListener('click', copyToClipboard);
+    document.getElementById('saveBtn').addEventListener('click', saveToHistory);
+
+    ['snr','rank'].forEach(id=>{
+      document.getElementById(id).addEventListener('input', updateAutoFlair);
+    });
+    updateAutoFlair();
+    loadHistory();
+  </script>
+</body>
+</html>
