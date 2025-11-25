@@ -297,26 +297,28 @@
       }
 
       .flair-wrap {
-        margin-top: 10px;
+        margin-top: 12px;
         font-size: 13px;
       }
 
       .flair-heading {
         font-size: 13px;
+        color: var(--muted);
         margin-bottom: 6px;
       }
 
-      .flair-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-        gap: 12px;
+      .flair-columns {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 16px;
       }
 
-      .flair-col {
-        background: rgba(8, 10, 20, 0.8);
+      .flair-column {
+        flex: 1 1 220px;
+        background: rgba(8, 10, 20, 0.9);
         border-radius: 12px;
         padding: 10px 12px;
-        border: 1px solid rgba(123, 198, 255, 0.15);
+        border: 1px solid rgba(123, 198, 255, 0.18);
       }
 
       .flair-title {
@@ -325,34 +327,40 @@
         margin-bottom: 6px;
       }
 
-      .flair-list {
+      .flair-rows {
         display: grid;
         gap: 4px;
       }
 
-      .flair-item {
-        padding: 4px 8px;
+      .flair-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 4px 9px;
         border-radius: 999px;
-        border: 1px solid rgba(123, 198, 255, 0.12);
-        background: radial-gradient(circle at 0% 0%, rgba(123, 198, 255, 0.08), transparent 50%);
+        border: 1px solid rgba(123, 198, 255, 0.14);
+        background: radial-gradient(circle at 0% 0%, rgba(123, 198, 255, 0.08), transparent 55%);
         color: #d6e5ff;
       }
 
-      .flair-item span {
-        margin-left: 4px;
+      .flair-label {
+        opacity: 0.9;
       }
 
-      .flair-item.active {
-        border-color: rgba(255, 215, 128, 0.9);
-        box-shadow: 0 0 12px rgba(255, 200, 80, 0.7);
-        background: radial-gradient(circle at 10% 0%, rgba(255, 215, 128, 0.25), transparent 55%);
+      .flair-row.active {
+        border-color: #ffd46a;
+        background: radial-gradient(circle at 10% 0%, rgba(255, 212, 106, 0.35), transparent 60%);
+        box-shadow:
+          0 0 0 1px rgba(255, 212, 106, 0.6),
+          0 0 16px rgba(255, 212, 106, 0.8);
+        color: #fff7df;
       }
 
       .flair-note {
         margin-top: 6px;
         color: var(--muted);
+        font-size: 12px;
       }
-
     }
   </style>
 </head>
@@ -447,41 +455,41 @@
         </div>
 
         <div class="flair-wrap">
-          <div class="muted flair-heading">Automatic flair based on SNR &amp; rank:</div>
+          <div class="flair-heading">Automatic flair based on SNR &amp; rank:</div>
 
-          <div class="flair-grid">
-            <div class="flair-col">
+          <div class="flair-columns">
+            <div class="flair-column">
               <div class="flair-title">SNR Flair</div>
-              <div class="flair-list">
-                <div class="flair-item snr-tier" data-tier="20">
-                  SNR 20+ 🚀
+              <div class="flair-rows">
+                <div class="flair-row snr-tier" data-tier="20">
+                  <span class="flair-label">SNR 20+ </span><span>🚀</span>
                 </div>
-                <div class="flair-item snr-tier" data-tier="10">
-                  SNR 10–19 ✨
+                <div class="flair-row snr-tier" data-tier="10">
+                  <span class="flair-label">SNR 10–19 </span><span>✨</span>
                 </div>
-                <div class="flair-item snr-tier" data-tier="5">
-                  SNR 5–9 🔭
+                <div class="flair-row snr-tier" data-tier="5">
+                  <span class="flair-label">SNR 5–9 </span><span>🔭</span>
                 </div>
-                <div class="flair-item snr-tier" data-tier="0">
-                  SNR 0–4 ⚠️
+                <div class="flair-row snr-tier" data-tier="0">
+                  <span class="flair-label">SNR 0–4 </span><span>⚠️</span>
                 </div>
               </div>
             </div>
 
-            <div class="flair-col">
+            <div class="flair-column">
               <div class="flair-title">Rank Flair</div>
-              <div class="flair-list">
-                <div class="flair-item rank-tier" data-tier="100">
-                  Rank 1–100 👑
+              <div class="flair-rows">
+                <div class="flair-row rank-tier" data-tier="100">
+                  <span class="flair-label">Rank 1–100 </span><span>👑</span>
                 </div>
-                <div class="flair-item rank-tier" data-tier="500">
-                  Rank 101–500 🌛
+                <div class="flair-row rank-tier" data-tier="500">
+                  <span class="flair-label">Rank 101–500 </span><span>🌛</span>
                 </div>
-                <div class="flair-item rank-tier" data-tier="1000">
-                  Rank 501–1000 🚀
+                <div class="flair-row rank-tier" data-tier="1000">
+                  <span class="flair-label">Rank 501–1000 </span><span>🚀</span>
                 </div>
-                <div class="flair-item rank-tier" data-tier="1001">
-                  Rank 1001+ 🌌
+                <div class="flair-row rank-tier" data-tier="1001">
+                  <span class="flair-label">Rank 1001+ </span><span>🌌</span>
                 </div>
               </div>
             </div>
