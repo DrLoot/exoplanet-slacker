@@ -578,21 +578,15 @@
 
     async function loadRankLookup() {
       try {
-        // adjust if stored elsewhere (e.g. 'data/epw_ranks.json')
-        const res = await fetch('epw_ranks.json');
+        // If you put it in /data/, change to 'data/epw_ranks_pretty.json'
+        const res = await fetch('epw_ranks_pretty.json');
         if (!res.ok) throw new Error('HTTP ' + res.status);
 
         const data = await res.json();
-        rankLookup = data;
 
-        // Build a canonical map for fuzzy names
-        rankLookupCanonical = {};
-        Object.entries(data).forEach(([name, rank]) => {
-          const c = canonicalName(name);
-          if (!rankLookupCanonical[c]) {
-            rankLookupCanonical[c] = rank;
-          }
-        });
+        // data is canonicalKey -> { name, rank }
+        rankLookup = {};              // not really used anymore, but keep it defined
+        rankLookupCanonical = data;   // use canonical map directly
 
       } catch (err) {
         console.warn("Rank lookup failed:", err);
@@ -603,17 +597,8 @@
 
     function findRankForTarget(name) {
       if (!name) return null;
-
-      const key = name.trim().toLowerCase();
-
-      // 1) Try exact name (case-insensitive)
-      if (key in rankLookup) {
-        return rankLookup[key];
-      }
-
-      // 2) Try canonicalized (no spaces, hyphens, punctuation)
       const c = canonicalName(name);
-      return rankLookupCanonical[c] ?? null;
+      return rankLookupCanonical[c] ?? null;   // { name, rank } or null
     }
 
     /* ============================================================ */
@@ -731,17 +716,18 @@
     const rankInput = document.getElementById('rank');
 
     function tryAutoFillRank() {
-      // don't overwrite manual entries
+      // don't overwrite manual rank if the user already typed one
       if (rankInput.value.trim()) return;
 
-      const name = targetInput.value;
-      const found = findRankForTarget(name);
+      const rawName = targetInput.value;
+      const entry = findRankForTarget(rawName);  // { name, rank }
 
-      if (found != null) {
-        rankInput.value = found;
+      if (entry != null) {
+        // pretty name + rank from JSON
+        targetInput.value = entry.name;                // e.g. "HAT-P-32 b"
+        rankInput.value = entry.rank;                  // e.g. 900
         updateAutoFlair();
-      }
-      else if (name.trim() !== "") {
+      } else if (rawName.trim() !== "") {
         autoFlairEl.textContent =
           "Target not found — check spelling, catalog, or formatting.";
       }
