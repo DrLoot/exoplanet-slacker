@@ -1,5 +1,6 @@
 <!doctype html>
 <html lang="en">
+
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -7,141 +8,365 @@
   <meta name="description" content="Generate formatted Slack posts for transit light curve reductions." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Orbitron:wght@700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Orbitron:wght@700&display=swap"
+    rel="stylesheet" />
   <style>
-    :root{
-      --bg:#05060b; --card:#0f1220; --glow:#5bc0ff; --accent:#FF6F00;
-      --text:#EAEAEA; --muted:#A9B1C3; --radius:16px; --shadow:0 10px 40px rgba(0,0,0,.45);
-      --border: rgba(123,198,255,.14); --link:#79c8ff;
-    }
-    html,body{height:100%;background:var(--bg);color:var(--text);}
-    body{margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;line-height:1.6;}
-
-    .starfield{position:fixed;inset:0;z-index:-2;overflow:hidden;
-      background:radial-gradient(1200px 800px at 80% -10%, rgba(91,192,255,.12), transparent 60%),
-                 radial-gradient(1000px 700px at 10% 120%, rgba(255,111,0,.08), transparent 60%),
-                 linear-gradient(180deg,#070910 0%,#04050a 100%);}
-    .stars,.stars:before,.stars:after{content:"";position:absolute;inset:-2000px;background-repeat:repeat;}
-    .stars{background-image:
-      radial-gradient(2px 2px at 20px 30px, rgba(255,255,255,.7) 50%, transparent 51%),
-      radial-gradient(1.5px 1.5px at 100px 80px, rgba(255,255,255,.5) 50%, transparent 51%),
-      radial-gradient(1px 1px at 50px 140px, rgba(255,255,255,.4) 50%, transparent 51%);
-      animation:drift 160s linear infinite; opacity:.85;}
-    .stars:before{background-image:
-      radial-gradient(1.5px 1.5px at 40px 60px, rgba(255,255,255,.35) 50%, transparent 51%),
-      radial-gradient(1px 1px at 80px 120px, rgba(255,255,255,.25) 50%, transparent 51%);
-      animation:drift 220s linear infinite;}
-    .stars:after{background-image:
-      radial-gradient(1px 1px at 70px 90px, rgba(123,198,255,.4) 50%, transparent 51%),
-      radial-gradient(1px 1px at 140px 30px, rgba(255,171,64,.35) 50%, transparent 51%);
-      animation:drift 300s linear infinite;}
-    @keyframes drift{from{transform:translate3d(0,0,0)}to{transform:translate3d(2000px,2000px,0)}}
-
-    header{padding: clamp(48px, 8vw, 96px) 24px 32px; text-align:center;
-      background: radial-gradient(900px 600px at 80% 20%, rgba(91,192,255,.12), transparent 60%);}
-    h1{font-family:Orbitron,Inter,sans-serif; font-size:clamp(28px,5.6vw,56px); margin:0;}
-    .subtitle{max-width:900px;margin:12px auto 24px;color:var(--muted);}
-    .nav{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
-    .btn{display:inline-flex;align-items:center;gap:10px;padding:10px 16px;border-radius:999px;
-      border:1px solid #1f2a44;background:linear-gradient(180deg,#133252,#0c1b2e);
-      color:var(--text);text-decoration:none;box-shadow:var(--shadow);cursor:pointer;}
-    .btn:hover{transform:translateY(-1px)}
-
-    main{padding:24px;max-width:1100px;margin:0 auto}
-    .card{background:linear-gradient(180deg,rgba(16,20,40,.7),rgba(10,12,20,.8));
-      border:1px solid var(--border); border-radius:var(--radius); padding:22px; box-shadow:var(--shadow); margin-bottom:28px;}
-    h2{margin:0 0 8px}
-    .muted{color:var(--muted)}
-
-    .form-grid{
-      display:grid;
-      grid-template-columns: repeat(auto-fit,minmax(220px,1fr));
-      gap:16px;
-      margin-top:16px;
-    }
-    label{font-size:14px;display:block;margin-bottom:3px;color:var(--muted);}
-    input,select,textarea{
-      width:100%;
-      padding:8px 10px;
-      border-radius:10px;
-      border:1px solid rgba(123,198,255,.2);
-      background:rgba(10,12,20,.9);
-      color:var(--text);
-      font-family:inherit;
-      font-size:14px;
-      box-sizing:border-box;
-    }
-    textarea{min-height:120px;resize:vertical;}
-    .inline-options{display:flex;flex-wrap:wrap;gap:10px;margin-top:8px;font-size:13px;}
-    .inline-options label{display:flex;align-items:center;gap:4px;margin:0;color:var(--muted);}
-    .inline-options input[type="checkbox"]{width:auto;}
-    .template-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px;}
-    .template-row select{max-width:220px;}
-    .buttons-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px;}
-    .pill{
-      font-size:11px;
-      padding:3px 8px;
-      border-radius:999px;
-      border:1px solid rgba(123,198,255,.35);
-      background:rgba(15,18,32,.9);
-      color:#9ed1ff;
-      display:inline-flex;
-      align-items:center;
-      gap:4px;
-      margin-right:6px;
-      margin-top:6px;
+    :root {
+      --bg: #05060b;
+      --card: #0f1220;
+      --glow: #5bc0ff;
+      --accent: #FF6F00;
+      --text: #EAEAEA;
+      --muted: #A9B1C3;
+      --radius: 16px;
+      --shadow: 0 10px 40px rgba(0, 0, 0, .45);
+      --border: rgba(123, 198, 255, .14);
+      --link: #79c8ff;
     }
 
-    .history-list{
-      display:grid;
-      gap:12px;
-      margin-top:12px;
-    }
-    .history-item{
-      background:rgba(15,18,32,.7);
-      border-radius:12px;
-      border:1px solid rgba(123,198,255,.18);
-      padding:10px 12px;
-      font-size:13px;
-    }
-    .history-header{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:6px;
-      margin-bottom:4px;
-      font-weight:600;
-    }
-    .history-meta{font-size:12px;color:var(--muted);}
-    .history-actions{
-      display:flex;
-      gap:6px;
-      margin-top:6px;
-      flex-wrap:wrap;
-    }
-    .mini-btn{
-      border-radius:999px;
-      border:1px solid #1f2a44;
-      background:linear-gradient(180deg,#133252,#0c1b2e);
-      color:#fff;
-      font-size:11px;
-      padding:3px 9px;
-      cursor:pointer;
+    html,
+    body {
+      height: 100%;
+      background: var(--bg);
+      color: var(--text);
     }
 
-    @media (max-width:600px){
-      .buttons-row{flex-direction:column;align-items:stretch;}
-      .buttons-row .btn{justify-content:center;width:100%;}
+    body {
+      margin: 0;
+      font-family: Inter, system-ui, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      line-height: 1.6;
+    }
+
+    .starfield {
+      position: fixed;
+      inset: 0;
+      z-index: -2;
+      overflow: hidden;
+      background: radial-gradient(1200px 800px at 80% -10%, rgba(91, 192, 255, .12), transparent 60%),
+        radial-gradient(1000px 700px at 10% 120%, rgba(255, 111, 0, .08), transparent 60%),
+        linear-gradient(180deg, #070910 0%, #04050a 100%);
+    }
+
+    .stars,
+    .stars:before,
+    .stars:after {
+      content: "";
+      position: absolute;
+      inset: -2000px;
+      background-repeat: repeat;
+    }
+
+    .stars {
+      background-image:
+        radial-gradient(2px 2px at 20px 30px, rgba(255, 255, 255, .7) 50%, transparent 51%),
+        radial-gradient(1.5px 1.5px at 100px 80px, rgba(255, 255, 255, .5) 50%, transparent 51%),
+        radial-gradient(1px 1px at 50px 140px, rgba(255, 255, 255, .4) 50%, transparent 51%);
+      animation: drift 160s linear infinite;
+      opacity: .85;
+    }
+
+    .stars:before {
+      background-image:
+        radial-gradient(1.5px 1.5px at 40px 60px, rgba(255, 255, 255, .35) 50%, transparent 51%),
+        radial-gradient(1px 1px at 80px 120px, rgba(255, 255, 255, .25) 50%, transparent 51%);
+      animation: drift 220s linear infinite;
+    }
+
+    .stars:after {
+      background-image:
+        radial-gradient(1px 1px at 70px 90px, rgba(123, 198, 255, .4) 50%, transparent 51%),
+        radial-gradient(1px 1px at 140px 30px, rgba(255, 171, 64, .35) 50%, transparent 51%);
+      animation: drift 300s linear infinite;
+    }
+
+    @keyframes drift {
+      from {
+        transform: translate3d(0, 0, 0)
+      }
+
+      to {
+        transform: translate3d(2000px, 2000px, 0)
+      }
+    }
+
+    header {
+      padding: clamp(48px, 8vw, 96px) 24px 32px;
+      text-align: center;
+      background: radial-gradient(900px 600px at 80% 20%, rgba(91, 192, 255, .12), transparent 60%);
+    }
+
+    h1 {
+      font-family: Orbitron, Inter, sans-serif;
+      font-size: clamp(28px, 5.6vw, 56px);
+      margin: 0;
+    }
+
+    .subtitle {
+      max-width: 900px;
+      margin: 12px auto 24px;
+      color: var(--muted);
+    }
+
+    .nav {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      flex-wrap: wrap
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 16px;
+      border-radius: 999px;
+      border: 1px solid #1f2a44;
+      background: linear-gradient(180deg, #133252, #0c1b2e);
+      color: var(--text);
+      text-decoration: none;
+      box-shadow: var(--shadow);
+      cursor: pointer;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px)
+    }
+
+    main {
+      padding: 24px;
+      max-width: 1100px;
+      margin: 0 auto
+    }
+
+    .card {
+      background: linear-gradient(180deg, rgba(16, 20, 40, .7), rgba(10, 12, 20, .8));
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 22px;
+      box-shadow: var(--shadow);
+      margin-bottom: 28px;
+    }
+
+    h2 {
+      margin: 0 0 8px
+    }
+
+    .muted {
+      color: var(--muted)
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      margin-top: 16px;
+    }
+
+    label {
+      font-size: 14px;
+      display: block;
+      margin-bottom: 3px;
+      color: var(--muted);
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      padding: 8px 10px;
+      border-radius: 10px;
+      border: 1px solid rgba(123, 198, 255, .2);
+      background: rgba(10, 12, 20, .9);
+      color: var(--text);
+      font-family: inherit;
+      font-size: 14px;
+      box-sizing: border-box;
+    }
+
+    textarea {
+      min-height: 120px;
+      resize: vertical;
+    }
+
+    .inline-options {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 8px;
+      font-size: 13px;
+    }
+
+    .inline-options label {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin: 0;
+      color: var(--muted);
+    }
+
+    .inline-options input[type="checkbox"] {
+      width: auto;
+    }
+
+    .template-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .template-row select {
+      max-width: 220px;
+    }
+
+    .buttons-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .pill {
+      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(123, 198, 255, .35);
+      background: rgba(15, 18, 32, .9);
+      color: #9ed1ff;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      margin-right: 6px;
+      margin-top: 6px;
+    }
+
+    .history-list {
+      display: grid;
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    .history-item {
+      background: rgba(15, 18, 32, .7);
+      border-radius: 12px;
+      border: 1px solid rgba(123, 198, 255, .18);
+      padding: 10px 12px;
+      font-size: 13px;
+    }
+
+    .history-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 4px;
+      font-weight: 600;
+    }
+
+    .history-meta {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .history-actions {
+      display: flex;
+      gap: 6px;
+      margin-top: 6px;
+      flex-wrap: wrap;
+    }
+
+    .mini-btn {
+      border-radius: 999px;
+      border: 1px solid #1f2a44;
+      background: linear-gradient(180deg, #133252, #0c1b2e);
+      color: #fff;
+      font-size: 11px;
+      padding: 3px 9px;
+      cursor: pointer;
+    }
+
+    @media (max-width:600px) {
+      .buttons-row {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .buttons-row .btn {
+        justify-content: center;
+        width: 100%;
+      }
+
+      .flair-wrap {
+        margin-top: 10px;
+        font-size: 13px;
+      }
+
+      .flair-heading {
+        font-size: 13px;
+        margin-bottom: 6px;
+      }
+
+      .flair-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 12px;
+      }
+
+      .flair-col {
+        background: rgba(8, 10, 20, 0.8);
+        border-radius: 12px;
+        padding: 10px 12px;
+        border: 1px solid rgba(123, 198, 255, 0.15);
+      }
+
+      .flair-title {
+        font-weight: 600;
+        font-size: 13px;
+        margin-bottom: 6px;
+      }
+
+      .flair-list {
+        display: grid;
+        gap: 4px;
+      }
+
+      .flair-item {
+        padding: 4px 8px;
+        border-radius: 999px;
+        border: 1px solid rgba(123, 198, 255, 0.12);
+        background: radial-gradient(circle at 0% 0%, rgba(123, 198, 255, 0.08), transparent 50%);
+        color: #d6e5ff;
+      }
+
+      .flair-item span {
+        margin-left: 4px;
+      }
+
+      .flair-item.active {
+        border-color: rgba(255, 215, 128, 0.9);
+        box-shadow: 0 0 12px rgba(255, 200, 80, 0.7);
+        background: radial-gradient(circle at 10% 0%, rgba(255, 215, 128, 0.25), transparent 55%);
+      }
+
+      .flair-note {
+        margin-top: 6px;
+        color: var(--muted);
+      }
+
     }
   </style>
 </head>
+
 <body>
-  <div class="starfield" aria-hidden="true"><div class="stars"></div></div>
+  <div class="starfield" aria-hidden="true">
+    <div class="stars"></div>
+  </div>
 
   <header>
     <h1>Transit Post Generator</h1>
     <p class="subtitle">
-      Build consistent Slack posts for your transit light curve reductions. Choose your format, add SNR &amp; rank flair, and keep a local history of your observations.
+      Build consistent Slack posts for your transit light curve reductions. Choose your format, add SNR &amp; rank
+      flair, and keep a local history of your observations.
     </p>
     <nav class="nav" aria-label="Primary">
       <a class="btn" href="index.html">← Back to Home</a>
@@ -152,7 +377,8 @@
     <!-- Builder -->
     <section class="card" aria-labelledby="builder-heading">
       <h2 id="builder-heading">1. Observation Details</h2>
-      <p class="muted">Fill in your transit info and choose what to include. You can either enter SNR directly or compute it from Rp²/Rs² and its uncertainty.</p>
+      <p class="muted">Fill in your transit info and choose what to include. You can either enter SNR directly or
+        compute it from Rp²/Rs² and its uncertainty.</p>
 
       <form id="transitForm" autocomplete="off">
         <div class="form-grid">
@@ -220,9 +446,50 @@
           </div>
         </div>
 
-        <div style="margin-top:10px;">
-          <span class="muted" style="font-size:13px;">Automatic flair based on SNR &amp; rank:</span><br/>
-          <span id="autoFlair" style="font-size:13px;"></span>
+        <div class="flair-wrap">
+          <div class="muted flair-heading">Automatic flair based on SNR &amp; rank:</div>
+
+          <div class="flair-grid">
+            <div class="flair-col">
+              <div class="flair-title">SNR Flair</div>
+              <div class="flair-list">
+                <div class="flair-item snr-tier" data-tier="20">
+                  SNR 20+ 🚀
+                </div>
+                <div class="flair-item snr-tier" data-tier="10">
+                  SNR 10–19 ✨
+                </div>
+                <div class="flair-item snr-tier" data-tier="5">
+                  SNR 5–9 🔭
+                </div>
+                <div class="flair-item snr-tier" data-tier="0">
+                  SNR 0–4 ⚠️
+                </div>
+              </div>
+            </div>
+
+            <div class="flair-col">
+              <div class="flair-title">Rank Flair</div>
+              <div class="flair-list">
+                <div class="flair-item rank-tier" data-tier="100">
+                  Rank 1–100 👑
+                </div>
+                <div class="flair-item rank-tier" data-tier="500">
+                  Rank 101–500 🌛
+                </div>
+                <div class="flair-item rank-tier" data-tier="1000">
+                  Rank 501–1000 🚀
+                </div>
+                <div class="flair-item rank-tier" data-tier="1001">
+                  Rank 1001+ 🌌
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div id="autoFlair" class="flair-note">
+            Enter SNR and/or rank to see which tier is active.
+          </div>
         </div>
 
         <div class="buttons-row">
@@ -238,7 +505,8 @@
       <h2 id="output-heading">2. Generated Post</h2>
       <p class="muted">Preview of what you’ll paste into Slack / Discord. Emojis are left as <code>:codes:</code>.</p>
 
-      <textarea id="output" spellcheck="false" placeholder="Fill in the form above and click &quot;Generate Post&quot; to see the result."></textarea>
+      <textarea id="output" spellcheck="false"
+        placeholder="Fill in the form above and click &quot;Generate Post&quot; to see the result."></textarea>
 
       <div style="margin-top:8px;font-size:12px;color:var(--muted);">
         Tip: tweak wording directly here if you want, then hit “Save to History” again to capture the edited version.
@@ -249,7 +517,8 @@
     <section class="card" aria-labelledby="history-heading">
       <h2 id="history-heading">3. Local Observation History</h2>
       <p class="muted">
-        Saved posts live in your browser only (via <code>localStorage</code>). Use this like a mini logbook of recent reductions.
+        Saved posts live in your browser only (via <code>localStorage</code>). Use this like a mini logbook of recent
+        reductions.
       </p>
 
       <div id="historyEmpty" class="muted" style="font-size:13px;margin-top:6px;">
@@ -277,74 +546,202 @@
 
     const STORAGE_KEY = 'transitgenHistory_v1';
 
-    function formatDateHuman(value){
-      if(!value) return '';
+    /* ============================================================
+       = Rank Lookup (Flexible / Canonical Matching) =
+       ============================================================ */
+
+    let rankLookup = {};            // exact names from JSON (lowercase)
+    let rankLookupCanonical = {};   // "stripped" names (no spaces/hyphens/punctuation)
+
+    function canonicalName(name) {
+      if (!name) return "";
+      return name
+        .toLowerCase()
+        .replace(/[^a-z0-9]/g, "");   // remove everything except a–z and 0–9
+    }
+
+    async function loadRankLookup() {
+      try {
+        // adjust if stored elsewhere (e.g. 'data/epw_ranks.json')
+        const res = await fetch('epw_ranks.json');
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+
+        const data = await res.json();
+        rankLookup = data;
+
+        // Build a canonical map for fuzzy names
+        rankLookupCanonical = {};
+        Object.entries(data).forEach(([name, rank]) => {
+          const c = canonicalName(name);
+          if (!rankLookupCanonical[c]) {
+            rankLookupCanonical[c] = rank;
+          }
+        });
+
+      } catch (err) {
+        console.warn("Rank lookup failed:", err);
+        rankLookup = {};
+        rankLookupCanonical = {};
+      }
+    }
+
+    function findRankForTarget(name) {
+      if (!name) return null;
+
+      const key = name.trim().toLowerCase();
+
+      // 1) Try exact name (case-insensitive)
+      if (key in rankLookup) {
+        return rankLookup[key];
+      }
+
+      // 2) Try canonicalized (no spaces, hyphens, punctuation)
+      const c = canonicalName(name);
+      return rankLookupCanonical[c] ?? null;
+    }
+
+    /* ============================================================ */
+
+    function formatDateHuman(value) {
+      if (!value) return '';
       const d = new Date(value + 'T00:00:00');
-      if(isNaN(d.getTime())) return '';
-      const day = String(d.getDate()).padStart(2,'0');
-      const monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+      if (isNaN(d.getTime())) return '';
+      const day = String(d.getDate()).padStart(2, '0');
+      const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
       const mon = monthNames[d.getMonth()];
       const year = d.getFullYear();
       return `${day}-${mon}-${year}`;
     }
 
-    function snrFlair(snr){
-      if(snr === '' || snr === null || snr === undefined) return '';
+    function snrFlair(snr) {
+      if (snr === '' || snr === null || snr === undefined) return '';
       const s = Number(snr);
-      if(!isFinite(s)) return '';
-      if(s >= 20) return ':rocket:';
-      if(s >= 10) return ':sparkles:';
-      if(s >= 5)  return ':telescope:';
-      if(s > 0)   return ':warning:';
+      if (!isFinite(s)) return '';
+      if (s >= 20) return ':rocket:';
+      if (s >= 10) return ':sparkles:';
+      if (s >= 5) return ':telescope:';
+      if (s > 0) return ':warning:';
       return '';
     }
 
-    function rankFlair(rank){
-      if(rank === '' || rank === null || rank === undefined) return '';
+    function rankFlair(rank) {
+      if (rank === '' || rank === null || rank === undefined) return '';
       const r = Number(rank);
-      if(!isFinite(r)) return '';
-      if(r <= 100)  return ':crown:';
-      if(r <= 500)  return ':first_quarter_moon_with_face:';
-      if(r <= 1000) return ':rocket:';
+      if (!isFinite(r)) return '';
+      if (r <= 100) return ':crown:';
+      if (r <= 500) return ':first_quarter_moon_with_face:';
+      if (r <= 1000) return ':rocket:';
       return ':milky_way:';
     }
 
-    function updateAutoFlair(){
-      const snr = document.getElementById('snr').value.trim();
-      const rank = document.getElementById('rank').value.trim();
-      const snrText = snr ? `SNR ${snr}σ → ${snrFlair(snr) || 'no flair'}` : '';
-      const rankText = rank ? `Rank ${rank} → ${rankFlair(rank) || 'no flair'}` : '';
+    function updateAutoFlair() {
+      const snrStr = document.getElementById('snr').value.trim();
+      const rankStr = document.getElementById('rank').value.trim();
+
+      const snr = snrStr === '' ? NaN : Number(snrStr);
+      const rank = rankStr === '' ? NaN : Number(rankStr);
+
+      const snrText = snrStr ? `SNR ${snrStr}σ → ${snrFlair(snrStr) || 'no flair'}` : '';
+      const rankText = rankStr ? `Rank ${rankStr} → ${rankFlair(rankStr) || 'no flair'}` : '';
+
       const bits = [];
-      if(snrText) bits.push(snrText);
-      if(rankText) bits.push(rankText);
-      autoFlairEl.textContent = bits.length ? bits.join(' | ') : 'Enter SNR and/or rank to see suggested flair.';
+      if (snrText) bits.push(snrText);
+      if (rankText) bits.push(rankText);
+
+      // Update note text
+      if (bits.length) {
+        autoFlairEl.textContent = bits.join(' | ');
+      } else {
+        autoFlairEl.textContent = 'Enter SNR and/or rank to see which tier is active.';
+      }
+
+      // Clear all highlights first
+      document.querySelectorAll('.snr-tier').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.rank-tier').forEach(el => el.classList.remove('active'));
+
+      // Highlight SNR tier
+      if (!isNaN(snr)) {
+        let snrTierSelector = null;
+        if (snr >= 20) snrTierSelector = '.snr-tier[data-tier="20"]';
+        else if (snr >= 10) snrTierSelector = '.snr-tier[data-tier="10"]';
+        else if (snr >= 5) snrTierSelector = '.snr-tier[data-tier="5"]';
+        else if (snr >= 0) snrTierSelector = '.snr-tier[data-tier="0"]';
+
+        if (snrTierSelector) {
+          const el = document.querySelector(snrTierSelector);
+          if (el) el.classList.add('active');
+        }
+      }
+
+      // Highlight rank tier
+      if (!isNaN(rank)) {
+        let rankTierSelector = null;
+        if (rank <= 100) rankTierSelector = '.rank-tier[data-tier="100"]';
+        else if (rank <= 500) rankTierSelector = '.rank-tier[data-tier="500"]';
+        else if (rank <= 1000) rankTierSelector = '.rank-tier[data-tier="1000"]';
+        else if (rank > 1000) rankTierSelector = '.rank-tier[data-tier="1001"]';
+
+        if (rankTierSelector) {
+          const el = document.querySelector(rankTierSelector);
+          if (el) el.classList.add('active');
+        }
+      }
     }
 
-    function updateSNRFromDepth(){
+
+    function updateSNRFromDepth() {
       const depthVal = document.getElementById('depth').value.trim();
       const depthErrVal = document.getElementById('depthErr').value.trim();
-      if(!depthVal || !depthErrVal){
-        return; // not enough info yet
+      if (!depthVal || !depthErrVal) {
+        return;
       }
       let depth = Number(depthVal);
       let depthErr = Number(depthErrVal);
       const snrField = document.getElementById('snr');
 
-      if(!isFinite(depth) || !isFinite(depthErr) || depthErr <= 0){
-        return; // invalid input, do nothing
+      if (!isFinite(depth) || !isFinite(depthErr) || depthErr <= 0) {
+        return;
       }
 
-      try{
+      try {
         const snr = depth / depthErr;
-        if(!isFinite(snr)) return;
+        if (!isFinite(snr)) return;
         snrField.value = snr.toFixed(1);
         updateAutoFlair();
-      } catch(e){
-        // fail silently, don't crash
+      } catch (e) { }
+    }
+
+    /* ===========================================
+       = NEW: Auto-fill Rank when Target changes =
+       =========================================== */
+
+    const targetInput = document.getElementById('target');
+    const rankInput = document.getElementById('rank');
+
+    function tryAutoFillRank() {
+      // don't overwrite manual entries
+      if (rankInput.value.trim()) return;
+
+      const name = targetInput.value;
+      const found = findRankForTarget(name);
+
+      if (found != null) {
+        rankInput.value = found;
+        updateAutoFlair();
+      }
+      else if (name.trim() !== "") {
+        autoFlairEl.textContent =
+          "Target not found — check spelling, catalog, or formatting.";
       }
     }
 
-    function buildPost(){
+    targetInput.addEventListener('blur', tryAutoFillRank);
+    targetInput.addEventListener('change', tryAutoFillRank);
+
+    /* =========================================== */
+
+
+    function buildPost() {
       const target = document.getElementById('target').value.trim();
       const rank = document.getElementById('rank').value.trim();
       const snr = document.getElementById('snr').value.trim();
@@ -355,7 +752,7 @@
       const includeData = document.getElementById('includeData').checked;
       const template = document.getElementById('template').value;
 
-      if(!target){
+      if (!target) {
         outputEl.value = 'Please enter at least a target name.';
         return '';
       }
@@ -366,63 +763,58 @@
 
       let lines = [];
 
-      if(template === 'short'){
-        // Line 1: target + optional rank
+      if (template === 'short') {
         let line1 = target;
-        if(includeRank && rank){
+        if (includeRank && rank) {
           line1 += ` (rank ${rank})`;
         }
-        if(includeRank && rankEmoji){
+        if (includeRank && rankEmoji) {
           line1 += ` ${rankEmoji}`;
         }
         lines.push(line1);
 
-        // Line 2: SNR hype
-        if(includeSNR && snr){
+        if (includeSNR && snr) {
           let line2 = `${snr}σ SNR`;
-          if(snrEmoji) line2 += ` ${snrEmoji}`;
-          line2 += ' :eyes:';
+          if (snrEmoji) line2 += ` ${snrEmoji}`;
           lines.push(line2);
         }
 
-        // Line 3: date + data
         let parts = [];
-        if(humanDate) parts.push(humanDate);
-        if(includeData && data) parts.push(data);
+        if (humanDate) parts.push(humanDate);
+        if (includeData && data) parts.push(data);
         const line3 = parts.join(', ');
-        if(line3) lines.push(line3);
+        if (line3) lines.push(line3);
 
-      } else if(template === 'tech'){
-        // Technical summary, 2–3 lines
+      } else if (template === 'tech') {
         let header = target;
-        if(includeRank && rank){
+        if (includeRank && rank) {
           header += ` | rank ${rank}`;
-          if(rankEmoji) header += ` ${rankEmoji}`;
+          if (rankEmoji) header += ` ${rankEmoji}`;
         }
-        if(includeSNR && snr){
+        if (includeSNR && snr) {
           header += ` | SNR ${snr}σ`;
-          if(snrEmoji) header += ` ${snrEmoji}`;
+          if (snrEmoji) header += ` ${snrEmoji}`;
         }
         lines.push(header);
 
         let meta = [];
-        if(humanDate) meta.push(humanDate);
-        if(includeData && data) meta.push(data);
-        if(meta.length) lines.push(meta.join(' — '));
+        if (humanDate) meta.push(humanDate);
+        if (includeData && data) meta.push(data);
+        if (meta.length) lines.push(meta.join(' — '));
 
-      } else if(template === 'minimal'){
+      } else if (template === 'minimal') {
         let line = target;
-        if(includeRank && rank){
+        if (includeRank && rank) {
           line += ` (rank ${rank}`;
-          if(rankEmoji) line += ` ${rankEmoji}`;
+          if (rankEmoji) line += ` ${rankEmoji}`;
           line += ')';
         }
-        if(includeSNR && snr){
+        if (includeSNR && snr) {
           line += ` — ${snr}σ SNR`;
-          if(snrEmoji) line += ` ${snrEmoji}`;
+          if (snrEmoji) line += ` ${snrEmoji}`;
         }
-        if(humanDate) line += ` — ${humanDate}`;
-        if(includeData && data) line += ` — ${data}`;
+        if (humanDate) line += ` — ${humanDate}`;
+        if (includeData && data) line += ` — ${data}`;
         lines.push(line);
       }
 
@@ -431,33 +823,33 @@
       return post;
     }
 
-    function copyToClipboard(){
+    function copyToClipboard() {
       const text = outputEl.value;
-      if(!text.trim()) return;
-      navigator.clipboard?.writeText(text).then(()=>{
+      if (!text.trim()) return;
+      navigator.clipboard?.writeText(text).then(() => {
         const original = document.getElementById('copyBtn').textContent;
         document.getElementById('copyBtn').textContent = 'Copied!';
-        setTimeout(()=>{document.getElementById('copyBtn').textContent = original;}, 1000);
-      }).catch(()=>{});
+        setTimeout(() => { document.getElementById('copyBtn').textContent = original; }, 1000);
+      }).catch(() => { });
     }
 
-    function loadHistory(){
+    function loadHistory() {
       let items = [];
-      try{
+      try {
         const raw = localStorage.getItem(STORAGE_KEY);
-        if(raw) items = JSON.parse(raw);
-      }catch(e){}
+        if (raw) items = JSON.parse(raw);
+      } catch (e) { }
       renderHistory(items);
     }
 
-    function renderHistory(items){
+    function renderHistory(items) {
       historyList.innerHTML = '';
-      if(!items || !items.length){
+      if (!items || !items.length) {
         historyEmpty.style.display = 'block';
         return;
       }
       historyEmpty.style.display = 'none';
-      items.forEach((item, idx)=>{
+      items.forEach((item, idx) => {
         const div = document.createElement('div');
         div.className = 'history-item';
 
@@ -468,9 +860,9 @@
 
         const meta = document.createElement('div');
         let metaBits = [];
-        if(item.rank) metaBits.push(`rank ${item.rank}`);
-        if(item.snr) metaBits.push(`SNR ${item.snr}σ`);
-        if(item.template) metaBits.push(item.template);
+        if (item.rank) metaBits.push(`rank ${item.rank}`);
+        if (item.snr) metaBits.push(`SNR ${item.snr}σ`);
+        if (item.template) metaBits.push(item.template);
         meta.textContent = metaBits.join(' • ');
         meta.className = 'history-meta';
         div.appendChild(meta);
@@ -484,31 +876,30 @@
 
         const actions = document.createElement('div');
         actions.className = 'history-actions';
+
         const copyBtn = document.createElement('button');
         copyBtn.type = 'button';
         copyBtn.className = 'mini-btn';
         copyBtn.textContent = 'Copy';
-        copyBtn.addEventListener('click', ()=>navigator.clipboard?.writeText(item.post || ''));
+        copyBtn.addEventListener('click', () => navigator.clipboard?.writeText(item.post || ''));
 
         const loadBtn = document.createElement('button');
         loadBtn.type = 'button';
         loadBtn.className = 'mini-btn';
         loadBtn.textContent = 'Load into editor';
-        loadBtn.addEventListener('click', ()=>{
-          outputEl.value = item.post || '';
-        });
+        loadBtn.addEventListener('click', () => { outputEl.value = item.post || ''; });
 
         const deleteBtn = document.createElement('button');
         deleteBtn.type = 'button';
         deleteBtn.className = 'mini-btn';
         deleteBtn.textContent = 'Delete';
-        deleteBtn.addEventListener('click', ()=>{
+        deleteBtn.addEventListener('click', () => {
           let arr = [];
-          try{
+          try {
             const raw = localStorage.getItem(STORAGE_KEY);
-            if(raw) arr = JSON.parse(raw);
-          }catch(e){}
-          arr.splice(idx,1);
+            if (raw) arr = JSON.parse(raw);
+          } catch (e) { }
+          arr.splice(idx, 1);
           localStorage.setItem(STORAGE_KEY, JSON.stringify(arr));
           renderHistory(arr);
         });
@@ -522,9 +913,9 @@
       });
     }
 
-    function saveToHistory(){
+    function saveToHistory() {
       const post = buildPost();
-      if(!post.trim()) return;
+      if (!post.trim()) return;
       const target = document.getElementById('target').value.trim();
       const rank = document.getElementById('rank').value.trim();
       const snr = document.getElementById('snr').value.trim();
@@ -532,20 +923,13 @@
       const template = document.getElementById('template').value;
 
       let items = [];
-      try{
+      try {
         const raw = localStorage.getItem(STORAGE_KEY);
-        if(raw) items = JSON.parse(raw);
-      }catch(e){}
-      const entry = {
-        target,
-        rank,
-        snr,
-        date: formatDateHuman(obsDate),
-        template,
-        post
-      };
+        if (raw) items = JSON.parse(raw);
+      } catch (e) { }
+      const entry = { target, rank, snr, date: formatDateHuman(obsDate), template, post };
       items.unshift(entry);
-      if(items.length > 30) items = items.slice(0,30);
+      if (items.length > 30) items = items.slice(0, 30);
       localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
       renderHistory(items);
     }
@@ -554,7 +938,7 @@
     document.getElementById('copyBtn').addEventListener('click', copyToClipboard);
     document.getElementById('saveBtn').addEventListener('click', saveToHistory);
 
-    ['snr','rank'].forEach(id=>{
+    ['snr', 'rank'].forEach(id => {
       document.getElementById(id).addEventListener('input', updateAutoFlair);
     });
 
@@ -563,6 +947,8 @@
 
     updateAutoFlair();
     loadHistory();
+    loadRankLookup();
   </script>
 </body>
+
 </html>
