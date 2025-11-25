@@ -285,6 +285,75 @@
       cursor: pointer;
     }
 
+    /* ---- Flair legend (global) ---- */
+
+    .flair-wrap {
+      margin-top: 12px;
+      font-size: 13px;
+    }
+
+    .flair-heading {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+
+    .flair-columns {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-top: 4px;
+    }
+
+    .flair-column {
+      flex: 1 1 220px;
+      background: rgba(8, 10, 20, 0.9);
+      border-radius: 12px;
+      padding: 10px 12px;
+      border: 1px solid rgba(123, 198, 255, 0.18);
+    }
+
+    .flair-title {
+      font-weight: 600;
+      font-size: 13px;
+      margin-bottom: 6px;
+    }
+
+    .flair-rows {
+      display: grid;
+      gap: 4px;
+    }
+
+    .flair-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 4px 9px;
+      border-radius: 999px;
+      border: 1px solid rgba(123, 198, 255, 0.14);
+      background: radial-gradient(circle at 0% 0%, rgba(123, 198, 255, 0.08), transparent 55%);
+      color: #d6e5ff;
+    }
+
+    .flair-label {
+      opacity: 0.9;
+    }
+
+    .flair-row.active {
+      border-color: #ffd46a;
+      background: radial-gradient(circle at 10% 0%, rgba(255, 212, 106, 0.35), transparent 60%);
+      box-shadow:
+        0 0 0 1px rgba(255, 212, 106, 0.6),
+        0 0 16px rgba(255, 212, 106, 0.8);
+      color: #fff7df;
+    }
+
+    .flair-note {
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
     @media (max-width:600px) {
       .buttons-row {
         flex-direction: column;
@@ -296,70 +365,9 @@
         width: 100%;
       }
 
-      .flair-wrap {
-        margin-top: 12px;
-        font-size: 13px;
-      }
-
-      .flair-heading {
-        font-size: 13px;
-        color: var(--muted);
-        margin-bottom: 6px;
-      }
-
+      /* optional: stack the columns vertically on very small screens */
       .flair-columns {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 16px;
-      }
-
-      .flair-column {
-        flex: 1 1 220px;
-        background: rgba(8, 10, 20, 0.9);
-        border-radius: 12px;
-        padding: 10px 12px;
-        border: 1px solid rgba(123, 198, 255, 0.18);
-      }
-
-      .flair-title {
-        font-weight: 600;
-        font-size: 13px;
-        margin-bottom: 6px;
-      }
-
-      .flair-rows {
-        display: grid;
-        gap: 4px;
-      }
-
-      .flair-row {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 4px 9px;
-        border-radius: 999px;
-        border: 1px solid rgba(123, 198, 255, 0.14);
-        background: radial-gradient(circle at 0% 0%, rgba(123, 198, 255, 0.08), transparent 55%);
-        color: #d6e5ff;
-      }
-
-      .flair-label {
-        opacity: 0.9;
-      }
-
-      .flair-row.active {
-        border-color: #ffd46a;
-        background: radial-gradient(circle at 10% 0%, rgba(255, 212, 106, 0.35), transparent 60%);
-        box-shadow:
-          0 0 0 1px rgba(255, 212, 106, 0.6),
-          0 0 16px rgba(255, 212, 106, 0.8);
-        color: #fff7df;
-      }
-
-      .flair-note {
-        margin-top: 6px;
-        color: var(--muted);
-        font-size: 12px;
+        flex-direction: column;
       }
     }
   </style>
@@ -692,7 +700,7 @@
         }
       }
     }
-    
+
     function updateSNRFromDepth() {
       const depthVal = document.getElementById('depth').value.trim();
       const depthErrVal = document.getElementById('depthErr').value.trim();
