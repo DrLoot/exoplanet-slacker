@@ -656,47 +656,43 @@
       if (snrText) bits.push(snrText);
       if (rankText) bits.push(rankText);
 
-      // Update note text
       if (bits.length) {
         autoFlairEl.textContent = bits.join(' | ');
       } else {
         autoFlairEl.textContent = 'Enter SNR and/or rank to see which tier is active.';
       }
 
-      // Clear all highlights first
+      // clear previous highlights
       document.querySelectorAll('.snr-tier').forEach(el => el.classList.remove('active'));
       document.querySelectorAll('.rank-tier').forEach(el => el.classList.remove('active'));
 
-      // Highlight SNR tier
+      // SNR highlight
       if (!isNaN(snr)) {
-        let snrTierSelector = null;
-        if (snr >= 20) snrTierSelector = '.snr-tier[data-tier="20"]';
-        else if (snr >= 10) snrTierSelector = '.snr-tier[data-tier="10"]';
-        else if (snr >= 5) snrTierSelector = '.snr-tier[data-tier="5"]';
-        else if (snr >= 0) snrTierSelector = '.snr-tier[data-tier="0"]';
-
-        if (snrTierSelector) {
-          const el = document.querySelector(snrTierSelector);
+        let selector = null;
+        if (snr >= 20) selector = '.snr-tier[data-tier="20"]';
+        else if (snr >= 10) selector = '.snr-tier[data-tier="10"]';
+        else if (snr >= 5) selector = '.snr-tier[data-tier="5"]';
+        else if (snr >= 0) selector = '.snr-tier[data-tier="0"]';
+        if (selector) {
+          const el = document.querySelector(selector);
           if (el) el.classList.add('active');
         }
       }
 
-      // Highlight rank tier
+      // Rank highlight
       if (!isNaN(rank)) {
-        let rankTierSelector = null;
-        if (rank <= 100) rankTierSelector = '.rank-tier[data-tier="100"]';
-        else if (rank <= 500) rankTierSelector = '.rank-tier[data-tier="500"]';
-        else if (rank <= 1000) rankTierSelector = '.rank-tier[data-tier="1000"]';
-        else if (rank > 1000) rankTierSelector = '.rank-tier[data-tier="1001"]';
-
-        if (rankTierSelector) {
-          const el = document.querySelector(rankTierSelector);
+        let selector = null;
+        if (rank <= 100) selector = '.rank-tier[data-tier="100"]';
+        else if (rank <= 500) selector = '.rank-tier[data-tier="500"]';
+        else if (rank <= 1000) selector = '.rank-tier[data-tier="1000"]';
+        else if (rank > 1000) selector = '.rank-tier[data-tier="1001"]';
+        if (selector) {
+          const el = document.querySelector(selector);
           if (el) el.classList.add('active');
         }
       }
     }
-
-
+    
     function updateSNRFromDepth() {
       const depthVal = document.getElementById('depth').value.trim();
       const depthErrVal = document.getElementById('depthErr').value.trim();
