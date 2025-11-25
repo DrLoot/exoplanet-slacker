@@ -17,7 +17,6 @@
     html,body{height:100%;background:var(--bg);color:var(--text);}
     body{margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;line-height:1.6;}
 
-    /* background */
     .starfield{position:fixed;inset:0;z-index:-2;overflow:hidden;
       background:radial-gradient(1200px 800px at 80% -10%, rgba(91,192,255,.12), transparent 60%),
                  radial-gradient(1000px 700px at 10% 120%, rgba(255,111,0,.08), transparent 60%),
@@ -38,7 +37,6 @@
       animation:drift 300s linear infinite;}
     @keyframes drift{from{transform:translate3d(0,0,0)}to{transform:translate3d(2000px,2000px,0)}}
 
-    /* header */
     header{padding: clamp(48px, 8vw, 96px) 24px 32px; text-align:center;
       background: radial-gradient(900px 600px at 80% 20%, rgba(91,192,255,.12), transparent 60%);}
     h1{font-family:Orbitron,Inter,sans-serif; font-size:clamp(28px,5.6vw,56px); margin:0;}
@@ -49,14 +47,12 @@
       color:var(--text);text-decoration:none;box-shadow:var(--shadow);cursor:pointer;}
     .btn:hover{transform:translateY(-1px)}
 
-    /* layout */
     main{padding:24px;max-width:1100px;margin:0 auto}
     .card{background:linear-gradient(180deg,rgba(16,20,40,.7),rgba(10,12,20,.8));
       border:1px solid var(--border); border-radius:var(--radius); padding:22px; box-shadow:var(--shadow); margin-bottom:28px;}
     h2{margin:0 0 8px}
     .muted{color:var(--muted)}
 
-    /* form */
     .form-grid{
       display:grid;
       grid-template-columns: repeat(auto-fit,minmax(220px,1fr));
@@ -96,7 +92,6 @@
       margin-top:6px;
     }
 
-    /* history */
     .history-list{
       display:grid;
       gap:12px;
@@ -157,7 +152,7 @@
     <!-- Builder -->
     <section class="card" aria-labelledby="builder-heading">
       <h2 id="builder-heading">1. Observation Details</h2>
-      <p class="muted">Fill in your transit info and choose what to include. The generator will create a ready-to-paste Slack post.</p>
+      <p class="muted">Fill in your transit info and choose what to include. You can either enter SNR directly or compute it from Rp²/Rs² and its uncertainty.</p>
 
       <form id="transitForm" autocomplete="off">
         <div class="form-grid">
@@ -172,6 +167,16 @@
           </div>
 
           <div>
+            <label for="depth">Rp²/Rs² (depth)</label>
+            <input id="depth" name="depth" type="number" step="0.0001" placeholder="0.0256" />
+          </div>
+
+          <div>
+            <label for="depthErr">σ(Rp²/Rs²) (uncertainty)</label>
+            <input id="depthErr" name="depthErr" type="number" step="0.0001" placeholder="0.0012" />
+          </div>
+
+          <div>
             <label for="snr">Transit SNR (σ)</label>
             <input id="snr" name="snr" type="number" step="0.1" placeholder="21.3" />
           </div>
@@ -182,21 +187,26 @@
           </div>
 
           <div>
-            <label for="site">Site / instrument</label>
-            <input id="site" name="site" placeholder="MObs :microobservatory: or backyard rig" />
+            <label for="data">Data</label>
+            <select id="data" name="data">
+              <option value="">Select data type…</option>
+              <option>EpW/MObs Checkout Data</option>
+              <option>MObs Image Directory</option>
+              <option>LCO</option>
+              <option>Backyard Rig</option>
+              <option>Other</option>
+            </select>
           </div>
+        </div>
 
-          <div>
-            <label for="notes">Notes (directory, variables, uploads…)</label>
-            <input id="notes" name="notes" placeholder="MObs image directory. Transit + 32 stellar vars uploaded to AAVSO :aavso:." />
-          </div>
+        <div class="muted" style="font-size:12px;margin-top:6px;">
+          If both Rp²/Rs² and σ(Rp²/Rs²) are provided, Transit SNR will be computed as depth / uncertainty.
         </div>
 
         <div class="inline-options" aria-label="Content options">
           <label><input type="checkbox" id="includeSNR" checked /> Include SNR line</label>
           <label><input type="checkbox" id="includeRank" checked /> Include rank</label>
-          <label><input type="checkbox" id="includeSite" checked /> Include site</label>
-          <label><input type="checkbox" id="includeNotes" checked /> Include notes</label>
+          <label><input type="checkbox" id="includeData" checked /> Include Data</label>
         </div>
 
         <div class="template-row">
@@ -279,9 +289,9 @@
     }
 
     function snrFlair(snr){
-      if(!snr && snr !== 0) return '';
+      if(snr === '' || snr === null || snr === undefined) return '';
       const s = Number(snr);
-      if(isNaN(s)) return '';
+      if(!isFinite(s)) return '';
       if(s >= 20) return ':rocket:';
       if(s >= 10) return ':sparkles:';
       if(s >= 5)  return ':telescope:';
@@ -290,9 +300,9 @@
     }
 
     function rankFlair(rank){
-      if(!rank && rank !== 0) return '';
+      if(rank === '' || rank === null || rank === undefined) return '';
       const r = Number(rank);
-      if(isNaN(r)) return '';
+      if(!isFinite(r)) return '';
       if(r <= 100)  return ':crown:';
       if(r <= 500)  return ':first_quarter_moon_with_face:';
       if(r <= 1000) return ':rocket:';
@@ -310,17 +320,39 @@
       autoFlairEl.textContent = bits.length ? bits.join(' | ') : 'Enter SNR and/or rank to see suggested flair.';
     }
 
+    function updateSNRFromDepth(){
+      const depthVal = document.getElementById('depth').value.trim();
+      const depthErrVal = document.getElementById('depthErr').value.trim();
+      if(!depthVal || !depthErrVal){
+        return; // not enough info yet
+      }
+      let depth = Number(depthVal);
+      let depthErr = Number(depthErrVal);
+      const snrField = document.getElementById('snr');
+
+      if(!isFinite(depth) || !isFinite(depthErr) || depthErr <= 0){
+        return; // invalid input, do nothing
+      }
+
+      try{
+        const snr = depth / depthErr;
+        if(!isFinite(snr)) return;
+        snrField.value = snr.toFixed(1);
+        updateAutoFlair();
+      } catch(e){
+        // fail silently, don't crash
+      }
+    }
+
     function buildPost(){
       const target = document.getElementById('target').value.trim();
       const rank = document.getElementById('rank').value.trim();
       const snr = document.getElementById('snr').value.trim();
       const obsDate = document.getElementById('obsDate').value;
-      const site = document.getElementById('site').value.trim();
-      const notes = document.getElementById('notes').value.trim();
+      const data = document.getElementById('data').value;
       const includeSNR = document.getElementById('includeSNR').checked;
       const includeRank = document.getElementById('includeRank').checked;
-      const includeSite = document.getElementById('includeSite').checked;
-      const includeNotes = document.getElementById('includeNotes').checked;
+      const includeData = document.getElementById('includeData').checked;
       const template = document.getElementById('template').value;
 
       if(!target){
@@ -353,15 +385,11 @@
           lines.push(line2);
         }
 
-        // Line 3: date + site + notes
-        let line3Parts = [];
-        if(humanDate) line3Parts.push(humanDate);
-        if(includeSite && site) line3Parts.push(site);
-        let line3 = line3Parts.join(', ');
-        if(includeNotes && notes){
-          if(line3) line3 += '. ';
-          line3 += notes;
-        }
+        // Line 3: date + data
+        let parts = [];
+        if(humanDate) parts.push(humanDate);
+        if(includeData && data) parts.push(data);
+        const line3 = parts.join(', ');
         if(line3) lines.push(line3);
 
       } else if(template === 'tech'){
@@ -379,10 +407,8 @@
 
         let meta = [];
         if(humanDate) meta.push(humanDate);
-        if(includeSite && site) meta.push(site);
+        if(includeData && data) meta.push(data);
         if(meta.length) lines.push(meta.join(' — '));
-
-        if(includeNotes && notes) lines.push(notes);
 
       } else if(template === 'minimal'){
         let line = target;
@@ -396,8 +422,7 @@
           if(snrEmoji) line += ` ${snrEmoji}`;
         }
         if(humanDate) line += ` — ${humanDate}`;
-        if(includeSite && site) line += ` — ${site}`;
-        if(includeNotes && notes) line += ` — ${notes}`;
+        if(includeData && data) line += ` — ${data}`;
         lines.push(line);
       }
 
@@ -410,7 +435,6 @@
       const text = outputEl.value;
       if(!text.trim()) return;
       navigator.clipboard?.writeText(text).then(()=>{
-        // tiny visual cue
         const original = document.getElementById('copyBtn').textContent;
         document.getElementById('copyBtn').textContent = 'Copied!';
         setTimeout(()=>{document.getElementById('copyBtn').textContent = original;}, 1000);
@@ -521,7 +545,6 @@
         post
       };
       items.unshift(entry);
-      // keep last 30
       if(items.length > 30) items = items.slice(0,30);
       localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
       renderHistory(items);
@@ -534,6 +557,10 @@
     ['snr','rank'].forEach(id=>{
       document.getElementById(id).addEventListener('input', updateAutoFlair);
     });
+
+    document.getElementById('depth').addEventListener('input', updateSNRFromDepth);
+    document.getElementById('depthErr').addEventListener('input', updateSNRFromDepth);
+
     updateAutoFlair();
     loadHistory();
   </script>
