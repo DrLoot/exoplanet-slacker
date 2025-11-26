@@ -463,6 +463,7 @@
           <label><input type="checkbox" id="includeSNR" checked /> Include SNR line</label>
           <label><input type="checkbox" id="includeRank" checked /> Include rank</label>
           <label><input type="checkbox" id="includeData" checked /> Include Data</label>
+          <label><input type="checkbox" id="includeFlair" checked /> Include flair emojis</label>
         </div>
 
         <div class="template-row">
@@ -769,6 +770,7 @@
       const data = document.getElementById('data').value;
       const includeSNR = document.getElementById('includeSNR').checked;
       const includeRank = document.getElementById('includeRank').checked;
+      const includeFlair = document.getElementById('includeFlair').checked;
       const includeData = document.getElementById('includeData').checked;
       const template = document.getElementById('template').value;
 
@@ -778,9 +780,14 @@
       }
 
       const humanDate = formatDateHuman(obsDate);
-      const snrEmoji = snrFlair(snr);
-      const rankEmoji = rankFlair(rank);
-
+      // Only add emojis if flair is enabled
+      let snrEmoji = '';
+      let rankEmoji = '';
+      if (includeFlair) {
+        snrEmoji = snrFlair(snr);
+        rankEmoji = rankFlair(rank);
+      }
+      
       let lines = [];
 
       if (template === 'short') {
@@ -1088,7 +1095,7 @@
 
       return meta;
     }
-    
+
     function clearForm() {
       // Clear all inputs
       form.reset();
