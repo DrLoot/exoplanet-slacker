@@ -399,6 +399,14 @@
       <form id="transitForm" autocomplete="off">
         <div class="form-grid">
           <div>
+            <label class="muted" style="font-size:13px;">Import from EXOTIC / AAVSO metadata (.txt)</label>
+            <label class="btn" style="padding:6px 12px; font-size:12px; cursor:pointer;">
+              Choose file…
+              <input id="lcFile" type="file" accept=".txt" style="display:none;">
+            </label>
+            <div id="lcFileName" class="muted" style="font-size:12px; margin-top:4px;"></div>
+          </div>
+          <div>
             <label for="target">Target name</label>
             <input id="target" name="target" placeholder="HAT-P-32 b" required />
           </div>
@@ -470,16 +478,16 @@
               <div class="flair-title">SNR Flair</div>
               <div class="flair-rows">
                 <div class="flair-row snr-tier" data-tier="20">
-                  <span class="flair-label">SNR 20+ </span><span>🚀</span>
+                  <span class="flair-label">SNR 20σ+ </span><span>🚀</span>
                 </div>
                 <div class="flair-row snr-tier" data-tier="10">
-                  <span class="flair-label">SNR 10–19 </span><span>✨</span>
+                  <span class="flair-label">SNR 10–19σ </span><span>✨</span>
                 </div>
                 <div class="flair-row snr-tier" data-tier="5">
-                  <span class="flair-label">SNR 5–9 </span><span>🔭</span>
+                  <span class="flair-label">SNR 5–9σ </span><span>🔭</span>
                 </div>
                 <div class="flair-row snr-tier" data-tier="0">
-                  <span class="flair-label">SNR 0–4 </span><span>⚠️</span>
+                  <span class="flair-label">SNR 0–4σ </span><span>⚠️</span>
                 </div>
               </div>
             </div>
