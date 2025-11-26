@@ -162,6 +162,11 @@
       margin-top: 16px;
     }
 
+    /* make some rows span the full grid width */
+    .form-grid-row-full {
+      grid-column: 1 / -1;
+    }
+
     label {
       font-size: 14px;
       display: block;
@@ -393,63 +398,61 @@
     <!-- Builder -->
     <section class="card" aria-labelledby="builder-heading">
       <h2 id="builder-heading">1. Observation Details</h2>
-      <p class="muted">Fill in your transit info and choose what to include. You can either enter SNR directly or
+      <p class="muted">Upload your AAVSO.txt file from EXOTIC, or fill in the transit info manually. You can either
+        enter SNR directly or
         compute it from Rp²/Rs² and its uncertainty.</p>
 
       <form id="transitForm" autocomplete="off">
-        <div style="margin-bottom: 16px;">
-          <label class="muted" style="font-size:13px;">
-            Import from EXOTIC / AAVSO metadata (.txt)
-          </label>
-          <br>
-          <label class="btn" style="padding:6px 12px; font-size:12px; cursor:pointer; margin-top:6px;">
-            Choose file…
-            <input id="lcFile" type="file" accept=".txt" style="display:none;">
-          </label>
-          <div id="lcFileName" class="muted" style="font-size:12px; margin-top:4px;"></div>
-        </div>
-        <div class="form-grid"></div>
-        <div>
-          <label for="target">Target name</label>
-          <input id="target" name="target" placeholder="HAT-P-32 b" required />
-        </div>
+        <div class="form-grid">
+          <div class="form-grid-row-full">
+            <br>
+            <label class="btn" style="padding:6px 12px; font-size:12px; cursor:pointer; margin-top:6px;">
+              Choose file…
+              <input id="lcFile" type="file" accept=".txt" style="display:none;">
+            </label>
+            <div id="lcFileName" class="muted" style="font-size:12px; margin-top:4px;"></div>
+          </div>
+          <div>
+            <label for="target">Target name</label>
+            <input id="target" name="target" placeholder="HAT-P-32 b" required />
+          </div>
 
-        <div>
-          <label for="rank">Rank (NASA list)</label>
-          <input id="rank" name="rank" type="number" min="1" placeholder="900" />
-        </div>
+          <div>
+            <label for="rank">Rank (NASA list)</label>
+            <input id="rank" name="rank" type="number" min="1" placeholder="900" />
+          </div>
 
-        <div>
-          <label for="depth">Rp²/Rs² (depth)</label>
-          <input id="depth" name="depth" type="number" step="0.0001" placeholder="0.0256" />
-        </div>
+          <div>
+            <label for="depth">Rp²/Rs² (depth)</label>
+            <input id="depth" name="depth" type="number" step="0.0001" placeholder="0.0256" />
+          </div>
 
-        <div>
-          <label for="depthErr">σ(Rp²/Rs²) (uncertainty)</label>
-          <input id="depthErr" name="depthErr" type="number" step="0.0001" placeholder="0.0012" />
-        </div>
+          <div>
+            <label for="depthErr">σ(Rp²/Rs²) (uncertainty)</label>
+            <input id="depthErr" name="depthErr" type="number" step="0.0001" placeholder="0.0012" />
+          </div>
 
-        <div>
-          <label for="snr">Transit SNR (σ)</label>
-          <input id="snr" name="snr" type="number" step="0.1" placeholder="21.3" />
-        </div>
+          <div>
+            <label for="snr">Transit SNR (σ)</label>
+            <input id="snr" name="snr" type="number" step="0.1" placeholder="21.3" />
+          </div>
 
-        <div>
-          <label for="obsDate">Observation date</label>
-          <input id="obsDate" name="obsDate" type="date" />
-        </div>
+          <div>
+            <label for="obsDate">Observation date</label>
+            <input id="obsDate" name="obsDate" type="date" />
+          </div>
 
-        <div>
-          <label for="data">Data</label>
-          <select id="data" name="data">
-            <option value="">Select data type…</option>
-            <option>EpW/MObs Checkout Data</option>
-            <option>MObs Image Directory</option>
-            <option>LCO</option>
-            <option>Backyard Rig</option>
-            <option>Other</option>
-          </select>
-        </div>
+          <div>
+            <label for="data">Data</label>
+            <select id="data" name="data">
+              <option value="">Select data type…</option>
+              <option>EpW/MObs Checkout Data</option>
+              <option>MObs Image Directory</option>
+              <option>LCO</option>
+              <option>Backyard Rig</option>
+              <option>Other</option>
+            </select>
+          </div>
         </div>
 
         <div class="muted" style="font-size:12px;margin-top:6px;">
@@ -725,6 +728,13 @@
 
     const targetInput = document.getElementById('target');
     const rankInput = document.getElementById('rank');
+    const lcFileInput = document.getElementById('lcFile');
+    const lcFileNameEl = document.getElementById('lcFileName');
+
+    if (lcFileInput) {
+      lcFileInput.addEventListener('change', handleLcFileImport);
+    }
+
 
     function tryAutoFillRank() {
       // don't overwrite manual rank if the user already typed one
@@ -941,6 +951,141 @@
       if (items.length > 30) items = items.slice(0, 30);
       localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
       renderHistory(items);
+    }
+    function handleLcFileImport(event) {
+      const file = event.target.files && event.target.files[0];
+      if (!file) return;
+
+      if (lcFileNameEl) {
+        lcFileNameEl.textContent = file.name;
+      }
+
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        const text = e.target.result;
+        const meta = parseExoticText(text, file.name);
+
+        if (!meta) {
+          autoFlairEl.textContent = "Could not read metadata from file. Check format.";
+          return;
+        }
+
+        let changed = false;
+
+        if (meta.target) {
+          targetInput.value = meta.target;
+          // this will also pretty-format and rank-fill from your JSON
+          tryAutoFillRank();
+          changed = true;
+        }
+
+        if (meta.snr) {
+          document.getElementById('snr').value = meta.snr;
+          changed = true;
+        }
+
+        if (meta.depth) {
+          document.getElementById('depth').value = meta.depth;
+          changed = true;
+        }
+
+        if (meta.depthErr) {
+          document.getElementById('depthErr').value = meta.depthErr;
+          changed = true;
+        }
+
+        if (meta.date) {
+          document.getElementById('obsDate').value = meta.date; // YYYY-MM-DD
+          changed = true;
+        }
+
+        if (meta.data) {
+          const dataSelect = document.getElementById('data');
+          if (dataSelect) {
+            dataSelect.value = meta.data; // e.g. "EpW/MObs Checkout Data"
+          }
+        }
+
+        if (changed) {
+          updateAutoFlair();
+        }
+      };
+
+      reader.readAsText(file);
+    }
+
+    /**
+     * Parse EXOTIC / AAVSO metadata .txt created alongside the lightcurve.
+     * Returns an object like:
+     * { target, depth, depthErr, snr, date, data } or null if nothing usable found.
+     */
+    function parseExoticText(text, fileName) {
+      if (!text) return null;
+
+      const lines = text.split(/\r?\n/);
+      const meta = {};
+
+      for (const raw of lines) {
+        const line = raw.trim();
+        if (!line || !line.startsWith('#')) continue;
+
+        // Target name (prefer exoplanet name, fall back to star name)
+        if (line.startsWith('#EXOPLANET_NAME=')) {
+          meta.target = line.split('=')[1].trim();
+        } else if (line.startsWith('#STAR_NAME=') && !meta.target) {
+          meta.target = line.split('=')[1].trim();
+        }
+
+        // Data source / instrument hint
+        if (line.startsWith('#SECONDARY_OBSCODES=') || line.startsWith('#OBSCODE=')) {
+          const v = line.split('=')[1].trim().toUpperCase();
+          if (v.includes('MOBS')) {
+            meta.data = 'EpW/MObs Checkout Data';
+          } else if (v.includes('LCO')) {
+            meta.data = 'LCO';
+          } else {
+            // leave it undefined; user can pick "Backyard Rig" or "Other"
+          }
+        }
+
+        // Rp/R* and its uncertainty from RESULTS line
+        if (line.startsWith('#RESULTS=')) {
+          // Example: #RESULTS=..., Rp/R*=0.134 +/- 0.014, ...
+          const m = line.match(/Rp\/R\*=\s*([0-9.]+)\s*\+\/-\s*([0-9.]+)/);
+          if (m) {
+            const rp = parseFloat(m[1]);
+            const rpErr = parseFloat(m[2]);
+            if (Number.isFinite(rp) && Number.isFinite(rpErr) && rp > 0 && rpErr > 0) {
+              const depth = rp * rp;
+              const depthErr = 2 * rp * rpErr; // error propagation for x^2
+
+              meta.depth = depth.toFixed(4);      // Rp^2/Rs^2
+              meta.depthErr = depthErr.toFixed(4);
+
+              if (depthErr > 0) {
+                const snr = depth / depthErr;
+                if (Number.isFinite(snr)) {
+                  meta.snr = snr.toFixed(1);
+                }
+              }
+            }
+          }
+        }
+      }
+
+      // Observation date from filename, e.g. AAVSO_WASP-12 b_2025-11-21.txt
+      if (fileName) {
+        const m = fileName.match(/\d{4}-\d{2}-\d{2}/);
+        if (m) {
+          meta.date = m[0]; // already YYYY-MM-DD
+        }
+      }
+
+      if (!meta.target && !meta.snr && !meta.depth && !meta.depthErr && !meta.date && !meta.data) {
+        return null;
+      }
+
+      return meta;
     }
 
     document.getElementById('generateBtn').addEventListener('click', buildPost);
