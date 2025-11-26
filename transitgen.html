@@ -397,56 +397,59 @@
         compute it from Rp²/Rs² and its uncertainty.</p>
 
       <form id="transitForm" autocomplete="off">
-        <div class="form-grid">
-          <div>
-            <label class="muted" style="font-size:13px;">Import from EXOTIC / AAVSO metadata (.txt)</label>
-            <label class="btn" style="padding:6px 12px; font-size:12px; cursor:pointer;">
-              Choose file…
-              <input id="lcFile" type="file" accept=".txt" style="display:none;">
-            </label>
-            <div id="lcFileName" class="muted" style="font-size:12px; margin-top:4px;"></div>
-          </div>
-          <div>
-            <label for="target">Target name</label>
-            <input id="target" name="target" placeholder="HAT-P-32 b" required />
-          </div>
+        <div style="margin-bottom: 16px;">
+          <label class="muted" style="font-size:13px;">
+            Import from EXOTIC / AAVSO metadata (.txt)
+          </label>
+          <br>
+          <label class="btn" style="padding:6px 12px; font-size:12px; cursor:pointer; margin-top:6px;">
+            Choose file…
+            <input id="lcFile" type="file" accept=".txt" style="display:none;">
+          </label>
+          <div id="lcFileName" class="muted" style="font-size:12px; margin-top:4px;"></div>
+        </div>
+        <div class="form-grid"></div>
+        <div>
+          <label for="target">Target name</label>
+          <input id="target" name="target" placeholder="HAT-P-32 b" required />
+        </div>
 
-          <div>
-            <label for="rank">Rank (NASA list)</label>
-            <input id="rank" name="rank" type="number" min="1" placeholder="900" />
-          </div>
+        <div>
+          <label for="rank">Rank (NASA list)</label>
+          <input id="rank" name="rank" type="number" min="1" placeholder="900" />
+        </div>
 
-          <div>
-            <label for="depth">Rp²/Rs² (depth)</label>
-            <input id="depth" name="depth" type="number" step="0.0001" placeholder="0.0256" />
-          </div>
+        <div>
+          <label for="depth">Rp²/Rs² (depth)</label>
+          <input id="depth" name="depth" type="number" step="0.0001" placeholder="0.0256" />
+        </div>
 
-          <div>
-            <label for="depthErr">σ(Rp²/Rs²) (uncertainty)</label>
-            <input id="depthErr" name="depthErr" type="number" step="0.0001" placeholder="0.0012" />
-          </div>
+        <div>
+          <label for="depthErr">σ(Rp²/Rs²) (uncertainty)</label>
+          <input id="depthErr" name="depthErr" type="number" step="0.0001" placeholder="0.0012" />
+        </div>
 
-          <div>
-            <label for="snr">Transit SNR (σ)</label>
-            <input id="snr" name="snr" type="number" step="0.1" placeholder="21.3" />
-          </div>
+        <div>
+          <label for="snr">Transit SNR (σ)</label>
+          <input id="snr" name="snr" type="number" step="0.1" placeholder="21.3" />
+        </div>
 
-          <div>
-            <label for="obsDate">Observation date</label>
-            <input id="obsDate" name="obsDate" type="date" />
-          </div>
+        <div>
+          <label for="obsDate">Observation date</label>
+          <input id="obsDate" name="obsDate" type="date" />
+        </div>
 
-          <div>
-            <label for="data">Data</label>
-            <select id="data" name="data">
-              <option value="">Select data type…</option>
-              <option>EpW/MObs Checkout Data</option>
-              <option>MObs Image Directory</option>
-              <option>LCO</option>
-              <option>Backyard Rig</option>
-              <option>Other</option>
-            </select>
-          </div>
+        <div>
+          <label for="data">Data</label>
+          <select id="data" name="data">
+            <option value="">Select data type…</option>
+            <option>EpW/MObs Checkout Data</option>
+            <option>MObs Image Directory</option>
+            <option>LCO</option>
+            <option>Backyard Rig</option>
+            <option>Other</option>
+          </select>
+        </div>
         </div>
 
         <div class="muted" style="font-size:12px;margin-top:6px;">
