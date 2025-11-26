@@ -526,6 +526,7 @@
           <button type="button" class="btn" id="generateBtn">Generate Post</button>
           <button type="button" class="btn" id="copyBtn">Copy to Clipboard</button>
           <button type="button" class="btn" id="saveBtn">Save to History</button>
+          <button id="clearFormBtn" type="button" class="btn btn-secondary">Clear Form</button>
         </div>
       </form>
     </section>
@@ -1087,10 +1088,38 @@
 
       return meta;
     }
+    
+    function clearForm() {
+      // Clear all inputs
+      form.reset();
+
+      // Clear dynamic fields
+      document.getElementById('rank').value = '';
+      document.getElementById('snr').value = '';
+      document.getElementById('depth').value = '';
+      document.getElementById('depthErr').value = '';
+      document.getElementById('obsDate').value = '';
+      document.getElementById('lcFileName').textContent = '';
+
+      // Reset auto flair preview
+      autoFlairEl.textContent = 'Enter SNR and/or rank to see suggested flair.';
+
+      // Remove highlight classes
+      document.querySelectorAll('.flair-row.active').forEach(el => {
+        el.classList.remove('active');
+      });
+
+      // Clear output box
+      outputEl.value = '';
+
+      // Re-run initial UI updates
+      updateAutoFlair();
+    }
 
     document.getElementById('generateBtn').addEventListener('click', buildPost);
     document.getElementById('copyBtn').addEventListener('click', copyToClipboard);
     document.getElementById('saveBtn').addEventListener('click', saveToHistory);
+    document.getElementById('clearFormBtn').addEventListener('click', clearForm);
 
     ['snr', 'rank'].forEach(id => {
       document.getElementById(id).addEventListener('input', updateAutoFlair);
