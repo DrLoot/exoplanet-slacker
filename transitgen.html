@@ -1100,10 +1100,35 @@
       }
 
       // Observation date from filename, e.g. AAVSO_WASP-12 b_2025-11-21.txt
-      if (fileName) {
-        const m = fileName.match(/\d{4}-\d{2}-\d{2}/);
+      if (fileName && !meta.date) {
+        // 1) Try YYYY-MM-DD (standard EXOTIC)
+        let m = fileName.match(/\d{4}-\d{2}-\d{2}/);
         if (m) {
           meta.date = m[0]; // already YYYY-MM-DD
+        } else {
+          // 2) Try DD-MMM-YYYY (local EXOTIC)
+          m = fileName.match(/(\d{2})-([A-Za-z]{3})-(\d{4})/);
+          if (m) {
+            const [, dd, monStr, yyyy] = m;
+            const monthMap = {
+              JAN: '01',
+              FEB: '02',
+              MAR: '03',
+              APR: '04',
+              MAY: '05',
+              JUN: '06',
+              JUL: '07',
+              AUG: '08',
+              SEP: '09',
+              OCT: '10',
+              NOV: '11',
+              DEC: '12',
+            };
+            const mm = monthMap[monStr.toUpperCase()];
+            if (mm) {
+              meta.date = `${yyyy}-${mm}-${dd}`;
+            }
+          }
         }
       }
 
