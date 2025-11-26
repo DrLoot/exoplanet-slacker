@@ -459,13 +459,6 @@
           If both Rp²/Rs² and σ(Rp²/Rs²) are provided, Transit SNR will be computed as depth / uncertainty.
         </div>
 
-        <div class="inline-options" aria-label="Content options">
-          <label><input type="checkbox" id="includeSNR" checked /> Include SNR line</label>
-          <label><input type="checkbox" id="includeRank" checked /> Include rank</label>
-          <label><input type="checkbox" id="includeData" checked /> Include Data</label>
-          <label><input type="checkbox" id="includeFlair" checked /> Include flair emojis</label>
-        </div>
-
         <div class="template-row">
           <div>
             <label for="template">Template style</label>
@@ -521,6 +514,13 @@
           <div id="autoFlair" class="flair-note">
             Enter SNR and/or rank to see which tier is active.
           </div>
+        </div>
+
+        <div class="inline-options" aria-label="Content options">
+          <label><input type="checkbox" id="includeSNR" checked /> Include SNR line</label>
+          <label><input type="checkbox" id="includeRank" checked /> Include rank</label>
+          <label><input type="checkbox" id="includeData" checked /> Include Data</label>
+          <label><input type="checkbox" id="includeFlair" checked /> Include flair emojis</label>
         </div>
 
         <div class="buttons-row">
@@ -787,7 +787,7 @@
         snrEmoji = snrFlair(snr);
         rankEmoji = rankFlair(rank);
       }
-      
+
       let lines = [];
 
       if (template === 'short') {
@@ -941,8 +941,16 @@
     }
 
     function saveToHistory() {
-      const post = buildPost();
-      if (!post.trim()) return;
+      // Prefer whatever is currently in the output box (including manual edits)
+      let post = (outputEl.value || '').trim();
+
+      // If the user hasn't generated/edited anything yet, build a fresh post
+      if (!post) {
+        post = buildPost();
+      }
+
+      if (!post || !post.trim()) return;
+
       const target = document.getElementById('target').value.trim();
       const rank = document.getElementById('rank').value.trim();
       const snr = document.getElementById('snr').value.trim();
@@ -954,12 +962,22 @@
         const raw = localStorage.getItem(STORAGE_KEY);
         if (raw) items = JSON.parse(raw);
       } catch (e) { }
-      const entry = { target, rank, snr, date: formatDateHuman(obsDate), template, post };
+
+      const entry = {
+        target,
+        rank,
+        snr,
+        date: formatDateHuman(obsDate),
+        template,
+        post,
+      };
+
       items.unshift(entry);
       if (items.length > 30) items = items.slice(0, 30);
       localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
       renderHistory(items);
     }
+
     function handleLcFileImport(event) {
       const file = event.target.files && event.target.files[0];
       if (!file) return;
