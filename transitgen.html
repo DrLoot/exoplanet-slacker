@@ -1096,12 +1096,22 @@
 
     // Button click opens dialog if we have data
     if (infoCardBtn && infoCardDialog) {
-      infoCardBtn.addEventListener('click', () => {
+      infoCardBtn.addEventListener('click', async () => {
+        // If we don't have data yet (e.g. user just typed and clicked),
+        // try to fetch it now.
+        if (!currentPlanetInfo) {
+          await updateInfoCardFromTarget(targetInput.value);
+        }
+
+        // If we STILL don't have info (error / not found), do nothing.
         if (!currentPlanetInfo) return;
+
+        // Now we have data – show the card.
         populateInfoCard(currentPlanetInfo, currentPlanetNasaUrl);
         infoCardDialog.showModal();
       });
     }
+
 
     if (lcFileInput) {
       lcFileInput.addEventListener('change', handleLcFileImport);
