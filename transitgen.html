@@ -712,6 +712,24 @@
     let currentPlanetNasaUrl = null;
     let infoCardIsLoading = false;
 
+    function syncInfoButtonState() {
+      if (!infoCardBtn || !targetInput) return;
+      const hasName = targetInput.value.trim().length > 0;
+
+      if (infoCardIsLoading) {
+        infoCardBtn.disabled = true;
+        infoCardBtn.textContent = 'Loading…';
+        infoCardBtn.title = 'Fetching planet data from NASA Exoplanet Archive…';
+        return;
+      }
+
+      infoCardBtn.disabled = !hasName;
+      infoCardBtn.textContent = 'Planet info';
+      infoCardBtn.title = hasName
+        ? 'Fetch planet info for this target'
+        : 'Enter a target name first';
+    }
+
     function buildNasaExoplanetUrl(plName) {
       if (!plName) return null;
       const slug = plName
@@ -1097,18 +1115,37 @@
     // Button click opens dialog if we have data
     if (infoCardBtn && infoCardDialog) {
       infoCardBtn.addEventListener('click', async () => {
-        // If we don't have data yet (e.g. user just typed and clicked),
-        // try to fetch it now.
-        if (!currentPlanetInfo) {
-          await updateInfoCardFromTarget(targetInput.value);
+        const name = (targetInput.value || '').trim();
+        if (!name) return;
+
+        infoCardIsLoading = true;
+        syncInfoButtonState();
+
+        try {
+          const info = await fetchPlanetInfo(name);
+
+          if (!info) {
+            infoCardIsLoading = false;
+            infoCardBtn.disabled = false;
+            infoCardBtn.textContent = 'No info found';
+            infoCardBtn.title = `No entry found in NASA Exoplanet Archive for "${name}".`;
+            return;
+          }
+
+          currentPlanetInfo = info;
+          currentPlanetNasaUrl = buildNasaExoplanetUrl(info.pl_name || name);
+
+          // Populate and show the dialog immediately on first click
+          populateInfoCard(currentPlanetInfo, currentPlanetNasaUrl);
+          infoCardDialog.showModal();
+        } catch (err) {
+          console.error('Planet info fetch failed:', err);
+          infoCardBtn.textContent = 'Info unavailable';
+          infoCardBtn.title = 'Could not load planet info (check console for details).';
+        } finally {
+          infoCardIsLoading = false;
+          syncInfoButtonState();
         }
-
-        // If we STILL don't have info (error / not found), do nothing.
-        if (!currentPlanetInfo) return;
-
-        // Now we have data – show the card.
-        populateInfoCard(currentPlanetInfo, currentPlanetNasaUrl);
-        infoCardDialog.showModal();
       });
     }
 
@@ -1119,10 +1156,9 @@
     function tryAutoFillRank() {
       const rawName = targetInput.value;
 
-      // If user already typed a rank manually, don't auto-fill it,
-      // but STILL update the planet info card.
+      // If user already typed a rank manually, just refresh the button state
       if (rankInput.value.trim()) {
-        updateInfoCardFromTarget(rawName);
+        syncInfoButtonState();
         return;
       }
 
@@ -1138,12 +1174,13 @@
           "Target not found — check spelling, catalog, or formatting.";
       }
 
-      // NOW that the name may have been normalized, do the NASA lookup.
-      updateInfoCardFromTarget(targetInput.value);
+      // Just update button enabled/disabled state — no auto fetch
+      syncInfoButtonState();
     }
 
     targetInput.addEventListener('blur', tryAutoFillRank);
     targetInput.addEventListener('change', tryAutoFillRank);
+    
 
     /* =========================================== */
 
@@ -1418,13 +1455,8 @@
           }
         }
 
-        if (changed) {
+                if (changed) {
           updateAutoFlair();
-
-          // 👇 NEW: kick off planet info lookup when we have a target
-          if (meta.target && typeof updateInfoCardFromTarget === 'function') {
-            updateInfoCardFromTarget(targetInput.value);
-          }
         }
       };
 
@@ -1572,6 +1604,7 @@
     updateAutoFlair();
     loadHistory();
     loadRankLookup();
+    syncInfoButtonState();
   </script>
 </body>
 
