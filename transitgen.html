@@ -750,19 +750,73 @@
       return await res.json();
     }
 
+    function buildNameCandidates(rawName) {
+      if (!rawName) return [];
+      const s = rawName.trim().replace(/\s+/g, " ");
+      if (!s) return [];
+
+      const candidates = new Set();
+
+      // 0) Always try what the user/file gave us first
+      candidates.add(s);
+
+      // Split on spaces and hyphens to detect patterns like:
+      // "gj1214b", "GJ1214b", "GJ 1214 b", "TOI-733 b", etc.
+      const compact = s.replace(/[\s-]+/g, "");
+      const m = compact.match(/^([A-Za-z]+)(\d+)([A-Za-z])$/);
+      const mNoSuffix = compact.match(/^([A-Za-z]+)(\d+)$/);
+
+      const addVariants = (prefixRaw, num, suffix) => {
+        const upperPrefix = prefixRaw.toUpperCase();                    // GJ / TOI
+        const titlePrefix =
+          prefixRaw.charAt(0).toUpperCase() + prefixRaw.slice(1).toLowerCase(); // Kepler
+
+        const suf = suffix ? suffix.toLowerCase() : "";
+        const sufSp = suffix ? " " + suf : "";
+
+        // Uppercase-style variants: GJ1214b, GJ 1214 b, GJ-1214 b, GJ-1214b
+        candidates.add(`${upperPrefix}${num}${suf}`);         // GJ1214b
+        candidates.add(`${upperPrefix} ${num}${sufSp}`);      // GJ 1214 b
+        candidates.add(`${upperPrefix}-${num}${sufSp}`);      // GJ-1214 b
+        candidates.add(`${upperPrefix}-${num}${suf}`);        // GJ-1214b
+
+        // Title-style variants: Kepler442 b, Kepler-442 b, Kepler 442 b
+        candidates.add(`${titlePrefix}${num}${suf}`);         // Kepler442b
+        candidates.add(`${titlePrefix} ${num}${sufSp}`);      // Kepler 442 b
+        candidates.add(`${titlePrefix}-${num}${sufSp}`);      // Kepler-442 b
+      };
+
+      if (m) {
+        const [, prefix, num, suffix] = m;
+        addVariants(prefix, num, suffix);
+      } else if (mNoSuffix) {
+        const [, prefix, num] = mNoSuffix;
+        addVariants(prefix, num, "");
+      }
+
+      return Array.from(candidates);
+    }
+
     async function resolveNameViaApi(rawName) {
       if (!rawName || !rawName.trim()) return null;
 
-      try {
-        const info = await fetchPlanetInfo(rawName.trim());
-        if (!info) return null;
+      const candidates = buildNameCandidates(rawName);
 
-        // Use NASA's canonical planet name
-        return info.pl_name || null;
-      } catch (e) {
-        console.warn('Failed to resolve name via NASA API:', e);
-        return null;
+      for (const candidate of candidates) {
+        try {
+          const info = await fetchPlanetInfo(candidate);
+          if (info && info.pl_name) {
+            // We have a real match – return NASA's canonical name
+            return info.pl_name;
+          }
+        } catch (e) {
+          console.warn('Failed planet lookup for candidate', candidate, e);
+          // Try the next candidate
+        }
       }
+
+      // Nothing matched in NASA
+      return null;
     }
 
     function classifyStar(stTeff, stSpectype) {
@@ -1141,58 +1195,58 @@
     }
 
     async function tryAutoFillRank() {
-  const rawName = targetInput.value;
+      const rawName = targetInput.value;
 
-  // If user already typed a rank manually, just refresh the button state
-  if (rankInput.value.trim()) {
-    syncInfoButtonState();
-    return;
-  }
+      // If user already typed a rank manually, just refresh the button state
+      if (rankInput.value.trim()) {
+        syncInfoButtonState();
+        return;
+      }
 
-  // 1) Try local rank JSON first (fast, offline)
-  const entry = findRankForTarget(rawName);  // { name, rank } or null
+      // 1) Try local rank JSON first (fast, offline)
+      const entry = findRankForTarget(rawName);  // { name, rank } or null
 
-  if (entry != null) {
-    // pretty name + rank from JSON
-    targetInput.value = entry.name;          // e.g. "HAT-P-32 b"
-    rankInput.value = entry.rank;            // e.g. 900
-    updateAutoFlair();
-    syncInfoButtonState();
-    return;
-  }
+      if (entry != null) {
+        // pretty name + rank from JSON
+        targetInput.value = entry.name;          // e.g. "HAT-P-32 b"
+        rankInput.value = entry.rank;            // e.g. 900
+        updateAutoFlair();
+        syncInfoButtonState();
+        return;
+      }
 
-  const trimmed = rawName.trim();
-  if (!trimmed) {
-    syncInfoButtonState();
-    return;
-  }
+      const trimmed = rawName.trim();
+      if (!trimmed) {
+        syncInfoButtonState();
+        return;
+      }
 
-  // 2) Fallback: resolve via NASA Exoplanet Archive API
-  const resolvedName = await resolveNameViaApi(trimmed);
+      // 2) Fallback: resolve via NASA Exoplanet Archive API
+      const resolvedName = await resolveNameViaApi(trimmed);
 
-  if (resolvedName) {
-    // Use NASA's canonical planet name
-    targetInput.value = resolvedName;
+      if (resolvedName) {
+        // Use NASA's canonical planet name
+        targetInput.value = resolvedName;
 
-    // Optional: see if your JSON has a rank for the canonical name
-    const entry2 = findRankForTarget(resolvedName);
-    if (entry2 != null) {
-      rankInput.value = entry2.rank;
-    } else {
-      // Valid planet, just not in your 3000-rank list
-      autoFlairEl.textContent =
-        'Planet found in NASA Exoplanet Archive (no local rank entry).';
+        // See if your JSON has a rank for the canonical name
+        const entry2 = findRankForTarget(resolvedName);
+        if (entry2 != null) {
+          rankInput.value = entry2.rank;
+        } else {
+          // Valid planet, just not in your 3000-rank list
+          rankInput.value = 'N/A';
+          autoFlairEl.textContent =
+            'Planet found in NASA Exoplanet Archive (rank N/A – not in local list).';
+        }
+
+        updateAutoFlair();
+      } else {
+        autoFlairEl.textContent =
+          "Target not found — check spelling, catalog, or formatting.";
+      }
+
+      syncInfoButtonState();
     }
-
-    updateAutoFlair();
-  } else {
-    autoFlairEl.textContent =
-      "Target not found — check spelling, catalog, or formatting.";
-  }
-
-  // Just update button enabled/disabled state — no auto fetch
-  syncInfoButtonState();
-}
 
     targetInput.addEventListener('blur', tryAutoFillRank);
     targetInput.addEventListener('change', tryAutoFillRank);
