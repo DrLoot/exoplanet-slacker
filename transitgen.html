@@ -390,6 +390,64 @@
     dialog::backdrop {
       background: rgba(0, 0, 0, 0.6);
     }
+
+    .info-card-grid {
+      display: flex;
+      gap: 16px;
+      margin-top: 10px;
+      align-items: flex-start;
+    }
+
+    .info-card-grid>div {
+      flex: 1 1 0;
+      min-width: 0;
+    }
+
+    .info-card-grid h3 {
+      margin: 0 0 6px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .info-card-grid ul {
+      margin: 0;
+      padding-left: 18px;
+      font-size: 13px;
+    }
+
+    .info-card-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin: 4px 0 6px;
+    }
+
+    .info-card-badge {
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.04);
+      white-space: nowrap;
+    }
+
+    .info-card-badge.badge-planet {
+      /* subtle emphasis for planet badge */
+      font-weight: 500;
+    }
+
+    .info-card-badge.badge-star {
+      opacity: 0.9;
+    }
+
+    @media (max-width: 520px) {
+      .info-card-grid {
+        flex-direction: column;
+      }
+    }
   </style>
 </head>
 
@@ -588,11 +646,25 @@
       <h2 id="infoCardTitle" style="margin-top:0;margin-bottom:8px;font-size:18px;">
         Planet Info
       </h2>
+
+      <!-- NEW: badges row -->
+      <div id="infoCardBadges" class="info-card-badges"></div>
+
       <p id="infoCardSummary" style="font-size:13px; color:var(--muted); margin-top:0;"></p>
 
-      <ul id="infoCardDetails" style="padding-left:18px; font-size:13px; margin-top:10px; margin-bottom:12px;"></ul>
+      <!-- NEW: two-column layout -->
+      <div class="info-card-grid">
+        <div>
+          <h3>Host star</h3>
+          <ul id="infoCardStarDetails"></ul>
+        </div>
+        <div>
+          <h3>Planet</h3>
+          <ul id="infoCardPlanetDetails"></ul>
+        </div>
+      </div>
 
-      <p id="infoCardLinkWrapper" style="margin:0 0 14px;">
+      <p id="infoCardLinkWrapper" style="margin:10px 0 14px;">
         <a id="infoCardNasaLink" href="#" target="_blank" rel="noopener"
           style="color:var(--link); font-size:13px; text-decoration:underline;">
           View full NASA page
@@ -631,7 +703,9 @@
     const infoCardDialog = document.getElementById('infoCardDialog');
     const infoCardTitle = document.getElementById('infoCardTitle');
     const infoCardSummary = document.getElementById('infoCardSummary');
-    const infoCardDetails = document.getElementById('infoCardDetails');
+    const infoCardBadges = document.getElementById('infoCardBadges');
+    const infoCardStarDetails = document.getElementById('infoCardStarDetails');
+    const infoCardPlanetDetails = document.getElementById('infoCardPlanetDetails');
     const infoCardNasaLink = document.getElementById('infoCardNasaLink');
 
     let currentPlanetInfo = null;
@@ -657,6 +731,66 @@
       return await res.json();
     }
 
+    function classifyStar(stTeff, stSpectype) {
+      if (!stTeff && !stSpectype) return null;
+
+      // If we have a spectral type string, trust its first letter
+      if (stSpectype && stSpectype.trim().length > 0) {
+        const letter = stSpectype.trim()[0].toUpperCase();
+        if ("OBAFGKM".includes(letter)) {
+          return `${letter}-type star`;
+        }
+      }
+
+      if (!stTeff) return null;
+
+      const teff = Number(stTeff);
+      if (Number.isNaN(teff)) return null;
+
+      if (teff >= 7500) return "A-type star";
+      if (teff >= 6000) return "F-type star";
+      if (teff >= 5200) return "G-type star";
+      if (teff >= 3700) return "K-type star";
+      if (teff >= 2400) return "M-type star";
+      return "cool star";
+    }
+
+    function classifyPlanet(plRade, plBmasse, plEqt) {
+      const r = plRade != null ? Number(plRade) : null;
+      const t = plEqt != null ? Number(plEqt) : null;
+
+      let sizeClass = "";
+      if (r && !Number.isNaN(r)) {
+        if (r < 1.5) sizeClass = "Earth-size planet";
+        else if (r < 2.5) sizeClass = "super-Earth";
+        else if (r < 4) sizeClass = "sub-Neptune";
+        else if (r < 8) sizeClass = "Neptune-size planet";
+        else sizeClass = "gas giant";
+      }
+
+      let tempClass = "";
+      if (t && !Number.isNaN(t)) {
+        if (t >= 1800) tempClass = "ultra-hot";
+        else if (t >= 1000) tempClass = "hot";
+        else if (t >= 500) tempClass = "warm";
+        else tempClass = "temperate/cool";
+      }
+
+      if (!sizeClass && !tempClass) return null;
+      if (sizeClass && tempClass) {
+        return `${tempClass} ${sizeClass}`; // e.g., "hot gas giant"
+      }
+      return sizeClass || tempClass;
+    }
+
+    function addInfoBadge(text, extraClass) {
+      if (!infoCardBadges) return;
+      const span = document.createElement("span");
+      span.textContent = text;
+      span.className = "info-card-badge" + (extraClass ? " " + extraClass : "");
+      infoCardBadges.appendChild(span);
+    }
+
     function populateInfoCard(info, nasaUrl) {
       if (!infoCardDialog) return;
 
@@ -675,45 +809,84 @@
         st_dist,
       } = info;
 
-      infoCardTitle.textContent = pl_name || 'Planet info';
+      // Title
+      infoCardTitle.textContent = pl_name || "Planet info";
 
+      // Classifications
+      const starClass = classifyStar(st_teff, st_spectype);
+      const planetClass = classifyPlanet(pl_rade, pl_bmasse, pl_eqt);
+
+      // Summary line
       const methodPart = discoverymethod
-        ? discoverymethod.toLowerCase() + '-discovered exoplanet'
-        : 'exoplanet';
+        ? discoverymethod.toLowerCase() + "-discovered exoplanet"
+        : "exoplanet";
 
-      const hostPart = hostname ? ` around ${hostname}` : '';
-      const yearPart = disc_year ? `, discovered in ${disc_year}` : '';
+      const hostPart = hostname ? ` around ${hostname}` : "";
+      const yearPart = disc_year ? `, discovered in ${disc_year}` : "";
 
       infoCardSummary.textContent =
-        `${pl_name || 'This planet'} is a ${methodPart}${hostPart}${yearPart}.`;
+        `${pl_name || "This planet"} is a ${methodPart}${hostPart}${yearPart}.`;
 
-      infoCardDetails.innerHTML = '';
+      // Badges row
+      if (infoCardBadges) {
+        infoCardBadges.innerHTML = "";
+        if (planetClass) addInfoBadge(`Planet: ${planetClass}`, "badge-planet");
+        if (starClass) addInfoBadge(`Star: ${starClass}`, "badge-star");
+      }
 
-      const details = [];
-      if (pl_orbper != null) details.push(`Orbital period: ${Number(pl_orbper).toFixed(2)} days`);
-      if (pl_rade != null) details.push(`Radius: ${Number(pl_rade).toFixed(2)} Earth radii`);
-      if (pl_bmasse != null) details.push(`Mass: ${Number(pl_bmasse).toFixed(1)} Earth masses`);
-      if (pl_eqt != null) details.push(`Equilibrium temperature: ${Math.round(Number(pl_eqt))} K`);
-      if (st_spectype) details.push(`Host star type: ${st_spectype}`);
-      if (st_teff != null) details.push(`Host star temperature: ${Math.round(Number(st_teff))} K`);
-      if (st_rad != null) details.push(`Host star radius: ${Number(st_rad).toFixed(2)} Solar radii`);
-      if (st_dist != null) details.push(`Distance: ${Number(st_dist).toFixed(1)} pc`);
+      // Clear both detail columns
+      if (infoCardStarDetails) infoCardStarDetails.innerHTML = "";
+      if (infoCardPlanetDetails) infoCardPlanetDetails.innerHTML = "";
 
-      details.forEach(text => {
-        const li = document.createElement('li');
+      // Host star column
+      const starDetails = [];
+      if (starClass) starDetails.push(`Classification: ${starClass}`);
+      if (st_spectype) starDetails.push(`Spectral type: ${st_spectype}`);
+      if (st_teff != null)
+        starDetails.push(`Effective temperature: ${Math.round(Number(st_teff))} K`);
+      if (st_rad != null)
+        starDetails.push(`Radius: ${Number(st_rad).toFixed(2)} Solar radii`);
+      if (st_dist != null)
+        starDetails.push(`Distance: ${Number(st_dist).toFixed(1)} pc`);
+
+      starDetails.forEach((text) => {
+        const li = document.createElement("li");
         li.textContent = text;
-        infoCardDetails.appendChild(li);
+        infoCardStarDetails.appendChild(li);
       });
 
+      // Planet column
+      const planetDetails = [];
+      if (planetClass) planetDetails.push(`Classification: ${planetClass}`);
+      if (pl_orbper != null)
+        planetDetails.push(
+          `Orbital period: ${Number(pl_orbper).toFixed(2)} days`
+        );
+      if (pl_rade != null)
+        planetDetails.push(`Radius: ${Number(pl_rade).toFixed(2)} Earth radii`);
+      if (pl_bmasse != null)
+        planetDetails.push(`Mass: ${Number(pl_bmasse).toFixed(1)} Earth masses`);
+      if (pl_eqt != null)
+        planetDetails.push(
+          `Equilibrium temperature: ${Math.round(Number(pl_eqt))} K`
+        );
+
+      planetDetails.forEach((text) => {
+        const li = document.createElement("li");
+        li.textContent = text;
+        infoCardPlanetDetails.appendChild(li);
+      });
+
+      // NASA link
       if (nasaUrl) {
         infoCardNasaLink.href = nasaUrl;
-        infoCardNasaLink.parentElement.style.display = '';
+        infoCardNasaLink.parentElement.style.display = "";
       } else {
-        infoCardNasaLink.href = '#';
-        infoCardNasaLink.parentElement.style.display = 'none';
+        infoCardNasaLink.href = "#";
+        infoCardNasaLink.parentElement.style.display = "none";
       }
     }
-
+    
     async function updateInfoCardFromTarget(rawName) {
       if (!infoCardBtn) return;
 
