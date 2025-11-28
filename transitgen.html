@@ -739,18 +739,25 @@
       currentPlanetNasaUrl = null;
 
       const name = (rawName || '').trim();
+
+      // reset button
       infoCardBtn.disabled = true;
       infoCardBtn.textContent = 'Planet info';
+      infoCardBtn.title = '';
 
       if (!name) return;
 
       infoCardIsLoading = true;
       infoCardBtn.textContent = 'Loading…';
+      infoCardBtn.title = 'Fetching planet data from NASA Exoplanet Archive…';
 
       try {
         const info = await fetchPlanetInfo(name);
+
         if (!info) {
+          infoCardBtn.disabled = true;
           infoCardBtn.textContent = 'No info found';
+          infoCardBtn.title = `No entry found in NASA Exoplanet Archive for "${name}".`;
           return;
         }
 
@@ -759,9 +766,14 @@
 
         infoCardBtn.disabled = false;
         infoCardBtn.textContent = 'Planet info';
+        infoCardBtn.title = 'Show planet info card';
       } catch (err) {
-        console.warn('Planet info fetch failed:', err);
-        infoCardBtn.textContent = 'Planet info';
+        console.error('Planet info fetch failed:', err);
+
+        // Show a clear error state
+        infoCardBtn.disabled = true;
+        infoCardBtn.textContent = 'Info unavailable';
+        infoCardBtn.title = 'Could not load planet info (check console for details).';
       } finally {
         infoCardIsLoading = false;
       }
