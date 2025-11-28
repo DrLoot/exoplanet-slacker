@@ -1094,16 +1094,6 @@
     const lcFileInput = document.getElementById('lcFile');
     const lcFileNameEl = document.getElementById('lcFileName');
 
-    // Wire Info Card to target field
-    if (targetInput) {
-      targetInput.addEventListener('change', () => {
-        updateInfoCardFromTarget(targetInput.value);
-      });
-      targetInput.addEventListener('blur', () => {
-        updateInfoCardFromTarget(targetInput.value);
-      });
-    }
-
     // Button click opens dialog if we have data
     if (infoCardBtn && infoCardDialog) {
       infoCardBtn.addEventListener('click', () => {
@@ -1118,21 +1108,29 @@
     }
 
     function tryAutoFillRank() {
-      // don't overwrite manual rank if the user already typed one
-      if (rankInput.value.trim()) return;
-
       const rawName = targetInput.value;
+
+      // If user already typed a rank manually, don't auto-fill it,
+      // but STILL update the planet info card.
+      if (rankInput.value.trim()) {
+        updateInfoCardFromTarget(rawName);
+        return;
+      }
+
       const entry = findRankForTarget(rawName);  // { name, rank }
 
       if (entry != null) {
         // pretty name + rank from JSON
-        targetInput.value = entry.name;                // e.g. "HAT-P-32 b"
-        rankInput.value = entry.rank;                  // e.g. 900
+        targetInput.value = entry.name;          // e.g. "HAT-P-32 b"
+        rankInput.value = entry.rank;            // e.g. 900
         updateAutoFlair();
       } else if (rawName.trim() !== "") {
         autoFlairEl.textContent =
           "Target not found — check spelling, catalog, or formatting.";
       }
+
+      // NOW that the name may have been normalized, do the NASA lookup.
+      updateInfoCardFromTarget(targetInput.value);
     }
 
     targetInput.addEventListener('blur', tryAutoFillRank);
