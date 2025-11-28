@@ -750,6 +750,21 @@
       return await res.json();
     }
 
+    async function resolveNameViaApi(rawName) {
+      if (!rawName || !rawName.trim()) return null;
+
+      try {
+        const info = await fetchPlanetInfo(rawName.trim());
+        if (!info) return null;
+
+        // Use NASA's canonical planet name
+        return info.pl_name || null;
+      } catch (e) {
+        console.warn('Failed to resolve name via NASA API:', e);
+        return null;
+      }
+    }
+
     function classifyStar(stTeff, stSpectype) {
       if (!stTeff && !stSpectype) return null;
 
@@ -1125,30 +1140,59 @@
       lcFileInput.addEventListener('change', handleLcFileImport);
     }
 
-    function tryAutoFillRank() {
-      const rawName = targetInput.value;
+    async function tryAutoFillRank() {
+  const rawName = targetInput.value;
 
-      // If user already typed a rank manually, just refresh the button state
-      if (rankInput.value.trim()) {
-        syncInfoButtonState();
-        return;
-      }
+  // If user already typed a rank manually, just refresh the button state
+  if (rankInput.value.trim()) {
+    syncInfoButtonState();
+    return;
+  }
 
-      const entry = findRankForTarget(rawName);  // { name, rank }
+  // 1) Try local rank JSON first (fast, offline)
+  const entry = findRankForTarget(rawName);  // { name, rank } or null
 
-      if (entry != null) {
-        // pretty name + rank from JSON
-        targetInput.value = entry.name;          // e.g. "HAT-P-32 b"
-        rankInput.value = entry.rank;            // e.g. 900
-        updateAutoFlair();
-      } else if (rawName.trim() !== "") {
-        autoFlairEl.textContent =
-          "Target not found — check spelling, catalog, or formatting.";
-      }
+  if (entry != null) {
+    // pretty name + rank from JSON
+    targetInput.value = entry.name;          // e.g. "HAT-P-32 b"
+    rankInput.value = entry.rank;            // e.g. 900
+    updateAutoFlair();
+    syncInfoButtonState();
+    return;
+  }
 
-      // Just update button enabled/disabled state — no auto fetch
-      syncInfoButtonState();
+  const trimmed = rawName.trim();
+  if (!trimmed) {
+    syncInfoButtonState();
+    return;
+  }
+
+  // 2) Fallback: resolve via NASA Exoplanet Archive API
+  const resolvedName = await resolveNameViaApi(trimmed);
+
+  if (resolvedName) {
+    // Use NASA's canonical planet name
+    targetInput.value = resolvedName;
+
+    // Optional: see if your JSON has a rank for the canonical name
+    const entry2 = findRankForTarget(resolvedName);
+    if (entry2 != null) {
+      rankInput.value = entry2.rank;
+    } else {
+      // Valid planet, just not in your 3000-rank list
+      autoFlairEl.textContent =
+        'Planet found in NASA Exoplanet Archive (no local rank entry).';
     }
+
+    updateAutoFlair();
+  } else {
+    autoFlairEl.textContent =
+      "Target not found — check spelling, catalog, or formatting.";
+  }
+
+  // Just update button enabled/disabled state — no auto fetch
+  syncInfoButtonState();
+}
 
     targetInput.addEventListener('blur', tryAutoFillRank);
     targetInput.addEventListener('change', tryAutoFillRank);
