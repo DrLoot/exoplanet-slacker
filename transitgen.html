@@ -711,6 +711,7 @@
     let currentPlanetInfo = null;
     let currentPlanetNasaUrl = null;
     let infoCardIsLoading = false;
+    let currentPlanetKey = null;
 
     function syncInfoButtonState() {
       if (!infoCardBtn || !targetInput) return;
@@ -910,53 +911,6 @@
       }
     }
 
-    async function updateInfoCardFromTarget(rawName) {
-      if (!infoCardBtn) return;
-
-      currentPlanetInfo = null;
-      currentPlanetNasaUrl = null;
-
-      const name = (rawName || '').trim();
-
-      // reset button
-      infoCardBtn.disabled = true;
-      infoCardBtn.textContent = 'Planet info';
-      infoCardBtn.title = '';
-
-      if (!name) return;
-
-      infoCardIsLoading = true;
-      infoCardBtn.textContent = 'Loading…';
-      infoCardBtn.title = 'Fetching planet data from NASA Exoplanet Archive…';
-
-      try {
-        const info = await fetchPlanetInfo(name);
-
-        if (!info) {
-          infoCardBtn.disabled = true;
-          infoCardBtn.textContent = 'No info found';
-          infoCardBtn.title = `No entry found in NASA Exoplanet Archive for "${name}".`;
-          return;
-        }
-
-        currentPlanetInfo = info;
-        currentPlanetNasaUrl = buildNasaExoplanetUrl(info.pl_name || name);
-
-        infoCardBtn.disabled = false;
-        infoCardBtn.textContent = 'Planet info';
-        infoCardBtn.title = 'Show planet info card';
-      } catch (err) {
-        console.error('Planet info fetch failed:', err);
-
-        // Show a clear error state
-        infoCardBtn.disabled = true;
-        infoCardBtn.textContent = 'Info unavailable';
-        infoCardBtn.title = 'Could not load planet info (check console for details).';
-      } finally {
-        infoCardIsLoading = false;
-      }
-    }
-
     /* ============================================================
        = Rank Lookup (Flexible / Canonical Matching) =
        ============================================================ */
@@ -1112,11 +1066,29 @@
     const lcFileInput = document.getElementById('lcFile');
     const lcFileNameEl = document.getElementById('lcFileName');
 
+    targetInput.addEventListener('input', () => {
+      // User is changing the target – drop cached info
+      currentPlanetInfo = null;
+      currentPlanetNasaUrl = null;
+      currentPlanetKey = null;
+      infoCardIsLoading = false;
+      syncInfoButtonState();
+    });
+
     // Button click opens dialog if we have data
     if (infoCardBtn && infoCardDialog) {
       infoCardBtn.addEventListener('click', async () => {
         const name = (targetInput.value || '').trim();
         if (!name) return;
+
+        const key = name.toLowerCase();
+
+        // If we already have info for this target, just show it – no fetch
+        if (currentPlanetInfo && currentPlanetKey === key) {
+          populateInfoCard(currentPlanetInfo, currentPlanetNasaUrl);
+          infoCardDialog.showModal();
+          return;
+        }
 
         infoCardIsLoading = true;
         syncInfoButtonState();
@@ -1134,8 +1106,8 @@
 
           currentPlanetInfo = info;
           currentPlanetNasaUrl = buildNasaExoplanetUrl(info.pl_name || name);
+          currentPlanetKey = key; // remember which target this belongs to
 
-          // Populate and show the dialog immediately on first click
           populateInfoCard(currentPlanetInfo, currentPlanetNasaUrl);
           infoCardDialog.showModal();
         } catch (err) {
@@ -1180,7 +1152,7 @@
 
     targetInput.addEventListener('blur', tryAutoFillRank);
     targetInput.addEventListener('change', tryAutoFillRank);
-    
+
 
     /* =========================================== */
 
@@ -1455,7 +1427,7 @@
           }
         }
 
-                if (changed) {
+        if (changed) {
           updateAutoFlair();
         }
       };
@@ -1584,6 +1556,15 @@
 
       // Clear output box
       outputEl.value = '';
+
+      // ----- NEW: Reset cached planet info -----
+      currentPlanetInfo = null;
+      currentPlanetNasaUrl = null;
+      currentPlanetKey = null;
+      infoCardIsLoading = false;
+
+      // Re-sync button state after clearing
+      syncInfoButtonState();
 
       // Re-run initial UI updates
       updateAutoFlair();
