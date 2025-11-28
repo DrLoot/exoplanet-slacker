@@ -448,6 +448,21 @@
         flex-direction: column;
       }
     }
+
+    .spinner {
+      width: 14px;
+      height: 14px;
+      border-radius: 999px;
+      border: 2px solid var(--muted);
+      border-top-color: var(--accent);
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
   </style>
 </head>
 
@@ -493,45 +508,48 @@
                 style="padding:6px 10px;font-size:11px;white-space:nowrap;" disabled>
                 Planet info
               </button>
+              <!-- NEW: spinner shown while target name is resolving -->
+              <span id="targetSpinner" class="spinner" style="display:none;"></span>
             </div>
           </div>
+        </div>
 
-          <div>
-            <label for="rank">Rank (NASA list)</label>
-            <input id="rank" name="rank" type="number" min="1" placeholder="900" />
-          </div>
+        <div>
+          <label for="rank">Rank (NASA list)</label>
+          <input id="rank" name="rank" type="number" min="1" placeholder="900" />
+        </div>
 
-          <div>
-            <label for="depth">Rp²/Rs² (depth)</label>
-            <input id="depth" name="depth" type="number" step="0.0001" placeholder="0.0256" />
-          </div>
+        <div>
+          <label for="depth">Rp²/Rs² (depth)</label>
+          <input id="depth" name="depth" type="number" step="0.0001" placeholder="0.0256" />
+        </div>
 
-          <div>
-            <label for="depthErr">σ(Rp²/Rs²) (uncertainty)</label>
-            <input id="depthErr" name="depthErr" type="number" step="0.0001" placeholder="0.0012" />
-          </div>
+        <div>
+          <label for="depthErr">σ(Rp²/Rs²) (uncertainty)</label>
+          <input id="depthErr" name="depthErr" type="number" step="0.0001" placeholder="0.0012" />
+        </div>
 
-          <div>
-            <label for="snr">Transit SNR (σ)</label>
-            <input id="snr" name="snr" type="number" step="0.1" placeholder="21.3" />
-          </div>
+        <div>
+          <label for="snr">Transit SNR (σ)</label>
+          <input id="snr" name="snr" type="number" step="0.1" placeholder="21.3" />
+        </div>
 
-          <div>
-            <label for="obsDate">Observation date</label>
-            <input id="obsDate" name="obsDate" type="date" />
-          </div>
+        <div>
+          <label for="obsDate">Observation date</label>
+          <input id="obsDate" name="obsDate" type="date" />
+        </div>
 
-          <div>
-            <label for="data">Data</label>
-            <select id="data" name="data">
-              <option value="">Select data type…</option>
-              <option>EpW/MObs Checkout Data</option>
-              <option>MObs Image Directory</option>
-              <option>LCO</option>
-              <option>Backyard Rig</option>
-              <option>Other</option>
-            </select>
-          </div>
+        <div>
+          <label for="data">Data</label>
+          <select id="data" name="data">
+            <option value="">Select data type…</option>
+            <option>EpW/MObs Checkout Data</option>
+            <option>MObs Image Directory</option>
+            <option>LCO</option>
+            <option>Backyard Rig</option>
+            <option>Other</option>
+          </select>
+        </div>
         </div>
 
         <div class="muted" style="font-size:12px;margin-top:6px;">
@@ -694,10 +712,20 @@
     const historyList = document.getElementById('historyList');
     const historyEmpty = document.getElementById('historyEmpty');
 
+    // NEW: spinner + resolving state
+    const targetSpinner = document.getElementById('targetSpinner');
+    let isResolvingTargetName = false;
+    function setTargetResolving(on) {
+      isResolvingTargetName = !!on;
+      if (targetSpinner) {
+        targetSpinner.style.display = on ? 'inline-block' : 'none';
+      }
+    }
+
     const STORAGE_KEY = 'transitgenHistory_v1';
     /* ============================================================
-   Planet Info Card (NASA Exoplanet Archive + dialog)
-   ============================================================ */
+       Planet Info Card (NASA Exoplanet Archive + dialog)
+       ============================================================ */
 
     const infoCardBtn = document.getElementById('infoCardBtn');
     const infoCardDialog = document.getElementById('infoCardDialog');
@@ -1222,18 +1250,23 @@
       }
 
       // 2) Fallback: resolve via NASA Exoplanet Archive API
-      const resolvedName = await resolveNameViaApi(trimmed);
+      setTargetResolving(true);
+      let resolvedName;
+      try {
+        resolvedName = await resolveNameViaApi(trimmed);
+      } finally {
+        // Always turn spinner off, even if the fetch throws
+        setTargetResolving(false);
+      }
 
       if (resolvedName) {
         // Use NASA's canonical planet name
         targetInput.value = resolvedName;
 
-        // See if your JSON has a rank for the canonical name
         const entry2 = findRankForTarget(resolvedName);
         if (entry2 != null) {
           rankInput.value = entry2.rank;
         } else {
-          // Valid planet, just not in your 3000-rank list
           rankInput.value = 'N/A';
           autoFlairEl.textContent =
             'Planet found in NASA Exoplanet Archive (rank N/A – not in local list).';
