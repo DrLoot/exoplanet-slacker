@@ -375,6 +375,21 @@
         flex-direction: column;
       }
     }
+
+    dialog {
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px 20px;
+      background: linear-gradient(180deg, rgba(16, 20, 40, .96), rgba(10, 12, 20, .98));
+      color: var(--text);
+      max-width: 440px;
+      width: calc(100% - 40px);
+      box-shadow: var(--shadow);
+    }
+
+    dialog::backdrop {
+      background: rgba(0, 0, 0, 0.6);
+    }
   </style>
 </head>
 
@@ -414,7 +429,13 @@
           </div>
           <div>
             <label for="target">Target name</label>
-            <input id="target" name="target" placeholder="HAT-P-32 b" required />
+            <div style="display:flex; gap:8px; align-items:center;">
+              <input id="target" name="target" placeholder="HAT-P-32 b" required style="flex:1 1 auto;" />
+              <button type="button" id="infoCardBtn" class="btn"
+                style="padding:6px 10px;font-size:11px;white-space:nowrap;" disabled>
+                Planet info
+              </button>
+            </div>
           </div>
 
           <div>
@@ -561,6 +582,31 @@
     </section>
   </main>
 
+  <!-- Planet Info Card Dialog -->
+  <dialog id="infoCardDialog">
+    <form method="dialog" style="margin:0;max-width:420px;">
+      <h2 id="infoCardTitle" style="margin-top:0;margin-bottom:8px;font-size:18px;">
+        Planet Info
+      </h2>
+      <p id="infoCardSummary" style="font-size:13px; color:var(--muted); margin-top:0;"></p>
+
+      <ul id="infoCardDetails" style="padding-left:18px; font-size:13px; margin-top:10px; margin-bottom:12px;"></ul>
+
+      <p id="infoCardLinkWrapper" style="margin:0 0 14px;">
+        <a id="infoCardNasaLink" href="#" target="_blank" rel="noopener"
+          style="color:var(--link); font-size:13px; text-decoration:underline;">
+          View full NASA page
+        </a>
+      </p>
+
+      <div style="text-align:right;">
+        <button type="submit" class="btn" style="font-size:12px; padding:6px 12px;">
+          Close
+        </button>
+      </div>
+    </form>
+  </dialog>
+
   <footer>
     <p style="text-align:center; font-size:14px; color:var(--muted); margin:40px 0 20px;">
       © <span id="y"></span> Exoplanet Slacker — A community resource. <em>Not an official NASA site.</em>
@@ -577,6 +623,149 @@
     const historyEmpty = document.getElementById('historyEmpty');
 
     const STORAGE_KEY = 'transitgenHistory_v1';
+    /* ============================================================
+   Planet Info Card (NASA Exoplanet Archive + dialog)
+   ============================================================ */
+
+    const infoCardBtn = document.getElementById('infoCardBtn');
+    const infoCardDialog = document.getElementById('infoCardDialog');
+    const infoCardTitle = document.getElementById('infoCardTitle');
+    const infoCardSummary = document.getElementById('infoCardSummary');
+    const infoCardDetails = document.getElementById('infoCardDetails');
+    const infoCardNasaLink = document.getElementById('infoCardNasaLink');
+
+    let currentPlanetInfo = null;
+    let currentPlanetNasaUrl = null;
+    let infoCardIsLoading = false;
+
+    function buildNasaExoplanetUrl(plName) {
+      if (!plName) return null;
+      const slug = plName
+        .trim()
+        .toLowerCase()
+        .replace(/\s+/g, '-'); // spaces → hyphens
+      return `https://science.nasa.gov/exoplanet-catalog/${slug}/`;
+    }
+
+    async function fetchPlanetInfo(plName) {
+      if (!plName) return null;
+
+      const safeName = plName.replace(/'/g, "''");
+
+      const adql = `
+        select pl_name,hostname,pl_rade,pl_bmasse,pl_orbper,pl_eqt,disc_year,
+               discoverymethod,st_spectype,st_teff,st_rad,st_dist
+        from pscomppars
+        where pl_name='${safeName}'
+      `;
+
+      const url =
+        'https://exoplanetarchive.ipac.caltech.edu/TAP/sync?' +
+        'query=' + encodeURIComponent(adql) +
+        '&format=json';
+
+      const res = await fetch(url);
+      if (!res.ok) {
+        throw new Error('Exoplanet Archive request failed: ' + res.status);
+      }
+
+      const rows = await res.json();
+      if (!Array.isArray(rows) || rows.length === 0) return null;
+
+      return rows[0]; // one row per planet
+    }
+
+    function populateInfoCard(info, nasaUrl) {
+      if (!infoCardDialog) return;
+
+      const {
+        pl_name,
+        hostname,
+        pl_rade,
+        pl_bmasse,
+        pl_orbper,
+        pl_eqt,
+        disc_year,
+        discoverymethod,
+        st_spectype,
+        st_teff,
+        st_rad,
+        st_dist,
+      } = info;
+
+      infoCardTitle.textContent = pl_name || 'Planet info';
+
+      const methodPart = discoverymethod
+        ? discoverymethod.toLowerCase() + '-discovered exoplanet'
+        : 'exoplanet';
+
+      const hostPart = hostname ? ` around ${hostname}` : '';
+      const yearPart = disc_year ? `, discovered in ${disc_year}` : '';
+
+      infoCardSummary.textContent =
+        `${pl_name || 'This planet'} is a ${methodPart}${hostPart}${yearPart}.`;
+
+      infoCardDetails.innerHTML = '';
+
+      const details = [];
+      if (pl_orbper != null) details.push(`Orbital period: ${Number(pl_orbper).toFixed(2)} days`);
+      if (pl_rade != null) details.push(`Radius: ${Number(pl_rade).toFixed(2)} Earth radii`);
+      if (pl_bmasse != null) details.push(`Mass: ${Number(pl_bmasse).toFixed(1)} Earth masses`);
+      if (pl_eqt != null) details.push(`Equilibrium temperature: ${Math.round(Number(pl_eqt))} K`);
+      if (st_spectype) details.push(`Host star type: ${st_spectype}`);
+      if (st_teff != null) details.push(`Host star temperature: ${Math.round(Number(st_teff))} K`);
+      if (st_rad != null) details.push(`Host star radius: ${Number(st_rad).toFixed(2)} Solar radii`);
+      if (st_dist != null) details.push(`Distance: ${Number(st_dist).toFixed(1)} pc`);
+
+      details.forEach(text => {
+        const li = document.createElement('li');
+        li.textContent = text;
+        infoCardDetails.appendChild(li);
+      });
+
+      if (nasaUrl) {
+        infoCardNasaLink.href = nasaUrl;
+        infoCardNasaLink.parentElement.style.display = '';
+      } else {
+        infoCardNasaLink.href = '#';
+        infoCardNasaLink.parentElement.style.display = 'none';
+      }
+    }
+
+    async function updateInfoCardFromTarget(rawName) {
+      if (!infoCardBtn) return;
+
+      currentPlanetInfo = null;
+      currentPlanetNasaUrl = null;
+
+      const name = (rawName || '').trim();
+      infoCardBtn.disabled = true;
+      infoCardBtn.textContent = 'Planet info';
+
+      if (!name) return;
+
+      infoCardIsLoading = true;
+      infoCardBtn.textContent = 'Loading…';
+
+      try {
+        const info = await fetchPlanetInfo(name);
+        if (!info) {
+          infoCardBtn.textContent = 'No info found';
+          return;
+        }
+
+        currentPlanetInfo = info;
+        currentPlanetNasaUrl = buildNasaExoplanetUrl(info.pl_name || name);
+
+        infoCardBtn.disabled = false;
+        infoCardBtn.textContent = 'Planet info';
+      } catch (err) {
+        console.warn('Planet info fetch failed:', err);
+        infoCardBtn.textContent = 'Planet info';
+      } finally {
+        infoCardIsLoading = false;
+      }
+    }
 
     /* ============================================================
        = Rank Lookup (Flexible / Canonical Matching) =
@@ -733,10 +922,28 @@
     const lcFileInput = document.getElementById('lcFile');
     const lcFileNameEl = document.getElementById('lcFileName');
 
+    // Wire Info Card to target field
+    if (targetInput) {
+      targetInput.addEventListener('change', () => {
+        updateInfoCardFromTarget(targetInput.value);
+      });
+      targetInput.addEventListener('blur', () => {
+        updateInfoCardFromTarget(targetInput.value);
+      });
+    }
+
+    // Button click opens dialog if we have data
+    if (infoCardBtn && infoCardDialog) {
+      infoCardBtn.addEventListener('click', () => {
+        if (!currentPlanetInfo) return;
+        populateInfoCard(currentPlanetInfo, currentPlanetNasaUrl);
+        infoCardDialog.showModal();
+      });
+    }
+
     if (lcFileInput) {
       lcFileInput.addEventListener('change', handleLcFileImport);
     }
-
 
     function tryAutoFillRank() {
       // don't overwrite manual rank if the user already typed one
@@ -1034,6 +1241,11 @@
 
         if (changed) {
           updateAutoFlair();
+
+          // 👇 NEW: kick off planet info lookup when we have a target
+          if (meta.target && typeof updateInfoCardFromTarget === 'function') {
+            updateInfoCardFromTarget(targetInput.value);
+          }
         }
       };
 
