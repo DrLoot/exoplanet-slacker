@@ -1279,12 +1279,9 @@
       syncInfoButtonState();
     }
 
-    targetInput.addEventListener('blur', tryAutoFillRank);
     targetInput.addEventListener('change', tryAutoFillRank);
 
-
     /* =========================================== */
-
 
     function buildPost() {
       const target = document.getElementById('target').value.trim();
