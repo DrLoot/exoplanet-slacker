@@ -843,11 +843,16 @@
       if (starClass) starDetails.push(`Classification: ${starClass}`);
       if (st_spectype) starDetails.push(`Spectral type: ${st_spectype}`);
       if (st_teff != null)
-        starDetails.push(`Effective temperature: ${Math.round(Number(st_teff))} K`);
+        starDetails.push(`Effective temp: ${Math.round(Number(st_teff))} K`);
       if (st_rad != null)
         starDetails.push(`Radius: ${Number(st_rad).toFixed(2)} Solar radii`);
-      if (st_dist != null)
-        starDetails.push(`Distance: ${Number(st_dist).toFixed(1)} pc`);
+      if (st_dist != null) {
+        const pc = Number(st_dist);
+        const ly = pc * 3.26156;
+        starDetails.push(
+          `Distance: ${pc.toFixed(1)} pc (${ly.toFixed(1)} ly)`
+        );
+      }
 
       starDetails.forEach((text) => {
         const li = document.createElement("li");
@@ -868,7 +873,7 @@
         planetDetails.push(`Mass: ${Number(pl_bmasse).toFixed(1)} Earth masses`);
       if (pl_eqt != null)
         planetDetails.push(
-          `Equilibrium temperature: ${Math.round(Number(pl_eqt))} K`
+          `Equilibrium temp: ${Math.round(Number(pl_eqt))} K`
         );
 
       planetDetails.forEach((text) => {
@@ -886,7 +891,7 @@
         infoCardNasaLink.parentElement.style.display = "none";
       }
     }
-    
+
     async function updateInfoCardFromTarget(rawName) {
       if (!infoCardBtn) return;
 
