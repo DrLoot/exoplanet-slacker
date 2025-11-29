@@ -418,6 +418,17 @@
       white-space: pre-wrap;
       /* word-wrap + preserve line breaks */
     }
+
+    .field-group-header td {
+      padding: 8px 8px;
+      border-bottom: 1px solid rgba(123, 198, 255, 0.18);
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #9ed1ff;
+      background: radial-gradient(circle at 0% 0%, rgba(91, 192, 255, 0.18), rgba(9, 12, 24, 0.96));
+    }
   </style>
 </head>
 
@@ -534,29 +545,38 @@
 
     // Field configuration: label + key mapping to API payload
     const FIELD_CONFIG = [
-      { key: "primaryName", label: "Primary name", fromApi: true },
-      { key: "auid", label: "AUID", fromApi: true },
-      { key: "raDeg", label: "RA (J2000, deg)", fromApi: true },
-      { key: "decDeg", label: "Dec (J2000, deg)", fromApi: true },
-      { key: "variableType", label: "Variability type", fromApi: true },
-      { key: "spectralType", label: "Spectral type", fromApi: true },
-      { key: "discoverer", label: "Discoverer", fromApi: true },
-      { key: "maxMag", label: "Max mag (numeric)", fromApi: true },
-      { key: "maxMagBand", label: "Max mag band", fromApi: true },
-      { key: "minMag", label: "Min mag (numeric)", fromApi: true },
-      { key: "minMagBand", label: "Min mag band", fromApi: true },
-      { key: "periodDays", label: "Period (days)", fromApi: true },
-      { key: "epochHJD", label: "Epoch (HJD)", fromApi: true },
+      // 1. Identification & Coordinates
+      { key: "primaryName", label: "Primary name", group: "Identification & Coordinates", fromApi: true },
+      { key: "auid", label: "AUID", group: "Identification & Coordinates", fromApi: true },
+      { key: "raDeg", label: "RA (J2000, deg)", group: "Identification & Coordinates", fromApi: true },
+      { key: "decDeg", label: "Dec (J2000, deg)", group: "Identification & Coordinates", fromApi: true },
+
+      // 2. Classification & Discovery
+      { key: "variableType", label: "Variability type", group: "Classification & Discovery", fromApi: true },
+      { key: "spectralType", label: "Spectral type", group: "Classification & Discovery", fromApi: true },
+      { key: "discoverer", label: "Discoverer", group: "Classification & Discovery", fromApi: true },
+
+      // 3. Photometric Data
+      { key: "maxMag", label: "Max mag (numeric)", group: "Photometric Data", fromApi: true },
+      { key: "maxMagBand", label: "Max mag band", group: "Photometric Data", fromApi: true },
+      { key: "minMag", label: "Min mag (numeric)", group: "Photometric Data", fromApi: true },
+      { key: "minMagBand", label: "Min mag band", group: "Photometric Data", fromApi: true },
+
+      // 4. Period & Ephemeris
+      { key: "periodDays", label: "Period (days)", group: "Period & Ephemeris", fromApi: true },
+      { key: "epochHJD", label: "Epoch (HJD)", group: "Period & Ephemeris", fromApi: true },
       {
         key: "eclipseDurationPercent",
         label: "Transit/Eclipse duration (%)",
+        group: "Period & Ephemeris",
         fromApi: true
       },
-      // Helper / app-only fields:      
-      { key: "referenceName", label: "Reference name(s)", fromApi: false },
-      { key: "referenceBibcode", label: "Reference bibcode(s)", fromApi: false },
-      { key: "remark", label: "Remark (summary)", fromApi: false },
-      { key: "revisionComment", label: "VSX revision comment block", fromApi: false },
+
+      // 5. References & Notes (helper-only fields)
+      { key: "referenceName", label: "Reference name(s)", group: "References & Notes", fromApi: false },
+      { key: "referenceBibcode", label: "Reference bibcode(s)", group: "References & Notes", fromApi: false },
+      { key: "remark", label: "Remark (summary)", group: "References & Notes", fromApi: false },
+      { key: "revisionComment", label: "VSX revision comment block", group: "References & Notes", fromApi: false },
     ];
 
     const identInput = document.getElementById("identInput");
@@ -593,7 +613,24 @@
         return;
       }
 
+      let currentGroup = null;
+
       FIELD_CONFIG.forEach(cfg => {
+        // Insert a group header row whenever the group changes
+        if (cfg.group && cfg.group !== currentGroup) {
+          currentGroup = cfg.group;
+
+          const headerTr = document.createElement("tr");
+          headerTr.className = "field-group-header";
+
+          const headerTd = document.createElement("td");
+          headerTd.colSpan = 3;
+          headerTd.textContent = currentGroup;
+
+          headerTr.appendChild(headerTd);
+          fieldGridBody.appendChild(headerTr);
+        }
+
         const tr = document.createElement("tr");
         tr.className = "field-row";
         tr.dataset.key = cfg.key;
@@ -632,16 +669,16 @@
         // Updated cell
         const tdUpdated = document.createElement("td");
         let updatedInput;
-        const updVal = updatedRecord[cfg.key]; // <-- add this line
+        const updVal = updatedRecord[cfg.key];
 
-        // Multi-line fields
         if (cfg.key === "remark" || cfg.key === "revisionComment") {
+          // Multi-line updated value
           updatedInput = document.createElement("textarea");
           updatedInput.className = "field-input updated multi-text";
           updatedInput.dataset.key = cfg.key;
           updatedInput.value = updVal == null ? "" : String(updVal);
         } else {
-          // Normal single-line fields
+          // Normal single-line updated value
           updatedInput = document.createElement("input");
           updatedInput.className = "field-input updated";
           updatedInput.dataset.key = cfg.key;
