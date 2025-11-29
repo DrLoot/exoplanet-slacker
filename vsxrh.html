@@ -648,6 +648,12 @@
           updatedInput.value = updVal == null ? "" : String(updVal);
         }
 
+        // Lock AUID on the updated side (never edited)
+        if (cfg.key === "auid") {
+          updatedInput.readOnly = true;
+          updatedInput.classList.add("field-input-locked");
+        }
+
         tdUpdated.appendChild(updatedInput);
 
         // Optional note for certain fields
