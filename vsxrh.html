@@ -552,8 +552,7 @@
         label: "Transit/Eclipse duration (%)",
         fromApi: true
       },
-      // Helper / app-only fields:
-      { key: "remark", label: "Remark (summary)", fromApi: false },
+      // Helper / app-only fields:      
       { key: "referenceName", label: "Reference name(s)", fromApi: false },
       { key: "referenceBibcode", label: "Reference bibcode(s)", fromApi: false },
       { key: "remark", label: "Remark (summary)", fromApi: false },
@@ -618,6 +617,7 @@
         // Updated cell
         const tdUpdated = document.createElement("td");
         let updatedInput;
+        const updVal = updatedRecord[cfg.key]; // <-- add this line
 
         // Multi-line fields
         if (cfg.key === "remark" || cfg.key === "revisionComment") {
