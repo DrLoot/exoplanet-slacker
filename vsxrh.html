@@ -406,6 +406,18 @@
         margin-top: 4px;
       }
     }
+
+    /* Multi-line fields */
+    .multi-text {
+      min-height: 110px;
+      /* ~5 lines */
+      resize: vertical;
+      /* allow user to expand if needed */
+      line-height: 1.4;
+      padding: 8px 10px;
+      white-space: pre-wrap;
+      /* word-wrap + preserve line breaks */
+    }
   </style>
 </head>
 
@@ -535,7 +547,6 @@
       { key: "minMagBand", label: "Min mag band", fromApi: true },
       { key: "periodDays", label: "Period (days)", fromApi: true },
       { key: "epochHJD", label: "Epoch (HJD)", fromApi: true },
-      { key: "remarks", label: "Remarks (summary)", fromApi: true },
       {
         key: "eclipseDurationPercent",
         label: "Transit/Eclipse duration (%)",
@@ -545,6 +556,7 @@
       { key: "remark", label: "Remark (summary)", fromApi: false },
       { key: "referenceName", label: "Reference name(s)", fromApi: false },
       { key: "referenceBibcode", label: "Reference bibcode(s)", fromApi: false },
+      { key: "remark", label: "Remark (summary)", fromApi: false },
       { key: "revisionComment", label: "VSX revision comment block", fromApi: false },
     ];
 
@@ -605,12 +617,22 @@
 
         // Updated cell
         const tdUpdated = document.createElement("td");
-        const updatedInput = document.createElement("input");
-        updatedInput.className = "field-input updated";
-        updatedInput.dataset.key = cfg.key;
+        let updatedInput;
 
-        const updVal = updatedRecord[cfg.key];
-        updatedInput.value = updVal == null ? "" : String(updVal);
+        // Multi-line fields
+        if (cfg.key === "remark" || cfg.key === "revisionComment") {
+          updatedInput = document.createElement("textarea");
+          updatedInput.className = "field-input updated multi-text";
+          updatedInput.dataset.key = cfg.key;
+          updatedInput.value = updVal == null ? "" : String(updVal);
+        } else {
+          // Normal single-line fields
+          updatedInput = document.createElement("input");
+          updatedInput.className = "field-input updated";
+          updatedInput.dataset.key = cfg.key;
+          updatedInput.value = updVal == null ? "" : String(updVal);
+        }
+
         tdUpdated.appendChild(updatedInput);
 
         // Optional note for certain fields
