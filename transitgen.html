@@ -776,74 +776,76 @@
       return await res.json();
     }
 
-    function buildNameCandidates(rawName) {
-      if (!rawName) return [];
-      const s = rawName.trim().replace(/\s+/g, " ");
-      if (!s) return [];
+    function normalizeTargetForApi(rawName) {
+  if (!rawName) return null;
+  const trimmed = rawName.trim();
+  if (!trimmed) return null;
 
-      const candidates = new Set();
+  // Compact form: remove spaces and hyphens
+  const compact = trimmed.replace(/[\s-]+/g, '');
+  // PREFIX + digits + optional letter (e.g., TOI733b, Kepler442b, HD189733b)
+  const m = compact.match(/^([A-Za-z]+)(\d+)([A-Za-z])?$/);
+  if (!m) {
+    // Doesn't look like PREFIX+number → just use as-is
+    return trimmed;
+  }
 
-      // 0) Always try what the user/file gave us first
-      candidates.add(s);
+  let [, prefixRaw, num, letterRaw] = m;
+  const prefix = prefixRaw.toUpperCase();
+  const letter = letterRaw ? letterRaw.toLowerCase() : '';
 
-      // Split on spaces and hyphens to detect patterns like:
-      // "gj1214b", "GJ1214b", "GJ 1214 b", "TOI-733 b", etc.
-      const compact = s.replace(/[\s-]+/g, "");
-      const m = compact.match(/^([A-Za-z]+)(\d+)([A-Za-z])$/);
-      const mNoSuffix = compact.match(/^([A-Za-z]+)(\d+)$/);
+  // Dash-style survey prefixes
+  const dashPrefixMap = {
+    'COROT': 'CoRoT',
+    'KEPLER': 'Kepler',
+    'K2': 'K2',
+    'TOI': 'TOI',
+    'WASP': 'WASP',
+    'HATP': 'HAT-P',   // "hatp32b" → HAT-P-32 b
+    'HAT-P': 'HAT-P',
+    'HATS': 'HATS',
+    'TRES': 'TrES',
+    'XO': 'XO',
+    'NGTS': 'NGTS',
+  };
 
-      const addVariants = (prefixRaw, num, suffix) => {
-        const upperPrefix = prefixRaw.toUpperCase();                    // GJ / TOI
-        const titlePrefix =
-          prefixRaw.charAt(0).toUpperCase() + prefixRaw.slice(1).toLowerCase(); // Kepler
+  // Space-style catalog prefixes
+  const spacePrefixes = new Set(['HD', 'HIP', 'GJ']);
 
-        const suf = suffix ? suffix.toLowerCase() : "";
-        const sufSp = suffix ? " " + suf : "";
+  // CoRoT-1 b, Kepler-1 b, K2-1 b, TOI-1 b, WASP-1 b, HAT-P-1 b, HATS-1 b,
+  // TrES-1 b, XO-1 b, NGTS-1 b
+  if (dashPrefixMap[prefix]) {
+    const nicePrefix = dashPrefixMap[prefix];
+    return `${nicePrefix}-${num}${letter ? ` ${letter}` : ''}`;
+  }
 
-        // Uppercase-style variants: GJ1214b, GJ 1214 b, GJ-1214 b, GJ-1214b
-        candidates.add(`${upperPrefix}${num}${suf}`);         // GJ1214b
-        candidates.add(`${upperPrefix} ${num}${sufSp}`);      // GJ 1214 b
-        candidates.add(`${upperPrefix}-${num}${sufSp}`);      // GJ-1214 b
-        candidates.add(`${upperPrefix}-${num}${suf}`);        // GJ-1214b
+  // HD 1 b, HIP 1 b, GJ 1 b
+  if (spacePrefixes.has(prefix)) {
+    return `${prefix} ${num}${letter ? ` ${letter}` : ''}`;
+  }
 
-        // Title-style variants: Kepler442 b, Kepler-442 b, Kepler 442 b
-        candidates.add(`${titlePrefix}${num}${suf}`);         // Kepler442b
-        candidates.add(`${titlePrefix} ${num}${sufSp}`);      // Kepler 442 b
-        candidates.add(`${titlePrefix}-${num}${sufSp}`);      // Kepler-442 b
-      };
+  // Unknown family → don't touch it
+  return trimmed;
+}
 
-      if (m) {
-        const [, prefix, num, suffix] = m;
-        addVariants(prefix, num, suffix);
-      } else if (mNoSuffix) {
-        const [, prefix, num] = mNoSuffix;
-        addVariants(prefix, num, "");
-      }
+async function resolveNameViaApi(rawName) {
+  if (!rawName || !rawName.trim()) return null;
 
-      return Array.from(candidates);
-    }
+  // Normalize to one official pattern if possible
+  const candidate = normalizeTargetForApi(rawName);
+  if (!candidate) return null;
 
-    async function resolveNameViaApi(rawName) {
-      if (!rawName || !rawName.trim()) return null;
+  try {
+    const info = await fetchPlanetInfo(candidate);
+    if (!info) return null;
 
-      const candidates = buildNameCandidates(rawName);
-
-      for (const candidate of candidates) {
-        try {
-          const info = await fetchPlanetInfo(candidate);
-          if (info && info.pl_name) {
-            // We have a real match – return NASA's canonical name
-            return info.pl_name;
-          }
-        } catch (e) {
-          console.warn('Failed planet lookup for candidate', candidate, e);
-          // Try the next candidate
-        }
-      }
-
-      // Nothing matched in NASA
-      return null;
-    }
+    // Prefer NASA's canonical name, fall back to our normalized one
+    return info.pl_name || candidate;
+  } catch (e) {
+    console.warn('Failed to resolve name via NASA API:', e);
+    return null;
+  }
+}
 
     function classifyStar(stTeff, stSpectype) {
       if (!stTeff && !stSpectype) return null;
