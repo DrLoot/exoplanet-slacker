@@ -9,8 +9,7 @@
     content="Load VSX objects, compare current and updated fields, and generate revision comments for VSX submissions." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link
-    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Orbitron:wght@700&display=swap"
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Orbitron:wght@700&display=swap"
     rel="stylesheet" />
   <style>
     :root {
@@ -346,6 +345,67 @@
       .field-grid td:nth-child(3) {
         margin-top: 4px;
       }
+
+      /* --- Notice Banner Styles --- */
+      .notice-banner {
+        background: linear-gradient(90deg, rgba(255, 165, 0, 0.15), rgba(255, 165, 0, 0.05));
+        border-bottom: 1px solid rgba(255, 200, 120, 0.25);
+        padding: 12px 20px;
+        color: #ffd7a0;
+        font-size: 14px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 12px;
+        position: relative;
+        box-shadow: 0 0 20px rgba(255, 165, 0, 0.15);
+        animation: bannerFadeIn 0.8s ease;
+      }
+
+      .notice-inner {
+        max-width: 960px;
+        text-align: center;
+        line-height: 1.4;
+      }
+
+      .notice-banner strong {
+        color: #ffe9c2;
+        font-weight: 600;
+      }
+
+      .notice-close {
+        position: absolute;
+        right: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: transparent;
+        border: 1px solid rgba(255, 200, 120, 0.35);
+        color: #ffd7a0;
+        font-size: 14px;
+        border-radius: 6px;
+        width: 26px;
+        height: 26px;
+        cursor: pointer;
+        transition: 0.2s ease;
+      }
+
+      .notice-close:hover {
+        background: rgba(255, 200, 120, 0.15);
+      }
+
+      /* Fade-in animation */
+      @keyframes bannerFadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(-6px);
+        }
+
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
     }
   </style>
 </head>
@@ -367,6 +427,14 @@
       <a class="btn" href="exopcalc.html">Transit Duration / Eclipse % Calculator</a>
     </nav>
   </header>
+
+  <div class="notice-banner" id="noticeBanner">
+    <div class="notice-inner">
+      🚧 <strong>VSX Revision Helper is under active development.</strong>
+      We’d love your feedback! Report bugs or ideas in the Exoplanet Watch Slack.
+    </div>
+    <button class="notice-close" onclick="document.getElementById('noticeBanner').remove()">✕</button>
+  </div>
 
   <main>
     <!-- Section 1: Load VSX object -->
@@ -432,7 +500,8 @@
         <button id="copySummaryBtn" class="btn" type="button">Copy summary</button>
       </div>
 
-      <textarea id="summaryOutput" placeholder="Load a VSX object, edit any updated values, then click “Generate revision summary”."
+      <textarea id="summaryOutput"
+        placeholder="Load a VSX object, edit any updated values, then click “Generate revision summary”."
         spellcheck="false"></textarea>
 
       <p class="muted" style="margin-top:8px; font-size:12px;">
