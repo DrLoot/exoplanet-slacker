@@ -605,12 +605,25 @@
         tr.appendChild(tdLabel);
 
         // Current cell
+        // Current cell
         const tdCurrent = document.createElement("td");
-        const currentInput = document.createElement("input");
-        currentInput.className = "field-input current";
-        currentInput.readOnly = true;
+        let currentInput;
         const curVal = currentRecord[cfg.key];
-        currentInput.value = curVal == null ? "" : String(curVal);
+
+        if (cfg.key === "remark" || cfg.key === "revisionComment") {
+          // Multi-line current value
+          currentInput = document.createElement("textarea");
+          currentInput.className = "field-input current multi-text";
+          currentInput.readOnly = true;
+          currentInput.value = curVal == null ? "" : String(curVal);
+        } else {
+          // Normal single-line current value
+          currentInput = document.createElement("input");
+          currentInput.className = "field-input current";
+          currentInput.readOnly = true;
+          currentInput.value = curVal == null ? "" : String(curVal);
+        }
+
         tdCurrent.appendChild(currentInput);
         tr.appendChild(tdCurrent);
 
