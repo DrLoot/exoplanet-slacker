@@ -1,0 +1,742 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>VSX Revision Helper | Exoplanet Slacker</title>
+  <meta name="description"
+    content="Load VSX objects, compare current and updated fields, and generate revision comments for VSX submissions." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Orbitron:wght@700&display=swap"
+    rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #05060b;
+      --card: #0f1220;
+      --glow: #5bc0ff;
+      --accent: #FF6F00;
+      --text: #EAEAEA;
+      --muted: #A9B1C3;
+      --radius: 16px;
+      --shadow: 0 10px 40px rgba(0, 0, 0, .45);
+      --border: rgba(123, 198, 255, .14);
+      --link: #79c8ff;
+    }
+
+    html,
+    body {
+      height: 100%;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    body {
+      margin: 0;
+      font-family: Inter, system-ui, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      line-height: 1.6;
+    }
+
+    .starfield {
+      position: fixed;
+      inset: 0;
+      z-index: -2;
+      overflow: hidden;
+      background:
+        radial-gradient(1200px 800px at 80% -10%, rgba(91, 192, 255, .12), transparent 60%),
+        radial-gradient(1000px 700px at 10% 120%, rgba(255, 111, 0, .08), transparent 60%),
+        linear-gradient(180deg, #070910 0%, #04050a 100%);
+    }
+
+    .stars,
+    .stars:before,
+    .stars:after {
+      content: "";
+      position: absolute;
+      inset: -2000px;
+      background-repeat: repeat;
+    }
+
+    .stars {
+      background-image:
+        radial-gradient(2px 2px at 20px 30px, rgba(255, 255, 255, .7) 50%, transparent 51%),
+        radial-gradient(1.5px 1.5px at 100px 80px, rgba(255, 255, 255, .5) 50%, transparent 51%),
+        radial-gradient(1px 1px at 50px 140px, rgba(255, 255, 255, .4) 50%, transparent 51%);
+      animation: drift 160s linear infinite;
+      opacity: .85;
+    }
+
+    .stars:before {
+      background-image:
+        radial-gradient(1.5px 1.5px at 40px 60px, rgba(255, 255, 255, .35) 50%, transparent 51%),
+        radial-gradient(1px 1px at 80px 120px, rgba(255, 255, 255, .25) 50%, transparent 51%);
+      animation: drift 220s linear infinite;
+    }
+
+    .stars:after {
+      background-image:
+        radial-gradient(1px 1px at 70px 90px, rgba(123, 198, 255, .4) 50%, transparent 51%),
+        radial-gradient(1px 1px at 140px 30px, rgba(255, 171, 64, .35) 50%, transparent 51%);
+      animation: drift 300s linear infinite;
+    }
+
+    @keyframes drift {
+      from {
+        transform: translate3d(0, 0, 0)
+      }
+
+      to {
+        transform: translate3d(2000px, 2000px, 0)
+      }
+    }
+
+    header {
+      padding: clamp(48px, 8vw, 96px) 24px 32px;
+      text-align: center;
+      background: radial-gradient(900px 600px at 80% 20%, rgba(91, 192, 255, .12), transparent 60%);
+    }
+
+    h1 {
+      font-family: Orbitron, Inter, sans-serif;
+      font-size: clamp(28px, 5.6vw, 56px);
+      margin: 0;
+    }
+
+    .subtitle {
+      max-width: 900px;
+      margin: 12px auto 24px;
+      color: var(--muted);
+    }
+
+    .nav {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 16px;
+      border-radius: 999px;
+      border: 1px solid #1f2a44;
+      background: linear-gradient(180deg, #133252, #0c1b2e);
+      color: var(--text);
+      text-decoration: none;
+      box-shadow: var(--shadow);
+      cursor: pointer;
+      font-size: 13px;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px)
+    }
+
+    main {
+      padding: 24px;
+      max-width: 1100px;
+      margin: 0 auto 40px auto;
+    }
+
+    .card {
+      background: linear-gradient(180deg, rgba(16, 20, 40, .7), rgba(10, 12, 20, .8));
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 22px;
+      box-shadow: var(--shadow);
+      margin-bottom: 28px;
+    }
+
+    h2 {
+      margin: 0 0 8px;
+      font-size: 20px;
+    }
+
+    .muted {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    label {
+      font-size: 13px;
+      display: block;
+      margin-bottom: 4px;
+      color: var(--muted);
+    }
+
+    input,
+    textarea,
+    select {
+      width: 100%;
+      padding: 7px 10px;
+      border-radius: 10px;
+      border: 1px solid rgba(123, 198, 255, .2);
+      background: rgba(10, 12, 20, .9);
+      color: var(--text);
+      font-family: inherit;
+      font-size: 13px;
+      box-sizing: border-box;
+    }
+
+    textarea {
+      min-height: 120px;
+      resize: vertical;
+    }
+
+    .form-row-inline {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      margin-top: 10px;
+    }
+
+    .form-row-inline>div {
+      flex: 1 1 200px;
+      min-width: 0;
+    }
+
+    .buttons-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .buttons-row .btn {
+      border-radius: 999px;
+    }
+
+    .status-line {
+      margin-top: 8px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .status-line.error {
+      color: #ff9b9b;
+    }
+
+    .field-grid {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 14px;
+      font-size: 13px;
+    }
+
+    .field-grid thead {
+      background: rgba(9, 12, 24, 0.95);
+    }
+
+    .field-grid th,
+    .field-grid td {
+      padding: 6px 8px;
+      border-bottom: 1px solid rgba(123, 198, 255, 0.12);
+      vertical-align: top;
+    }
+
+    .field-grid th {
+      font-weight: 600;
+      color: var(--muted);
+      text-align: left;
+    }
+
+    .field-label {
+      white-space: nowrap;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .field-row.changed .field-label {
+      color: #ffe29b;
+    }
+
+    .field-input {
+      width: 100%;
+    }
+
+    .field-input[readonly] {
+      opacity: 0.8;
+      cursor: default;
+    }
+
+    .field-input.updated.changed {
+      border-color: #ffd46a;
+      box-shadow:
+        0 0 0 1px rgba(255, 212, 106, 0.7),
+        0 0 12px rgba(255, 212, 106, 0.9);
+      background: radial-gradient(circle at 0% 0%, rgba(255, 212, 106, 0.2), rgba(15, 18, 32, 0.95));
+    }
+
+    .field-note {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 3px;
+    }
+
+    .pill {
+      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(123, 198, 255, .35);
+      background: rgba(15, 18, 32, .9);
+      color: #9ed1ff;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      margin-top: 6px;
+    }
+
+    .summary-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 8px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    code {
+      font-family: "Fira Code", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: 12px;
+    }
+
+    footer {
+      text-align: center;
+      font-size: 14px;
+      color: var(--muted);
+      margin: 40px 0 20px;
+    }
+
+    a {
+      color: var(--link);
+    }
+
+    @media (max-width: 720px) {
+      .field-grid thead {
+        display: none;
+      }
+
+      .field-grid,
+      .field-grid tbody,
+      .field-grid tr,
+      .field-grid td {
+        display: block;
+        width: 100%;
+      }
+
+      .field-grid tr {
+        border-radius: 12px;
+        border: 1px solid rgba(123, 198, 255, 0.15);
+        margin-bottom: 10px;
+        padding: 8px;
+        background: rgba(8, 10, 20, 0.9);
+      }
+
+      .field-grid td {
+        border: none;
+        padding: 4px 0;
+      }
+
+      .field-grid td:nth-child(2),
+      .field-grid td:nth-child(3) {
+        margin-top: 4px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="starfield" aria-hidden="true">
+    <div class="stars"></div>
+  </div>
+
+  <header>
+    <h1>VSX Revision Helper</h1>
+    <p class="subtitle">
+      Load an object from AAVSO VSX, compare current vs updated values, and generate a ready-to-paste revision summary
+      for your submissions.
+    </p>
+    <nav class="nav" aria-label="Primary">
+      <a class="btn" href="index.html">← Back to Home</a>
+      <!-- Update this link to your existing transit calculator page -->
+      <a class="btn" href="transitcalc.html">Transit Duration / Eclipse % Calculator</a>
+    </nav>
+  </header>
+
+  <main>
+    <!-- Section 1: Load VSX object -->
+    <section class="card" aria-labelledby="load-heading">
+      <h2 id="load-heading">1. Load VSX Object</h2>
+      <p class="muted">
+        Enter the VSX identifier you would normally search for (e.g. <code>TRAPPIST-1</code>, <code>WASP-52</code>) and
+        fetch the current VSX values through the helper API.
+      </p>
+
+      <div class="form-row-inline">
+        <div>
+          <label for="identInput">VSX identifier (Ident)</label>
+          <input id="identInput" placeholder="TRAPPIST-1" />
+        </div>
+        <div style="flex:0 0 auto; display:flex; gap:8px; align-items:flex-end;">
+          <button id="loadBtn" class="btn" type="button">Load VSX data</button>
+        </div>
+      </div>
+
+      <div id="loadStatus" class="status-line">
+        Waiting for ident…
+      </div>
+    </section>
+
+    <!-- Section 2: Compare & edit fields -->
+    <section class="card" aria-labelledby="compare-heading">
+      <h2 id="compare-heading">2. Compare & Edit Fields</h2>
+      <p class="muted">
+        The left column shows the current values fetched from VSX. Edit the right column with values from your new
+        papers. Fields that differ will be highlighted so you don’t miss revision comments.
+      </p>
+      <span class="pill">Tip: Only a subset of VSX fields is available via the public API. The rest can be copy/pasted
+        directly from the VSX web page.</span>
+
+      <table class="field-grid" aria-label="VSX fields comparison">
+        <thead>
+          <tr>
+            <th style="width:20%;">Field</th>
+            <th style="width:40%;">Current VSX</th>
+            <th style="width:40%;">Updated value</th>
+          </tr>
+        </thead>
+        <tbody id="fieldGridBody">
+          <!-- Rows created dynamically -->
+        </tbody>
+      </table>
+    </section>
+
+    <!-- Section 3: Generate revision summary -->
+    <section class="card" aria-labelledby="summary-heading">
+      <h2 id="summary-heading">3. Generate Revision Summary</h2>
+      <p class="muted">
+        Create a concise summary of all changed fields that you can paste into the VSX revision comments box.
+      </p>
+
+      <div class="summary-meta">
+        <span>Changed fields will be listed as <code>Name: old → new</code>.</span>
+      </div>
+
+      <div class="buttons-row">
+        <button id="generateSummaryBtn" class="btn" type="button">Generate revision summary</button>
+        <button id="copySummaryBtn" class="btn" type="button">Copy summary</button>
+      </div>
+
+      <textarea id="summaryOutput" placeholder="Load a VSX object, edit any updated values, then click “Generate revision summary”."
+        spellcheck="false"></textarea>
+
+      <p class="muted" style="margin-top:8px; font-size:12px;">
+        You can tweak wording directly here before pasting into VSX if needed.
+      </p>
+    </section>
+  </main>
+
+  <footer>
+    <p>
+      © <span id="year"></span> Exoplanet Slacker — VSX Revision Helper. <em>Not affiliated with AAVSO.</em>
+    </p>
+  </footer>
+
+  <script>
+    // === CONFIG ===
+    // Point this to your Vercel API proxy, similar to how you route NASA Exoplanet Archive.
+    const VSX_API_BASE = "https://vsx-revision-helper.vercel.app/api/vsx";
+
+    // Field configuration: label + key mapping to API payload
+    const FIELD_CONFIG = [
+      { key: "primaryName", label: "Primary name", fromApi: true },
+      { key: "auid", label: "AUID", fromApi: true },
+      { key: "raDeg", label: "RA (J2000, deg)", fromApi: true },
+      { key: "decDeg", label: "Dec (J2000, deg)", fromApi: true },
+      { key: "variableType", label: "Variability type", fromApi: true },
+      { key: "spectralType", label: "Spectral type", fromApi: true },
+      { key: "discoverer", label: "Discoverer", fromApi: true },
+      { key: "maxMag", label: "Max mag (numeric)", fromApi: true },
+      { key: "maxMagBand", label: "Max mag band", fromApi: true },
+      { key: "minMag", label: "Min mag (numeric)", fromApi: true },
+      { key: "minMagBand", label: "Min mag band", fromApi: true },
+      { key: "periodDays", label: "Period (days)", fromApi: true },
+      { key: "epochHJD", label: "Epoch (HJD)", fromApi: true },
+      {
+        key: "eclipseDurationPercent",
+        label: "Transit/Eclipse duration (%)",
+        fromApi: true
+      },
+      // Helper / app-only fields:
+      { key: "remark", label: "Remark (summary)", fromApi: false },
+      { key: "referenceName", label: "Reference name(s)", fromApi: false },
+      { key: "referenceBibcode", label: "Reference bibcode(s)", fromApi: false },
+      { key: "revisionComment", label: "VSX revision comment block", fromApi: false },
+    ];
+
+    const identInput = document.getElementById("identInput");
+    const loadBtn = document.getElementById("loadBtn");
+    const loadStatus = document.getElementById("loadStatus");
+    const fieldGridBody = document.getElementById("fieldGridBody");
+    const generateSummaryBtn = document.getElementById("generateSummaryBtn");
+    const copySummaryBtn = document.getElementById("copySummaryBtn");
+    const summaryOutput = document.getElementById("summaryOutput");
+
+    let currentRecord = null;
+    let updatedRecord = null;
+
+    document.getElementById("year").textContent = new Date().getFullYear();
+
+    function setStatus(msg, isError = false) {
+      if (!loadStatus) return;
+      loadStatus.textContent = msg;
+      loadStatus.classList.toggle("error", !!isError);
+    }
+
+    function formatNumber(value) {
+      if (value === null || value === undefined || value === "") return "";
+      const num = Number(value);
+      if (!Number.isFinite(num)) return String(value);
+      // Keep original precision for now. You can tweak per-field if desired.
+      return String(num);
+    }
+
+    function buildFieldRows() {
+      fieldGridBody.innerHTML = "";
+
+      if (!currentRecord || !updatedRecord) {
+        return;
+      }
+
+      FIELD_CONFIG.forEach(cfg => {
+        const tr = document.createElement("tr");
+        tr.className = "field-row";
+        tr.dataset.key = cfg.key;
+
+        // Label cell
+        const tdLabel = document.createElement("td");
+        tdLabel.className = "field-label";
+        tdLabel.textContent = cfg.label;
+        tr.appendChild(tdLabel);
+
+        // Current cell
+        const tdCurrent = document.createElement("td");
+        const currentInput = document.createElement("input");
+        currentInput.className = "field-input current";
+        currentInput.readOnly = true;
+        const curVal = currentRecord[cfg.key];
+        currentInput.value = curVal == null ? "" : String(curVal);
+        tdCurrent.appendChild(currentInput);
+        tr.appendChild(tdCurrent);
+
+        // Updated cell
+        const tdUpdated = document.createElement("td");
+        const updatedInput = document.createElement("input");
+        updatedInput.className = "field-input updated";
+        updatedInput.dataset.key = cfg.key;
+
+        const updVal = updatedRecord[cfg.key];
+        updatedInput.value = updVal == null ? "" : String(updVal);
+        tdUpdated.appendChild(updatedInput);
+
+        // Optional note for certain fields
+        if (cfg.key === "eclipseDurationPercent") {
+          const note = document.createElement("div");
+          note.className = "field-note";
+          note.textContent = "VSX EclipseDuration: T14 / (P × 24) × 100, in percent.";
+          tdUpdated.appendChild(note);
+        }
+
+        if (cfg.key === "revisionComment") {
+          const note = document.createElement("div");
+          note.className = "field-note";
+          note.textContent = "Use this to collect a concise explanation of all changes you’re submitting.";
+          tdUpdated.appendChild(note);
+        }
+
+        tr.appendChild(tdUpdated);
+        fieldGridBody.appendChild(tr);
+      });
+
+      wireUpdatedInputs();
+      recomputeDiffs();
+    }
+
+    function wireUpdatedInputs() {
+      const updatedInputs = fieldGridBody.querySelectorAll(".field-input.updated");
+      updatedInputs.forEach(input => {
+        input.addEventListener("input", () => {
+          const key = input.dataset.key;
+          if (!key) return;
+          updatedRecord[key] = input.value;
+          recomputeDiffs();
+        });
+      });
+    }
+
+    function recomputeDiffs() {
+      const rows = fieldGridBody.querySelectorAll(".field-row");
+
+      rows.forEach(row => {
+        const key = row.dataset.key;
+        const currentInput = row.querySelector(".field-input.current");
+        const updatedInput = row.querySelector(".field-input.updated");
+
+        if (!key || !currentInput || !updatedInput) return;
+
+        const curVal = (currentInput.value || "").trim();
+        const updVal = (updatedInput.value || "").trim();
+
+        const changed = curVal !== updVal;
+
+        row.classList.toggle("changed", changed);
+        updatedInput.classList.toggle("changed", changed);
+      });
+    }
+
+    async function loadVsx() {
+      const ident = (identInput.value || "").trim();
+      if (!ident) {
+        setStatus("Please enter an ident (e.g. TRAPPIST-1 or WASP-52).", true);
+        return;
+      }
+
+      setStatus(`Loading VSX data for "${ident}"…`);
+      loadBtn.disabled = true;
+      loadBtn.textContent = "Loading…";
+
+      try {
+        const url = `${VSX_API_BASE}?ident=${encodeURIComponent(ident)}`;
+        const res = await fetch(url);
+
+        if (!res.ok) {
+          throw new Error(`VSX proxy error: HTTP ${res.status}`);
+        }
+
+        const data = await res.json();
+
+        // Expect data shaped like:
+        // { primaryName, auid, raDeg, decDeg, variableType, spectralType, discoverer, ... }
+        currentRecord = {};
+        updatedRecord = {};
+
+        FIELD_CONFIG.forEach(cfg => {
+          if (cfg.fromApi) {
+            currentRecord[cfg.key] = data[cfg.key] ?? "";
+            updatedRecord[cfg.key] = data[cfg.key] ?? "";
+          } else {
+            currentRecord[cfg.key] = "";
+            updatedRecord[cfg.key] = "";
+          }
+        });
+
+        buildFieldRows();
+        setStatus(`Loaded VSX object for "${ident}". Edit updated values on the right.`);
+      } catch (err) {
+        console.error(err);
+        setStatus("Failed to load VSX data. Check console or API URL configuration.", true);
+      } finally {
+        loadBtn.disabled = false;
+        loadBtn.textContent = "Load VSX data";
+      }
+    }
+
+    function generateSummary() {
+      if (!currentRecord || !updatedRecord) {
+        summaryOutput.value = "Load a VSX object first, then edit any updated values.";
+        return;
+      }
+
+      const ident = (identInput.value || "").trim();
+      const lines = [];
+
+      if (ident) {
+        lines.push(`VSX revision for: ${ident}`);
+        lines.push("");
+      }
+
+      const changedFieldLines = [];
+
+      FIELD_CONFIG.forEach(cfg => {
+        const key = cfg.key;
+        const label = cfg.label;
+
+        const curVal = (currentRecord[key] ?? "").toString().trim();
+        const updVal = (updatedRecord[key] ?? "").toString().trim();
+
+        if (!cfg.fromApi) {
+          // Helper fields: if non-empty in updated, list them directly
+          if (updVal) {
+            if (key === "revisionComment") {
+              lines.push("Revision comment:");
+              lines.push(updVal);
+              lines.push("");
+            } else {
+              changedFieldLines.push(`${label}: ${updVal}`);
+            }
+          }
+          return;
+        }
+
+        if (curVal === updVal) {
+          return;
+        }
+
+        // For normal API-backed fields, show old → new
+        if (!curVal && updVal) {
+          changedFieldLines.push(`${label}: (no value in VSX) → ${updVal}`);
+        } else if (curVal && !updVal) {
+          changedFieldLines.push(`${label}: ${curVal} → (blank / remove)`);
+        } else {
+          changedFieldLines.push(`${label}: ${curVal} → ${updVal}`);
+        }
+      });
+
+      if (changedFieldLines.length) {
+        lines.push("Field changes:");
+        changedFieldLines.forEach(l => lines.push(" - " + l));
+        lines.push("");
+      } else {
+        lines.push("No field changes detected between current and updated values.");
+      }
+
+      summaryOutput.value = lines.join("\n");
+    }
+
+    function copySummary() {
+      const txt = summaryOutput.value || "";
+      if (!txt.trim()) return;
+
+      navigator.clipboard?.writeText(txt).then(() => {
+        const orig = copySummaryBtn.textContent;
+        copySummaryBtn.textContent = "Copied!";
+        setTimeout(() => {
+          copySummaryBtn.textContent = orig;
+        }, 900);
+      }).catch(() => {
+        // fail silently
+      });
+    }
+
+    loadBtn.addEventListener("click", loadVsx);
+    identInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        loadVsx();
+      }
+    });
+
+    generateSummaryBtn.addEventListener("click", generateSummary);
+    copySummaryBtn.addEventListener("click", copySummary);
+
+    // Initial status
+    setStatus("Enter an ident and click “Load VSX data”.");
+  </script>
+</body>
+
+</html>
