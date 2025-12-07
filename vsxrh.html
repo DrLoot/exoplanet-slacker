@@ -489,6 +489,22 @@
         The left column shows the current values fetched from VSX. Edit the right column with values from your new
         papers. Fields that differ will be highlighted so you don’t miss revision comments.
       </p>
+
+      <div class="form-row-inline" style="margin-bottom: 4px;">
+        <div style="flex: 1 1 260px;">
+          <label for="paperPdf">Attach reference paper (PDF)</label>
+          <input id="paperPdf" type="file" accept="application/pdf" />
+        </div>
+        <div style="flex: 0 0 auto; display:flex; gap:8px; align-items:flex-end;">
+          <button id="scanPdfBtn" class="btn" type="button">
+            Scan paper with AI
+          </button>
+        </div>
+      </div>
+      <div id="scanStatus" class="status-line">
+        Attach a PDF after loading a VSX object, then click “Scan paper with AI”.
+      </div>
+
       <span class="pill">Tip: Only a subset of VSX fields is available via the public API. The rest can be copy/pasted
         directly from the VSX web page.</span>
 
@@ -497,6 +513,7 @@
           <tr>
             <th style="width:20%;">Field</th>
             <th style="width:40%;">Current VSX</th>
+            <th style="width:25%;">Paper data</th>
             <th style="width:40%;">Updated value</th>
           </tr>
         </thead>
@@ -587,10 +604,22 @@
     const copySummaryBtn = document.getElementById("copySummaryBtn");
     const summaryOutput = document.getElementById("summaryOutput");
 
+    // NEW:
+    const paperUpload = document.getElementById("paperPdf");
+    const scanPdfBtn = document.getElementById("scanPdfBtn");
+    const scanStatus = document.getElementById("scanStatus");
+
     let currentRecord = null;
     let updatedRecord = null;
+    let paperRecord = null;
 
     document.getElementById("year").textContent = new Date().getFullYear();
+
+    function setScanStatus(msg, isError = false) {
+      if (!scanStatus) return;
+      scanStatus.textContent = msg;
+      scanStatus.classList.toggle("error", !!isError);
+    }
 
     function setStatus(msg, isError = false) {
       if (!loadStatus) return;
@@ -624,7 +653,7 @@
           headerTr.className = "field-group-header";
 
           const headerTd = document.createElement("td");
-          headerTd.colSpan = 3;
+          headerTd.colSpan = 4;
           headerTd.textContent = currentGroup;
 
           headerTr.appendChild(headerTd);
@@ -665,6 +694,26 @@
 
         tdCurrent.appendChild(currentInput);
         tr.appendChild(tdCurrent);
+
+        // NEW: Paper cell
+        const tdPaper = document.createElement("td");
+        let paperInput;
+        const paperVal = paperRecord ? paperRecord[cfg.key] : "";
+
+        if (cfg.key === "remark" || cfg.key === "revisionComment") {
+          paperInput = document.createElement("textarea");
+          paperInput.className = "field-input paper multi-text";
+        } else {
+          paperInput = document.createElement("input");
+          paperInput.className = "field-input paper";
+        }
+
+        paperInput.dataset.key = cfg.key;
+        paperInput.value = paperVal == null ? "" : String(paperVal);
+        paperInput.readOnly = true; // user doesn’t type here
+
+        tdPaper.appendChild(paperInput);
+        tr.appendChild(tdPaper);
 
         // Updated cell
         const tdUpdated = document.createElement("td");
@@ -773,19 +822,24 @@
         // { primaryName, auid, raDeg, decDeg, variableType, spectralType, discoverer, ... }
         currentRecord = {};
         updatedRecord = {};
+        paperRecord = {};
 
         FIELD_CONFIG.forEach(cfg => {
           if (cfg.fromApi) {
             currentRecord[cfg.key] = data[cfg.key] ?? "";
             updatedRecord[cfg.key] = data[cfg.key] ?? "";
+            paperRecord[cfg.key] = "";
           } else {
             currentRecord[cfg.key] = "";
             updatedRecord[cfg.key] = "";
+            paperRecord[cfg.key] = "";
           }
         });
 
         buildFieldRows();
         setStatus(`Loaded VSX object for "${ident}". Edit updated values on the right.`);
+        setScanStatus("Attach a PDF for this object and click “Scan paper with AI”.");
+
       } catch (err) {
         console.error(err);
         setStatus("Failed to load VSX data. Check console or API URL configuration.", true);
@@ -857,6 +911,81 @@
       summaryOutput.value = lines.join("\n");
     }
 
+    async function scanPdf() {
+      if (!currentRecord) {
+        setScanStatus("Load a VSX object before scanning a paper.", true);
+        return;
+      }
+
+      const file = paperUpload.files?.[0];
+      if (!file) {
+        setScanStatus("Please choose a PDF file first.", true);
+        return;
+      }
+
+      setScanStatus("Uploading PDF and asking AI to extract fields…");
+      scanPdfBtn.disabled = true;
+      scanPdfBtn.textContent = "Scanning…";
+
+      try {
+        const formData = new FormData();
+        formData.append("paper", file);
+
+        // Optional: send the current VSX values so the model can cross-check
+        const baseline = {
+          raDeg: currentRecord.raDeg ?? "",
+          decDeg: currentRecord.decDeg ?? "",
+          spectralType: currentRecord.spectralType ?? "",
+          maxMag: currentRecord.maxMag ?? "",
+          maxMagBand: currentRecord.maxMagBand ?? "",
+          minMag: currentRecord.minMag ?? "",
+          minMagBand: currentRecord.minMagBand ?? "",
+          periodDays: currentRecord.periodDays ?? "",
+          epochHJD: currentRecord.epochHJD ?? "",
+          transitPct: currentRecord.eclipseDurationPercent ?? ""
+        };
+        formData.append("baseline", JSON.stringify(baseline));
+
+        const res = await fetch("/api/vsx-scan-paper", {
+          method: "POST",
+          body: formData
+        });
+
+        if (!res.ok) {
+          throw new Error(`HTTP ${res.status}`);
+        }
+
+        const json = await res.json();
+        if (!json.ok) {
+          throw new Error(json.error || "Unknown error from AI endpoint.");
+        }
+
+        // Fill paperRecord with returned values
+        const data = json.data || {};
+        if (!paperRecord) paperRecord = {};
+        paperRecord.raDeg = data.raDeg ?? "";
+        paperRecord.decDeg = data.decDeg ?? "";
+        paperRecord.spectralType = data.spectralType ?? "";
+        paperRecord.maxMag = data.maxMag ?? "";
+        paperRecord.maxMagBand = data.maxMagBand ?? "";
+        paperRecord.minMag = data.minMag ?? "";
+        paperRecord.minMagBand = data.minMagBand ?? "";
+        paperRecord.periodDays = data.periodDays ?? "";
+        paperRecord.epochHJD = data.epochHJD ?? "";
+        paperRecord.eclipseDurationPercent = data.transitPct ?? "";
+
+        // Rebuild rows so the Paper column updates (Updated values are preserved)
+        buildFieldRows();
+        setScanStatus("Paper scanned successfully. Review Paper data vs Current VSX.");
+      } catch (err) {
+        console.error(err);
+        setScanStatus("Failed to scan PDF. Check console and your API endpoint.", true);
+      } finally {
+        scanPdfBtn.disabled = false;
+        scanPdfBtn.textContent = "Scan paper with AI";
+      }
+    }
+
     function copySummary() {
       const txt = summaryOutput.value || "";
       if (!txt.trim()) return;
@@ -882,6 +1011,7 @@
 
     generateSummaryBtn.addEventListener("click", generateSummary);
     copySummaryBtn.addEventListener("click", copySummary);
+    scanPdfBtn.addEventListener("click", scanPdf);
 
     // Initial status
     setStatus("Enter an ident and click “Load VSX data”.");
