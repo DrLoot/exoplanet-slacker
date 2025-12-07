@@ -548,6 +548,11 @@
               <option>Other</option>
             </select>
           </div>
+          <div>
+            <label for="photometry">Photometry (stellar variabilities)</label>
+            <input id="photometry" name="photometry" type="number" inputmode="numeric" min="0" max="200" step="1"
+              placeholder="" />
+          </div>
         </div>
 
         <div class="muted" style="font-size:12px;margin-top:6px;">
@@ -616,6 +621,7 @@
           <label><input type="checkbox" id="includeRank" checked /> Include rank</label>
           <label><input type="checkbox" id="includeData" checked /> Include Data</label>
           <label><input type="checkbox" id="includeFlair" checked /> Include flair emojis</label>
+          <label><input type="checkbox" id="includePhotometry" /> Include Photometry</label>
         </div>
 
         <div class="buttons-row">
@@ -777,75 +783,75 @@
     }
 
     function normalizeTargetForApi(rawName) {
-  if (!rawName) return null;
-  const trimmed = rawName.trim();
-  if (!trimmed) return null;
+      if (!rawName) return null;
+      const trimmed = rawName.trim();
+      if (!trimmed) return null;
 
-  // Compact form: remove spaces and hyphens
-  const compact = trimmed.replace(/[\s-]+/g, '');
-  // PREFIX + digits + optional letter (e.g., TOI733b, Kepler442b, HD189733b)
-  const m = compact.match(/^([A-Za-z]+)(\d+)([A-Za-z])?$/);
-  if (!m) {
-    // Doesn't look like PREFIX+number → just use as-is
-    return trimmed;
-  }
+      // Compact form: remove spaces and hyphens
+      const compact = trimmed.replace(/[\s-]+/g, '');
+      // PREFIX + digits + optional letter (e.g., TOI733b, Kepler442b, HD189733b)
+      const m = compact.match(/^([A-Za-z]+)(\d+)([A-Za-z])?$/);
+      if (!m) {
+        // Doesn't look like PREFIX+number → just use as-is
+        return trimmed;
+      }
 
-  let [, prefixRaw, num, letterRaw] = m;
-  const prefix = prefixRaw.toUpperCase();
-  const letter = letterRaw ? letterRaw.toLowerCase() : '';
+      let [, prefixRaw, num, letterRaw] = m;
+      const prefix = prefixRaw.toUpperCase();
+      const letter = letterRaw ? letterRaw.toLowerCase() : '';
 
-  // Dash-style survey prefixes
-  const dashPrefixMap = {
-    'COROT': 'CoRoT',
-    'KEPLER': 'Kepler',
-    'K2': 'K2',
-    'TOI': 'TOI',
-    'WASP': 'WASP',
-    'HATP': 'HAT-P',   // "hatp32b" → HAT-P-32 b
-    'HAT-P': 'HAT-P',
-    'HATS': 'HATS',
-    'TRES': 'TrES',
-    'XO': 'XO',
-    'NGTS': 'NGTS',
-  };
+      // Dash-style survey prefixes
+      const dashPrefixMap = {
+        'COROT': 'CoRoT',
+        'KEPLER': 'Kepler',
+        'K2': 'K2',
+        'TOI': 'TOI',
+        'WASP': 'WASP',
+        'HATP': 'HAT-P',   // "hatp32b" → HAT-P-32 b
+        'HAT-P': 'HAT-P',
+        'HATS': 'HATS',
+        'TRES': 'TrES',
+        'XO': 'XO',
+        'NGTS': 'NGTS',
+      };
 
-  // Space-style catalog prefixes
-  const spacePrefixes = new Set(['HD', 'HIP', 'GJ']);
+      // Space-style catalog prefixes
+      const spacePrefixes = new Set(['HD', 'HIP', 'GJ']);
 
-  // CoRoT-1 b, Kepler-1 b, K2-1 b, TOI-1 b, WASP-1 b, HAT-P-1 b, HATS-1 b,
-  // TrES-1 b, XO-1 b, NGTS-1 b
-  if (dashPrefixMap[prefix]) {
-    const nicePrefix = dashPrefixMap[prefix];
-    return `${nicePrefix}-${num}${letter ? ` ${letter}` : ''}`;
-  }
+      // CoRoT-1 b, Kepler-1 b, K2-1 b, TOI-1 b, WASP-1 b, HAT-P-1 b, HATS-1 b,
+      // TrES-1 b, XO-1 b, NGTS-1 b
+      if (dashPrefixMap[prefix]) {
+        const nicePrefix = dashPrefixMap[prefix];
+        return `${nicePrefix}-${num}${letter ? ` ${letter}` : ''}`;
+      }
 
-  // HD 1 b, HIP 1 b, GJ 1 b
-  if (spacePrefixes.has(prefix)) {
-    return `${prefix} ${num}${letter ? ` ${letter}` : ''}`;
-  }
+      // HD 1 b, HIP 1 b, GJ 1 b
+      if (spacePrefixes.has(prefix)) {
+        return `${prefix} ${num}${letter ? ` ${letter}` : ''}`;
+      }
 
-  // Unknown family → don't touch it
-  return trimmed;
-}
+      // Unknown family → don't touch it
+      return trimmed;
+    }
 
-async function resolveNameViaApi(rawName) {
-  if (!rawName || !rawName.trim()) return null;
+    async function resolveNameViaApi(rawName) {
+      if (!rawName || !rawName.trim()) return null;
 
-  // Normalize to one official pattern if possible
-  const candidate = normalizeTargetForApi(rawName);
-  if (!candidate) return null;
+      // Normalize to one official pattern if possible
+      const candidate = normalizeTargetForApi(rawName);
+      if (!candidate) return null;
 
-  try {
-    const info = await fetchPlanetInfo(candidate);
-    if (!info) return null;
+      try {
+        const info = await fetchPlanetInfo(candidate);
+        if (!info) return null;
 
-    // Prefer NASA's canonical name, fall back to our normalized one
-    return info.pl_name || candidate;
-  } catch (e) {
-    console.warn('Failed to resolve name via NASA API:', e);
-    return null;
-  }
-}
+        // Prefer NASA's canonical name, fall back to our normalized one
+        return info.pl_name || candidate;
+      } catch (e) {
+        console.warn('Failed to resolve name via NASA API:', e);
+        return null;
+      }
+    }
 
     function classifyStar(stTeff, stSpectype) {
       if (!stTeff && !stSpectype) return null;
@@ -1291,10 +1297,13 @@ async function resolveNameViaApi(rawName) {
       const snr = document.getElementById('snr').value.trim();
       const obsDate = document.getElementById('obsDate').value;
       const data = document.getElementById('data').value;
+      const photometryRaw = document.getElementById('photometry').value.trim();
+
       const includeSNR = document.getElementById('includeSNR').checked;
       const includeRank = document.getElementById('includeRank').checked;
       const includeFlair = document.getElementById('includeFlair').checked;
       const includeData = document.getElementById('includeData').checked;
+      const includePhotometry = document.getElementById('includePhotometry').checked;
       const template = document.getElementById('template').value;
 
       if (!target) {
@@ -1303,12 +1312,23 @@ async function resolveNameViaApi(rawName) {
       }
 
       const humanDate = formatDateHuman(obsDate);
+
       // Only add emojis if flair is enabled
       let snrEmoji = '';
       let rankEmoji = '';
       if (includeFlair) {
         snrEmoji = snrFlair(snr);
         rankEmoji = rankFlair(rank);
+      }
+
+      // Normalize photometry count: numbers only, clamp to 0–200
+      let photometryCount = '';
+      if (photometryRaw) {
+        const n = Number(photometryRaw);
+        if (!Number.isNaN(n) && n >= 0) {
+          const clamped = Math.min(Math.round(n), 200);
+          photometryCount = String(clamped);
+        }
       }
 
       let lines = [];
@@ -1335,6 +1355,18 @@ async function resolveNameViaApi(rawName) {
         const line3 = parts.join(', ');
         if (line3) lines.push(line3);
 
+        // Photometry sentence after the date/data line
+        if (includePhotometry) {
+          let photLine = 'Transit and XX stellar variabilities uploaded to AAVSO! :aavso:';
+          if (photometryCount) {
+            photLine = photLine.replace('XX', photometryCount);
+          } else {
+            // field blank → “ignore the number” (drop XX entirely)
+            photLine = photLine.replace('XX ', '');
+          }
+          lines.push(photLine);
+        }
+
       } else if (template === 'tech') {
         let header = target;
         if (includeRank && rank) {
@@ -1352,6 +1384,17 @@ async function resolveNameViaApi(rawName) {
         if (includeData && data) meta.push(data);
         if (meta.length) lines.push(meta.join(' — '));
 
+        // Photometry sentence as its own line
+        if (includePhotometry) {
+          let photLine = 'Transit and XX stellar variabilities uploaded to AAVSO! :aavso:';
+          if (photometryCount) {
+            photLine = photLine.replace('XX', photometryCount);
+          } else {
+            photLine = photLine.replace('XX ', '');
+          }
+          lines.push(photLine);
+        }
+
       } else if (template === 'minimal') {
         let line = target;
         if (includeRank && rank) {
@@ -1365,6 +1408,20 @@ async function resolveNameViaApi(rawName) {
         }
         if (humanDate) line += ` — ${humanDate}`;
         if (includeData && data) line += ` — ${data}`;
+
+        if (includePhotometry) {
+          let photSentence = 'Transit and XX stellar variabilities uploaded to AAVSO! :aavso:';
+          if (photometryCount) {
+            photSentence = photSentence.replace('XX', photometryCount);
+          } else {
+            photSentence = photSentence.replace('XX ', '');
+          }
+          // Append as a second sentence
+          if (photSentence) {
+            line += (line ? ' ' : '') + photSentence;
+          }
+        }
+
         lines.push(line);
       }
 
