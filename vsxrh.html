@@ -559,6 +559,8 @@
     // === CONFIG ===
     // Point this to your Vercel API proxy, similar to how you route NASA Exoplanet Archive.
     const VSX_API_BASE = "https://lost-matrix-relics.vercel.app/api/vsx";
+    const VSX_SCAN_API = "https://lost-matrix-relics.vercel.app/api/vsx-scan-paper";
+
 
     // Field configuration: label + key mapping to API payload
     const FIELD_CONFIG = [
@@ -946,7 +948,7 @@
         };
         formData.append("baseline", JSON.stringify(baseline));
 
-        const res = await fetch("/api/vsx-scan-paper", {
+        const res = await fetch(VSX_SCAN_API, {
           method: "POST",
           body: formData
         });
