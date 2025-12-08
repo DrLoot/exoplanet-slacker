@@ -913,80 +913,94 @@
       summaryOutput.value = lines.join("\n");
     }
 
-    async function scanPdf() {
-      if (!currentRecord) {
-        setScanStatus("Load a VSX object before scanning a paper.", true);
-        return;
-      }
+    function scanPdf() {
+  if (!currentRecord) {
+    setScanStatus("Load a VSX object before scanning a paper.", true);
+    return;
+  }
 
-      const file = paperUpload.files?.[0];
-      if (!file) {
-        setScanStatus("Please choose a PDF file first.", true);
-        return;
-      }
+  const file = paperUpload.files?.[0];
+  if (!file) {
+    setScanStatus("Please choose a PDF file first.", true);
+    return;
+  }
 
-      setScanStatus("Uploading PDF and asking AI to extract fields…");
-      scanPdfBtn.disabled = true;
-      scanPdfBtn.textContent = "Scanning…";
+  setScanStatus("Uploading PDF and asking AI to extract fields…");
+  scanPdfBtn.disabled = true;
+  scanPdfBtn.textContent = "Scanning…";
 
+  (async () => {
+    try {
+      const formData = new FormData();
+      formData.append("paper", file);
+
+      // Optional: send the current VSX values so the model can cross-check
+      const baseline = {
+        raDeg: currentRecord.raDeg ?? "",
+        decDeg: currentRecord.decDeg ?? "",
+        spectralType: currentRecord.spectralType ?? "",
+        maxMag: currentRecord.maxMag ?? "",
+        maxMagBand: currentRecord.maxMagBand ?? "",
+        minMag: currentRecord.minMag ?? "",
+        minMagBand: currentRecord.minMagBand ?? "",
+        periodDays: currentRecord.periodDays ?? "",
+        epochHJD: currentRecord.epochHJD ?? "",
+        transitPct: currentRecord.eclipseDurationPercent ?? ""
+      };
+      formData.append("baseline", JSON.stringify(baseline));
+
+      const res = await fetch(VSX_SCAN_API, {
+        method: "POST",
+        body: formData
+      });
+
+      let json = null;
       try {
-        const formData = new FormData();
-        formData.append("paper", file);
-
-        // Optional: send the current VSX values so the model can cross-check
-        const baseline = {
-          raDeg: currentRecord.raDeg ?? "",
-          decDeg: currentRecord.decDeg ?? "",
-          spectralType: currentRecord.spectralType ?? "",
-          maxMag: currentRecord.maxMag ?? "",
-          maxMagBand: currentRecord.maxMagBand ?? "",
-          minMag: currentRecord.minMag ?? "",
-          minMagBand: currentRecord.minMagBand ?? "",
-          periodDays: currentRecord.periodDays ?? "",
-          epochHJD: currentRecord.epochHJD ?? "",
-          transitPct: currentRecord.eclipseDurationPercent ?? ""
-        };
-        formData.append("baseline", JSON.stringify(baseline));
-
-        const res = await fetch(VSX_SCAN_API, {
-          method: "POST",
-          body: formData
-        });
-
-        if (!res.ok) {
-          throw new Error(`HTTP ${res.status}`);
-        }
-
-        const json = await res.json();
-        if (!json.ok) {
-          throw new Error(json.error || "Unknown error from AI endpoint.");
-        }
-
-        // Fill paperRecord with returned values
-        const data = json.data || {};
-        if (!paperRecord) paperRecord = {};
-        paperRecord.raDeg = data.raDeg ?? "";
-        paperRecord.decDeg = data.decDeg ?? "";
-        paperRecord.spectralType = data.spectralType ?? "";
-        paperRecord.maxMag = data.maxMag ?? "";
-        paperRecord.maxMagBand = data.maxMagBand ?? "";
-        paperRecord.minMag = data.minMag ?? "";
-        paperRecord.minMagBand = data.minMagBand ?? "";
-        paperRecord.periodDays = data.periodDays ?? "";
-        paperRecord.epochHJD = data.epochHJD ?? "";
-        paperRecord.eclipseDurationPercent = data.transitPct ?? "";
-
-        // Rebuild rows so the Paper column updates (Updated values are preserved)
-        buildFieldRows();
-        setScanStatus("Paper scanned successfully. Review Paper data vs Current VSX.");
-      } catch (err) {
-        console.error(err);
-        setScanStatus("Failed to scan PDF. Check console and your API endpoint.", true);
-      } finally {
-        scanPdfBtn.disabled = false;
-        scanPdfBtn.textContent = "Scan paper with AI";
+        json = await res.json();
+      } catch {
+        // ignore parse failure; handled below
       }
+
+      if (!res.ok || !json || !json.ok) {
+        const msg =
+          (json && json.error) ||
+          `HTTP ${res.status} from /vsx-scan-paper`;
+        throw new Error(msg);
+      }
+
+      // Fill paperRecord with returned values
+      const data = json.data || {};
+      if (!paperRecord) paperRecord = {};
+      paperRecord.raDeg = data.raDeg ?? "";
+      paperRecord.decDeg = data.decDeg ?? "";
+      paperRecord.spectralType = data.spectralType ?? "";
+      paperRecord.maxMag = data.maxMag ?? "";
+      paperRecord.maxMagBand = data.maxMagBand ?? "";
+      paperRecord.minMag = data.minMag ?? "";
+      paperRecord.minMagBand = data.minMagBand ?? "";
+      paperRecord.periodDays = data.periodDays ?? "";
+      paperRecord.epochHJD = data.epochHJD ?? "";
+      paperRecord.eclipseDurationPercent = data.transitPct ?? "";
+
+      // Rebuild rows so the Paper column updates (Updated values are preserved)
+      buildFieldRows();
+      setScanStatus(
+        "Paper scanned successfully. Review Paper data vs Current VSX."
+      );
+    } catch (err) {
+      console.error(err);
+      const msg =
+        err instanceof Error ? err.message : "Unknown error from AI endpoint.";
+      setScanStatus(
+        `Failed to scan PDF: ${msg}`,
+        true
+      );
+    } finally {
+      scanPdfBtn.disabled = false;
+      scanPdfBtn.textContent = "Scan paper with AI";
     }
+  })();
+}
 
     function copySummary() {
       const txt = summaryOutput.value || "";
