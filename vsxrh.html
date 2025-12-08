@@ -948,6 +948,7 @@
         transitPct: currentRecord.eclipseDurationPercent ?? ""
       };
       formData.append("baseline", JSON.stringify(baseline));
+      formData.append("targetName", currentRecord.primaryName ?? "");
 
       const res = await fetch(VSX_SCAN_API, {
         method: "POST",
