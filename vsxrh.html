@@ -914,94 +914,82 @@
     }
 
     function scanPdf() {
-  if (!currentRecord) {
-    setScanStatus("Load a VSX object before scanning a paper.", true);
-    return;
-  }
-
-  const file = paperUpload.files?.[0];
-  if (!file) {
-    setScanStatus("Please choose a PDF file first.", true);
-    return;
-  }
-
-  setScanStatus("Uploading PDF and asking AI to extract fields…");
-  scanPdfBtn.disabled = true;
-  scanPdfBtn.textContent = "Scanning…";
-
-  (async () => {
-    try {
-      const formData = new FormData();
-      formData.append("paper", file);
-
-      // Optional: send the current VSX values so the model can cross-check
-      const baseline = {
-        raDeg: currentRecord.raDeg ?? "",
-        decDeg: currentRecord.decDeg ?? "",
-        spectralType: currentRecord.spectralType ?? "",
-        maxMag: currentRecord.maxMag ?? "",
-        maxMagBand: currentRecord.maxMagBand ?? "",
-        minMag: currentRecord.minMag ?? "",
-        minMagBand: currentRecord.minMagBand ?? "",
-        periodDays: currentRecord.periodDays ?? "",
-        epochHJD: currentRecord.epochHJD ?? "",
-        transitPct: currentRecord.eclipseDurationPercent ?? ""
-      };
-      formData.append("baseline", JSON.stringify(baseline));
-      formData.append("targetName", currentRecord.primaryName ?? "");
-
-      const res = await fetch(VSX_SCAN_API, {
-        method: "POST",
-        body: formData
-      });
-
-      let json = null;
-      try {
-        json = await res.json();
-      } catch {
-        // ignore parse failure; handled below
+      if (!currentRecord) {
+        setScanStatus("Load a VSX object before scanning a paper.", true);
+        return;
       }
 
-      if (!res.ok || !json || !json.ok) {
-        const msg =
-          (json && json.error) ||
-          `HTTP ${res.status} from /vsx-scan-paper`;
-        throw new Error(msg);
+      const url = (paperUrlInput.value || "").trim();
+      if (!url) {
+        setScanStatus("Please enter a PDF URL first.", true);
+        return;
       }
 
-      // Fill paperRecord with returned values
-      const data = json.data || {};
-      if (!paperRecord) paperRecord = {};
-      paperRecord.raDeg = data.raDeg ?? "";
-      paperRecord.decDeg = data.decDeg ?? "";
-      paperRecord.spectralType = data.spectralType ?? "";
-      paperRecord.maxMag = data.maxMag ?? "";
-      paperRecord.maxMagBand = data.maxMagBand ?? "";
-      paperRecord.minMag = data.minMag ?? "";
-      paperRecord.minMagBand = data.minMagBand ?? "";
-      paperRecord.periodDays = data.periodDays ?? "";
-      paperRecord.epochHJD = data.epochHJD ?? "";
-      paperRecord.eclipseDurationPercent = data.transitPct ?? "";
+      setScanStatus(
+        "Fetching PDF on the server and asking AI to extract fields…"
+      );
+      scanPdfBtn.disabled = true;
+      scanPdfBtn.textContent = "Scanning…";
 
-      // Rebuild rows so the Paper column updates (Updated values are preserved)
-      buildFieldRows();
-      setScanStatus(
-        "Paper scanned successfully. Review Paper data vs Current VSX."
-      );
-    } catch (err) {
-      console.error(err);
-      const msg =
-        err instanceof Error ? err.message : "Unknown error from AI endpoint.";
-      setScanStatus(
-        `Failed to scan PDF: ${msg}`,
-        true
-      );
-    } finally {
-      scanPdfBtn.disabled = false;
-      scanPdfBtn.textContent = "Scan paper with AI";
+      (async () => {
+        try {
+          const payload = {
+            paperUrl: url,
+            // optional, just for the prompt: which system the paper is about
+            targetName: currentRecord.primaryName ?? "",
+          };
+
+          const res = await fetch(VSX_SCAN_API, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(payload),
+          });
+
+          let json = null;
+          try {
+            json = await res.json();
+          } catch {
+            // ignore parse failure; handled below
+          }
+
+          if (!res.ok || !json || !json.ok) {
+            const msg =
+              (json && json.error) ||
+              `HTTP ${res.status} from /vsx-scan-paper`;
+            throw new Error(msg);
+          }
+
+          // Fill paperRecord with returned values ONLY from the paper
+          const data = json.data || {};
+          if (!paperRecord) paperRecord = {};
+          paperRecord.raDeg = data.raDeg ?? "";
+          paperRecord.decDeg = data.decDeg ?? "";
+          paperRecord.spectralType = data.spectralType ?? "";
+          paperRecord.maxMag = data.maxMag ?? "";
+          paperRecord.maxMagBand = data.maxMagBand ?? "";
+          paperRecord.minMag = data.minMag ?? "";
+          paperRecord.minMagBand = data.minMagBand ?? "";
+          paperRecord.periodDays = data.periodDays ?? "";
+          paperRecord.epochHJD = data.epochHJD ?? "";
+          paperRecord.eclipseDurationPercent = data.transitPct ?? "";
+
+          buildFieldRows();
+          setScanStatus(
+            "Paper scanned successfully. Review Paper data vs Current VSX."
+          );
+        } catch (err) {
+          console.error(err);
+          const msg =
+            err instanceof Error ? err.message : "Unknown error from AI endpoint.";
+          setScanStatus(`Failed to scan PDF: ${msg}`, true);
+        } finally {
+          scanPdfBtn.disabled = false;
+          scanPdfBtn.textContent = "Scan paper with AI";
+        }
+      })();
     }
-  })();
-}
 
     function copySummary() {
       const txt = summaryOutput.value || "";
