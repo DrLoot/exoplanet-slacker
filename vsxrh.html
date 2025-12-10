@@ -492,8 +492,8 @@
 
       <div class="form-row-inline" style="margin-bottom: 4px;">
         <div style="flex: 1 1 260px;">
-          <label for="paperPdf">Attach reference paper (PDF)</label>
-          <input id="paperPdf" type="file" accept="application/pdf" />
+          <label for="paperUrl">Reference paper URL (PDF)</label>
+          <input id="paperUrl" type="url" placeholder="https://.../paper.pdf" />
         </div>
         <div style="flex: 0 0 auto; display:flex; gap:8px; align-items:flex-end;">
           <button id="scanPdfBtn" class="btn" type="button">
@@ -502,7 +502,7 @@
         </div>
       </div>
       <div id="scanStatus" class="status-line">
-        Attach a PDF after loading a VSX object, then click “Scan paper with AI”.
+        Enter a PDF URL after loading a VSX object, then click “Scan paper with AI”.
       </div>
 
       <span class="pill">Tip: Only a subset of VSX fields is available via the public API. The rest can be copy/pasted
@@ -607,7 +607,7 @@
     const summaryOutput = document.getElementById("summaryOutput");
 
     // NEW:
-    const paperUpload = document.getElementById("paperPdf");
+    const paperUrlInput = document.getElementById("paperUrl");
     const scanPdfBtn = document.getElementById("scanPdfBtn");
     const scanStatus = document.getElementById("scanStatus");
 
@@ -840,7 +840,7 @@
 
         buildFieldRows();
         setStatus(`Loaded VSX object for "${ident}". Edit updated values on the right.`);
-        setScanStatus("Attach a PDF for this object and click “Scan paper with AI”.");
+        setScanStatus("Enter a PDF URL for this object and click “Scan paper with AI”.");
 
       } catch (err) {
         console.error(err);
