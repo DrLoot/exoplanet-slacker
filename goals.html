@@ -1,13 +1,16 @@
 <!doctype html>
 <html lang="en">
+
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Goals & Stickers | Exoplanet Slacker</title>
-  <meta name="description" content="Collectable goals for Exoplanet Slacker — earn stickers for contributions and milestones." />
+  <meta name="description"
+    content="Collectable goals for Exoplanet Slacker — earn stickers for contributions and milestones." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Orbitron:wght@700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Orbitron:wght@700&display=swap"
+    rel="stylesheet" />
   <style>
     footer {
       text-align: center;
@@ -15,99 +18,367 @@
       color: var(--muted);
       margin: 40px 0 20px;
     }
-    :root{
-      --bg:#05060b; --card:#0f1220; --glow:#5bc0ff; --accent:#FF6F00;
-      --text:#EAEAEA; --muted:#A9B1C3; --radius:16px; --shadow:0 10px 40px rgba(0,0,0,.45);
-      --border: rgba(123,198,255,.14); --link:#79c8ff;
+
+    :root {
+      --bg: #05060b;
+      --card: #0f1220;
+      --glow: #5bc0ff;
+      --accent: #FF6F00;
+      --text: #EAEAEA;
+      --muted: #A9B1C3;
+      --radius: 16px;
+      --shadow: 0 10px 40px rgba(0, 0, 0, .45);
+      --border: rgba(123, 198, 255, .14);
+      --link: #79c8ff;
     }
-    html,body{height:100%;background:var(--bg);color:var(--text);}
-    body{margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;line-height:1.6;}
+
+    html,
+    body {
+      height: 100%;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    body {
+      margin: 0;
+      font-family: Inter, system-ui, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      line-height: 1.6;
+    }
 
     /* background */
-    .starfield{position:fixed;inset:0;z-index:-2;overflow:hidden;
-      background:radial-gradient(1200px 800px at 80% -10%, rgba(91,192,255,.12), transparent 60%),
-                 radial-gradient(1000px 700px at 10% 120%, rgba(255,111,0,.08), transparent 60%),
-                 linear-gradient(180deg,#070910 0%,#04050a 100%);}
-    .stars,.stars:before,.stars:after{content:"";position:absolute;inset:-2000px;background-repeat:repeat;}
-    .stars{background-image:
-      radial-gradient(2px 2px at 20px 30px, rgba(255,255,255,.7) 50%, transparent 51%),
-      radial-gradient(1.5px 1.5px at 100px 80px, rgba(255,255,255,.5) 50%, transparent 51%),
-      radial-gradient(1px 1px at 50px 140px, rgba(255,255,255,.4) 50%, transparent 51%);
-      animation:drift 160s linear infinite; opacity:.85;}
-    .stars:before{background-image:
-      radial-gradient(1.5px 1.5px at 40px 60px, rgba(255,255,255,.35) 50%, transparent 51%),
-      radial-gradient(1px 1px at 80px 120px, rgba(255,255,255,.25) 50%, transparent 51%);
-      animation:drift 220s linear infinite;}
-    .stars:after{background-image:
-      radial-gradient(1px 1px at 70px 90px, rgba(123,198,255,.4) 50%, transparent 51%),
-      radial-gradient(1px 1px at 140px 30px, rgba(255,171,64,.35) 50%, transparent 51%);
-      animation:drift 300s linear infinite;}
-    @keyframes drift{from{transform:translate3d(0,0,0)}to{transform:translate3d(2000px,2000px,0)}}
+    .starfield {
+      position: fixed;
+      inset: 0;
+      z-index: -2;
+      overflow: hidden;
+      background: radial-gradient(1200px 800px at 80% -10%, rgba(91, 192, 255, .12), transparent 60%),
+        radial-gradient(1000px 700px at 10% 120%, rgba(255, 111, 0, .08), transparent 60%),
+        linear-gradient(180deg, #070910 0%, #04050a 100%);
+    }
+
+    .stars,
+    .stars:before,
+    .stars:after {
+      content: "";
+      position: absolute;
+      inset: -2000px;
+      background-repeat: repeat;
+    }
+
+    .stars {
+      background-image:
+        radial-gradient(2px 2px at 20px 30px, rgba(255, 255, 255, .7) 50%, transparent 51%),
+        radial-gradient(1.5px 1.5px at 100px 80px, rgba(255, 255, 255, .5) 50%, transparent 51%),
+        radial-gradient(1px 1px at 50px 140px, rgba(255, 255, 255, .4) 50%, transparent 51%);
+      animation: drift 160s linear infinite;
+      opacity: .85;
+    }
+
+    .stars:before {
+      background-image:
+        radial-gradient(1.5px 1.5px at 40px 60px, rgba(255, 255, 255, .35) 50%, transparent 51%),
+        radial-gradient(1px 1px at 80px 120px, rgba(255, 255, 255, .25) 50%, transparent 51%);
+      animation: drift 220s linear infinite;
+    }
+
+    .stars:after {
+      background-image:
+        radial-gradient(1px 1px at 70px 90px, rgba(123, 198, 255, .4) 50%, transparent 51%),
+        radial-gradient(1px 1px at 140px 30px, rgba(255, 171, 64, .35) 50%, transparent 51%);
+      animation: drift 300s linear infinite;
+    }
+
+    @keyframes drift {
+      from {
+        transform: translate3d(0, 0, 0)
+      }
+
+      to {
+        transform: translate3d(2000px, 2000px, 0)
+      }
+    }
 
     /* header */
-    header{padding: clamp(48px, 8vw, 96px) 24px 32px; text-align:center;
-      background: radial-gradient(900px 600px at 80% 20%, rgba(91,192,255,.12), transparent 60%);}
-    h1{font-family:Orbitron,Inter,sans-serif; font-size:clamp(28px,5.6vw,56px); margin:0;}
-    .subtitle{max-width:900px;margin:12px auto 24px;color:var(--muted);}
-    .nav{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
-    .btn{display:inline-flex;align-items:center;gap:10px;padding:10px 16px;border-radius:999px;
-      border:1px solid #1f2a44;background:linear-gradient(180deg,#133252,#0c1b2e);
-      color:var(--text);text-decoration:none;box-shadow:var(--shadow);}
-    .btn:hover{transform:translateY(-1px)}
+    header {
+      padding: clamp(48px, 8vw, 96px) 24px 32px;
+      text-align: center;
+      background: radial-gradient(900px 600px at 80% 20%, rgba(91, 192, 255, .12), transparent 60%);
+    }
+
+    h1 {
+      font-family: Orbitron, Inter, sans-serif;
+      font-size: clamp(28px, 5.6vw, 56px);
+      margin: 0;
+    }
+
+    .subtitle {
+      max-width: 900px;
+      margin: 12px auto 24px;
+      color: var(--muted);
+    }
+
+    .nav {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      flex-wrap: wrap
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 16px;
+      border-radius: 999px;
+      border: 1px solid #1f2a44;
+      background: linear-gradient(180deg, #133252, #0c1b2e);
+      color: var(--text);
+      text-decoration: none;
+      box-shadow: var(--shadow);
+    }
+
+    .btn:hover {
+      transform: translateY(-1px)
+    }
 
     /* layout */
-    main{padding:24px;max-width:1100px;margin:0 auto}
-    .card{background:linear-gradient(180deg,rgba(16,20,40,.7),rgba(10,12,20,.8));
-      border:1px solid var(--border); border-radius:var(--radius); padding:22px; box-shadow:var(--shadow); margin-bottom:28px;}
-    h2{margin:0 0 8px}
-    .muted{color:var(--muted)}
+    main {
+      padding: 24px;
+      max-width: 1100px;
+      margin: 0 auto
+    }
+
+    .card {
+      background: linear-gradient(180deg, rgba(16, 20, 40, .7), rgba(10, 12, 20, .8));
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 22px;
+      box-shadow: var(--shadow);
+      margin-bottom: 28px;
+    }
+
+    h2 {
+      margin: 0 0 8px
+    }
+
+    .muted {
+      color: var(--muted)
+    }
 
     /* sticker grid */
-    .sticker-grid{
-      display:grid; gap:16px; margin-top:16px;
+    .sticker-grid {
+      display: grid;
+      gap: 16px;
+      margin-top: 16px;
       grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
     }
-    .sticker{
-      display:grid; gap:10px; align-content:start;
-      background:rgba(15,18,32,.6); border:1px solid rgba(123,198,255,.12);
-      border-radius:14px; padding:12px;
+
+    .sticker {
+      display: grid;
+      gap: 10px;
+      align-content: start;
+      background: rgba(15, 18, 32, .6);
+      border: 1px solid rgba(123, 198, 255, .12);
+      border-radius: 14px;
+      padding: 12px;
     }
-    .sticker figure{margin:0; display:grid; place-items:center;}
-    .sticker img{
-      width:100%; max-width:160px; aspect-ratio:1/1; object-fit:contain;
-      background:rgba(91,192,255,.06);
-      border:1px solid rgba(123,198,255,.18); border-radius:12px;
-      box-shadow:0 6px 18px rgba(0,0,0,.35);
-      transition:transform .12s ease, box-shadow .12s ease;
-      cursor:zoom-in;
+
+    .sticker figure {
+      margin: 0;
+      display: grid;
+      place-items: center;
     }
-    .sticker img:hover{ transform:translateY(-2px) scale(1.02); box-shadow:0 10px 32px rgba(0,0,0,.45); }
-    .sticker h3{margin:0 0 4px; font-size:16px;}
-    .sticker p{margin:0; font-size:14px; color:var(--muted);}
+
+    .sticker img {
+      width: 100%;
+      max-width: 160px;
+      aspect-ratio: 1/1;
+      object-fit: contain;
+      background: rgba(91, 192, 255, .06);
+      border: 1px solid rgba(123, 198, 255, .18);
+      border-radius: 12px;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, .35);
+      transition: transform .12s ease, box-shadow .12s ease;
+      cursor: zoom-in;
+    }
+
+    .sticker img:hover {
+      transform: translateY(-2px) scale(1.02);
+      box-shadow: 0 10px 32px rgba(0, 0, 0, .45);
+    }
+
+    .sticker h3 {
+      margin: 0 0 4px;
+      font-size: 16px;
+    }
+
+    .sticker p {
+      margin: 0;
+      font-size: 14px;
+      color: var(--muted);
+    }
 
     /* image modal */
-    #imageModal{ display:none; position:fixed; inset:0; z-index:9999;
-      background:rgba(0,0,0,.75); color:#fff; place-items:center; }
-    #imageModal .modal-inner{
-      background:rgba(10,12,20,.95); border:1px solid var(--border);
-      border-radius:16px; padding:14px; max-width:min(92vw, 920px);
-      box-shadow:var(--shadow);
+    #imageModal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      background: rgba(0, 0, 0, .75);
+      color: #fff;
+      place-items: center;
     }
-    #imageModal img {display: block; max-width: 600px; max-height: 600px; width: auto; height: auto; margin: 0 auto; border-radius: 12px;}
-    #imageModal .caption{ margin-top:8px; font-size:14px; color:#d9e6ff; }
-    #imageModal .close{
-      display:inline-block; margin-top:10px; padding:8px 14px; border-radius:999px;
-      border:1px solid #1f2a44; background:linear-gradient(180deg,#133252,#0c1b2e);
-      color:#fff; text-decoration:none;
+
+    #imageModal .modal-inner {
+      background: rgba(10, 12, 20, .95);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 14px;
+      max-width: min(92vw, 920px);
+      box-shadow: var(--shadow);
+    }
+
+    #imageModal img {
+      display: block;
+      max-width: 600px;
+      max-height: 600px;
+      width: auto;
+      height: auto;
+      margin: 0 auto;
+      border-radius: 12px;
+    }
+
+    #imageModal .caption {
+      margin-top: 8px;
+      font-size: 14px;
+      color: #d9e6ff;
+    }
+
+    #imageModal .close {
+      display: inline-block;
+      margin-top: 10px;
+      padding: 8px 14px;
+      border-radius: 999px;
+      border: 1px solid #1f2a44;
+      background: linear-gradient(180deg, #133252, #0c1b2e);
+      color: #fff;
+      text-decoration: none;
+    }
+
+    /* allow badge positioning */
+    .sticker {
+      position: relative;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-touch-callout: none;
+      touch-action: manipulation;
+    }
+
+    /* owned look */
+    .sticker.owned {
+      border: 2px solid #FFD700;
+      box-shadow:
+        0 0 0 1px rgba(255, 215, 0, .35),
+        0 0 18px rgba(255, 215, 0, .45);
+    }
+
+    /* optional: owned badge */
+    .sticker.owned::after {
+      content: "✓ Owned";
+      position: absolute;
+      top: 10px;
+      right: 12px;
+      font-size: 12px;
+      letter-spacing: .2px;
+      color: #FFD700;
+      opacity: .95;
+    }
+
+    /* unlock animation */
+    @keyframes unlockGlow {
+      0% {
+        box-shadow: 0 0 0 0 rgba(255, 215, 0, 0), 0 0 0 rgba(255, 215, 0, 0);
+        transform: scale(1);
+      }
+
+      35% {
+        box-shadow: 0 0 0 3px rgba(255, 215, 0, .35), 0 0 26px rgba(255, 215, 0, .65);
+        transform: scale(1.015);
+      }
+
+      100% {
+        box-shadow:
+          0 0 0 1px rgba(255, 215, 0, .35),
+          0 0 18px rgba(255, 215, 0, .45);
+        transform: scale(1);
+      }
+    }
+
+    .sticker.unlocking {
+      animation: unlockGlow 520ms ease-out;
+    }
+
+    .progress-wrap {
+      margin: 10px 0 14px;
+      padding: 12px 14px;
+      border-radius: 14px;
+      border: 1px solid rgba(123, 198, 255, .14);
+      background: rgba(15, 18, 32, .45);
+    }
+
+    .progress-top {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+
+    .progress-title {
+      font-weight: 600;
+      font-size: 14px;
+      color: var(--text);
+    }
+
+    .progress-stats {
+      font-size: 13px;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      white-space: nowrap;
+    }
+
+    .progress-stats .dot {
+      opacity: .6;
+    }
+
+    .progress-bar {
+      height: 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(123, 198, 255, .16);
+      background: rgba(91, 192, 255, .06);
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, rgba(255, 215, 0, .55), rgba(255, 215, 0, .95));
+      transition: width 260ms ease;
     }
   </style>
 </head>
+
 <body>
-  <div class="starfield" aria-hidden="true"><div class="stars"></div></div>
+  <div class="starfield" aria-hidden="true">
+    <div class="stars"></div>
+  </div>
 
   <header>
     <h1>Goals & Stickers</h1>
-    <p class="subtitle">Collect fun milestone stickers as you contribute to Exoplanet Watch and the community. Click a sticker to view it larger.</p>
+    <p class="subtitle">Collect fun milestone stickers as you contribute to Exoplanet Watch and the community. Click a
+      sticker to view it larger.</p>
     <nav class="nav" aria-label="Primary">
       <a class="btn" href="index.html">← Back to Home</a>
     </nav>
@@ -116,61 +387,119 @@
   <main>
     <section class="card">
       <h2>Goals</h2>
+      <div class="progress-wrap" aria-label="Sticker collection progress">
+        <div class="progress-top">
+          <div class="progress-title">Collection Progress</div>
+          <div class="progress-stats">
+            <span id="progressCount">0 / 0</span>
+            <span class="dot">•</span>
+            <span id="progressPct">0%</span>
+          </div>
+        </div>
+        <div class="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+          <div id="progressFill" class="progress-fill" style="width:0%"></div>
+        </div>
+      </div>
       <div class="sticker-grid">
 
-        <article class="sticker">
-          <figure><img src="images/epw.png" alt="Joined Exoplanet Watch" data-full="images/epw.png" data-caption="Joined Exoplanet Watch" /></figure>
-          <div><h3>Joined Exoplanet Watch</h3><p>Welcome aboard! You’ve taken the first step into the community.</p></div>
+        <article class="sticker" data-sticker-id="joined-epw">
+          <figure><img src="images/epw.png" alt="Joined Exoplanet Watch" data-full="images/epw.png"
+              data-caption="Joined Exoplanet Watch" /></figure>
+          <div>
+            <h3>Joined Exoplanet Watch</h3>
+            <p>Welcome aboard! You’ve taken the first step into the community.</p>
+          </div>
         </article>
 
-        <article class="sticker">
-          <figure><img src="images/exotic.png" alt="First EXOTIC Reduction" data-full="images/exotic.png" data-caption="First EXOTIC Reduction" /></figure>
-          <div><h3>First EXOTIC Reduction</h3><p>Reduced your very first light curve using EXOTIC.</p></div>
+        <article class="sticker" data-sticker-id="first-exotic">
+          <figure><img src="images/exotic.png" alt="First EXOTIC Reduction" data-full="images/exotic.png"
+              data-caption="First EXOTIC Reduction" /></figure>
+          <div>
+            <h3>First EXOTIC Reduction</h3>
+            <p>Reduced your very first light curve using EXOTIC.</p>
+          </div>
         </article>
 
-        <article class="sticker">
-          <figure><img src="images/50th.png" alt="50th Light Curve" data-full="images/50th.png" data-caption="50th Light Curve" /></figure>
-          <div><h3>50th Light Curve</h3><p>Submit your 50th light curve — a sign of real dedication.</p></div>
+        <article class="sticker" data-sticker-id="exotic-50">
+          <figure><img src="images/50th.png" alt="50th Light Curve" data-full="images/50th.png"
+              data-caption="50th Light Curve" /></figure>
+          <div>
+            <h3>50th Light Curve</h3>
+            <p>Submit your 50th light curve — a sign of real dedication.</p>
+          </div>
         </article>
 
-        <article class="sticker">
-          <figure><img src="images/100th.png" alt="100th Light Curve" data-full="images/100th.png" data-caption="100th Light Curve" /></figure>
-          <div><h3>100th Light Curve</h3><p>Submit your 100th light curve and join the century club.</p></div>
+        <article class="sticker" data-sticker-id="exotic-100">
+          <figure><img src="images/100th.png" alt="100th Light Curve" data-full="images/100th.png"
+              data-caption="100th Light Curve" /></figure>
+          <div>
+            <h3>100th Light Curve</h3>
+            <p>Submit your 100th light curve and join the century club.</p>
+          </div>
         </article>
 
-        <article class="sticker">
-          <figure><img src="images/250th.png" alt="250th Light Curve" data-full="images/250th.png" data-caption="250th Light Curve" /></figure>
-          <div><h3>250th Light Curve</h3><p>A huge milestone — 250 curves observed and submitted!</p></div>
+        <article class="sticker" data-sticker-id="exotic-250">
+          <figure><img src="images/250th.png" alt="250th Light Curve" data-full="images/250th.png"
+              data-caption="250th Light Curve" /></figure>
+          <div>
+            <h3>250th Light Curve</h3>
+            <p>A huge milestone — 250 curves observed and submitted!</p>
+          </div>
         </article>
 
-        <article class="sticker">
-          <figure><img src="images/mobs.png" alt="MOBS Reduction" data-full="images/mobs.png" data-caption="MOBS Reduction" /></figure>
-          <div><h3>MOBS Reduction</h3><p>Reduced your first light curve using MicroObservatory Image Directory data.</p></div>
+        <article class="sticker" data-sticker-id="first-mobs">
+          <figure><img src="images/mobs.png" alt="MOBS Reduction" data-full="images/mobs.png"
+              data-caption="MOBS Reduction" /></figure>
+          <div>
+            <h3>MOBS Reduction</h3>
+            <p>Reduced your first light curve using MicroObservatory Image Directory data.</p>
+          </div>
         </article>
 
-        <article class="sticker">
-          <figure><img src="images/golden.png" alt="Golden Light Curve" data-full="images/golden.png" data-caption="Golden Light Curve" /></figure>
-          <div><h3>Golden Light Curve</h3><p>Achieved your first reduction with SNR 3.0 or higher.</p></div>
+        <article class="sticker" data-sticker-id="gold-curve">
+          <figure><img src="images/golden.png" alt="Golden Light Curve" data-full="images/golden.png"
+              data-caption="Golden Light Curve" /></figure>
+          <div>
+            <h3>Golden Light Curve</h3>
+            <p>Achieved your first reduction with SNR 3.0 or higher.</p>
+          </div>
         </article>
 
-        <article class="sticker">
-          <figure><img src="images/aid.png" alt="First AID Upload" data-full="images/aid.png" data-caption="First AID Upload" /></figure>
-          <div><h3>First AID Upload</h3><p>Uploaded your first photometry info to AAVSO’s AID database.</p></div>
+        <article class="sticker" data-sticker-id="first-aid">
+          <figure><img src="images/aid.png" alt="First AID Upload" data-full="images/aid.png"
+              data-caption="First AID Upload" /></figure>
+          <div>
+            <h3>First AID Upload</h3>
+            <p>Uploaded your first photometry info to AAVSO’s AID database.</p>
+          </div>
         </article>
 
-        <article class="sticker">
-          <figure><img src="images/aavso.png" alt="First AAVSO Exoplanet" data-full="images/aavso.png" data-caption="First AAVSO Exoplanet" /></figure>
-          <div><h3>First AAVSO Exoplanet</h3><p>Uploaded your first exoplanet info to AAVSO.</p></div>
+        <article class="sticker" data-sticker-id="first-aavso">
+          <figure><img src="images/aavso.png" alt="First AAVSO Exoplanet" data-full="images/aavso.png"
+              data-caption="First AAVSO Exoplanet" /></figure>
+          <div>
+            <h3>First AAVSO Exoplanet</h3>
+            <p>Uploaded your first exoplanet info to AAVSO.</p>
+          </div>
         </article>
 
-        <article class="sticker">
-          <figure><img src="images/pandora.png" alt="First Pandora Target" data-full="images/pandora.png" data-caption="First Pandora Target" /></figure>
-          <div><h3>First Pandora Target</h3><p>Used EXOTIC to reduce your first Pandora mission target.</p><a href="https://pandorasat.com/targets/"> Pandora Targets</a></div>
+        <article class="sticker" data-sticker-id="first-pandora">
+          <figure><img src="images/pandora.png" alt="First Pandora Target" data-full="images/pandora.png"
+              data-caption="First Pandora Target" /></figure>
+          <div>
+            <h3>First Pandora Target</h3>
+            <p>Used EXOTIC to reduce your first Pandora mission target.</p><a href="https://pandorasat.com/targets/">
+              Pandora Targets</a>
+          </div>
         </article>
 
-        <article class="sticker">
-          <figure><img src="images/byot.png" alt="First BYOT EXOTIC Reduction" data-full="images/byot.png" data-caption="First BYOT EXOTIC Reduction" /></figure>
-          <div><h3>First BYOT EXOTIC Reduction</h3><p>Bring Your Own Telescope and use your homegrown data with EXOTIC.</p></div>
+        <article class="sticker" data-sticker-id="first-byot">
+          <figure><img src="images/byot.png" alt="First BYOT EXOTIC Reduction" data-full="images/byot.png"
+              data-caption="First BYOT EXOTIC Reduction" /></figure>
+          <div>
+            <h3>First BYOT EXOTIC Reduction</h3>
+            <p>Bring Your Own Telescope and use your homegrown data with EXOTIC.</p>
+          </div>
         </article>
 
       </div>
@@ -206,12 +535,126 @@
       });
     });
 
-    function closeImageModal(e){ e.preventDefault(); modal.style.display='none'; }
+    function closeImageModal(e) { e.preventDefault(); modal.style.display = 'none'; }
 
     // Close with ESC or background click
-    document.addEventListener('keydown', (ev)=>{ if(ev.key==='Escape') modal.style.display='none'; });
-    modal.addEventListener('click', (ev)=>{ if(ev.target.id==='imageModal') modal.style.display='none'; });
+    document.addEventListener('keydown', (ev) => { if (ev.key === 'Escape') modal.style.display = 'none'; });
+    modal.addEventListener('click', (ev) => { if (ev.target.id === 'imageModal') modal.style.display = 'none'; });
+  </script>
+  <script>
+    const STORAGE_KEY = 'ownedStickers_v1';
+    const LONG_PRESS_MS = 450;
+
+    const owned = new Set(JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'));
+
+    function saveOwned() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify([...owned]));
+    }
+    function updateProgress() {
+      const allStickers = document.querySelectorAll('.sticker[data-sticker-id]');
+      const total = allStickers.length;
+
+      // Only count owned that actually exist on the page (avoids old IDs inflating count)
+      let have = 0;
+      allStickers.forEach(el => {
+        if (el.classList.contains('owned')) have++;
+      });
+
+      const pct = total ? Math.round((have / total) * 100) : 0;
+
+      const countEl = document.getElementById('progressCount');
+      const pctEl = document.getElementById('progressPct');
+      const fillEl = document.getElementById('progressFill');
+      const barEl = document.querySelector('.progress-bar[role="progressbar"]');
+
+      if (countEl) countEl.textContent = `${have} / ${total}`;
+      if (pctEl) pctEl.textContent = `${pct}%`;
+      if (fillEl) fillEl.style.width = `${pct}%`;
+      if (barEl) barEl.setAttribute('aria-valuenow', String(pct));
+    }
+
+    function setOwned(stickerEl, isOwned, animate = false, persist = true) {
+      const id = stickerEl.dataset.stickerId;
+      if (!id) return;
+
+      stickerEl.classList.toggle('owned', isOwned);
+
+      if (isOwned) owned.add(id);
+      else owned.delete(id);
+
+      if (persist) saveOwned();
+
+      if (animate && isOwned) {
+        stickerEl.classList.add('unlocking');
+        stickerEl.addEventListener('animationend', () => {
+          stickerEl.classList.remove('unlocking');
+        }, { once: true });
+      }
+
+      updateProgress();
+    }
+
+    // Restore owned states on load
+    document.querySelectorAll('.sticker[data-sticker-id]').forEach(sticker => {
+      setOwned(sticker, owned.has(sticker.dataset.stickerId), false, false);
+    });
+    updateProgress();
+
+    // Desktop click-to-toggle (but not when clicking the image/figure)
+    document.querySelectorAll('.sticker[data-sticker-id]').forEach(sticker => {
+      sticker.addEventListener('click', (e) => {
+        if (e.target.closest('figure')) return; // keep your image zoom UX
+        // On touch devices, we only want long-press, not tap
+        if (window.matchMedia('(pointer: coarse)').matches) return;
+
+        const isOwned = !sticker.classList.contains('owned');
+        setOwned(sticker, isOwned, true);
+      });
+    });
+
+    // Mobile long-press (pointer events)
+    document.querySelectorAll('.sticker[data-sticker-id]').forEach(sticker => {
+      let timer = null;
+      let longPressed = false;
+
+      sticker.addEventListener('pointerdown', (e) => {
+        // only for touch/pen + avoid long-pressing the image area
+        if (e.pointerType === 'mouse') return;
+        if (e.target.closest('figure')) return;
+
+        longPressed = false;
+
+        timer = window.setTimeout(() => {
+          longPressed = true;
+          const isOwned = !sticker.classList.contains('owned');
+          setOwned(sticker, isOwned, true);
+
+          // prevent any “tap” behavior firing after long press
+          try { e.preventDefault(); } catch { }
+        }, LONG_PRESS_MS);
+      }, { passive: false });
+
+      const cancel = () => {
+        if (timer) window.clearTimeout(timer);
+        timer = null;
+      };
+
+      sticker.addEventListener('pointerup', cancel);
+      sticker.addEventListener('pointercancel', cancel);
+      sticker.addEventListener('pointermove', (e) => {
+        // if they start scrolling / moving finger, cancel long press
+        if (Math.abs(e.movementX) + Math.abs(e.movementY) > 6) cancel();
+      });
+
+      // if long-pressed, stop the subsequent click from doing anything odd
+      sticker.addEventListener('click', (e) => {
+        if (!longPressed) return;
+        e.preventDefault();
+        e.stopPropagation();
+        longPressed = false;
+      }, true);
+    });
   </script>
 </body>
-</html>
 
+</html>
