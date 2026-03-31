@@ -1617,98 +1617,101 @@
      * { target, depth, depthErr, snr, date, data } or null if nothing usable found.
      */
     function parseExoticText(text, fileName) {
-      if (!text) return null;
+  if (!text) return null;
 
-      const lines = text.split(/\r?\n/);
-      const meta = {};
+  const lines = text.split(/\r?\n/);
+  const meta = {};
 
-      for (const raw of lines) {
-        const line = raw.trim();
-        if (!line || !line.startsWith('#')) continue;
+  for (const raw of lines) {
+    const line = raw.trim();
+    if (!line || !line.startsWith('#')) continue;
 
-        // Target name (prefer exoplanet name, fall back to star name)
-        if (line.startsWith('#EXOPLANET_NAME=')) {
-          meta.target = line.split('=')[1].trim();
-        } else if (line.startsWith('#STAR_NAME=') && !meta.target) {
-          meta.target = line.split('=')[1].trim();
-        }
-
-        // Data source / instrument hint
-        if (line.startsWith('#SECONDARY_OBSCODES=') || line.startsWith('#OBSCODE=')) {
-          const v = line.split('=')[1].trim().toUpperCase();
-          if (v.includes('MOBS')) {
-            meta.data = 'EpW/MObs Checkout Data';
-          } else if (v.includes('LCO')) {
-            meta.data = 'LCO';
-          } else {
-            // leave it undefined; user can pick "Backyard Rig" or "Other"
-          }
-        }
-
-        // Rp/R* and its uncertainty from RESULTS line
-        if (line.startsWith('#RESULTS=')) {
-          // Example: #RESULTS=..., Rp/R*=0.134 +/- 0.014, ...
-          const m = line.match(/Rp\/R\*=\s*([0-9.]+)\s*\+\/-\s*([0-9.]+)/);
-          if (m) {
-            const rp = parseFloat(m[1]);
-            const rpErr = parseFloat(m[2]);
-            if (Number.isFinite(rp) && Number.isFinite(rpErr) && rp > 0 && rpErr > 0) {
-              const depth = rp * rp;
-              const depthErr = 2 * rp * rpErr; // error propagation for x^2
-
-              meta.depth = depth.toFixed(4);      // Rp^2/Rs^2
-              meta.depthErr = depthErr.toFixed(4);
-
-              if (depthErr > 0) {
-                const snr = depth / depthErr;
-                if (Number.isFinite(snr)) {
-                  meta.snr = snr.toFixed(1);
-                }
-              }
-            }
-          }
-        }
-      }
-
-      // Observation date from filename, e.g. AAVSO_WASP-12 b_2025-11-21.txt
-      if (fileName && !meta.date) {
-        // 1) Try YYYY-MM-DD (standard EXOTIC)
-        let m = fileName.match(/\d{4}-\d{2}-\d{2}/);
-        if (m) {
-          meta.date = m[0]; // already YYYY-MM-DD
-        } else {
-          // 2) Try DD-MMM-YYYY (local EXOTIC)
-          m = fileName.match(/(\d{2})-([A-Za-z]{3})-(\d{4})/);
-          if (m) {
-            const [, dd, monStr, yyyy] = m;
-            const monthMap = {
-              JAN: '01',
-              FEB: '02',
-              MAR: '03',
-              APR: '04',
-              MAY: '05',
-              JUN: '06',
-              JUL: '07',
-              AUG: '08',
-              SEP: '09',
-              OCT: '10',
-              NOV: '11',
-              DEC: '12',
-            };
-            const mm = monthMap[monStr.toUpperCase()];
-            if (mm) {
-              meta.date = `${yyyy}-${mm}-${dd}`;
-            }
-          }
-        }
-      }
-
-      if (!meta.target && !meta.snr && !meta.depth && !meta.depthErr && !meta.date && !meta.data) {
-        return null;
-      }
-
-      return meta;
+    // Target name (prefer exoplanet name, fall back to star name)
+    if (line.startsWith('#EXOPLANET_NAME=')) {
+      meta.target = line.split('=')[1].trim();
+    } else if (line.startsWith('#STAR_NAME=') && !meta.target) {
+      meta.target = line.split('=')[1].trim();
     }
+
+    // Data source / instrument hint
+    if (line.startsWith('#SECONDARY_OBSCODES=') || line.startsWith('#OBSCODE=')) {
+      const v = line.split('=')[1].trim().toUpperCase();
+      if (v.includes('MOBS')) {
+        meta.data = 'EpW/MObs Checkout Data';
+      } else if (v.includes('LCO')) {
+        meta.data = 'LCO';
+      }
+    }
+
+    // Rp/R* and its uncertainty from RESULTS line
+    if (line.startsWith('#RESULTS=')) {
+      // Example: #RESULTS=..., Rp/R*=0.134 +/- 0.014, ...
+      const m = line.match(/Rp\/R\*=\s*([0-9.]+)\s*\+\/-\s*([0-9.]+)/);
+      if (m) {
+        const rp = parseFloat(m[1]);
+        const rpErr = parseFloat(m[2]);
+
+        if (Number.isFinite(rp) && Number.isFinite(rpErr) && rp > 0 && rpErr > 0) {
+          const depthRaw = rp * rp;
+          const depthErrRaw = 2 * rp * rpErr; // error propagation for x^2
+
+          // Round first so displayed values and computed SNR always agree
+          const depthRounded = Number(depthRaw.toFixed(4));
+          const depthErrRounded = Number(depthErrRaw.toFixed(4));
+
+          meta.depth = depthRounded.toFixed(4);
+          meta.depthErr = depthErrRounded.toFixed(4);
+
+          if (depthErrRounded > 0) {
+            const snr = depthRounded / depthErrRounded;
+            if (Number.isFinite(snr)) {
+              meta.snr = snr.toFixed(1);
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // Observation date from filename, e.g. AAVSO_WASP-12 b_2025-11-21.txt
+  if (fileName && !meta.date) {
+    // 1) Try YYYY-MM-DD
+    let m = fileName.match(/\d{4}-\d{2}-\d{2}/);
+    if (m) {
+      meta.date = m[0];
+    } else {
+      // 2) Try DD-MMM-YYYY
+      m = fileName.match(/(\d{2})-([A-Za-z]{3})-(\d{4})/);
+      if (m) {
+        const [, dd, monStr, yyyy] = m;
+        const monthMap = {
+          JAN: '01',
+          FEB: '02',
+          MAR: '03',
+          APR: '04',
+          MAY: '05',
+          JUN: '06',
+          JUL: '07',
+          AUG: '08',
+          SEP: '09',
+          OCT: '10',
+          NOV: '11',
+          DEC: '12',
+        };
+        const mm = monthMap[monStr.toUpperCase()];
+        if (mm) {
+          meta.date = `${yyyy}-${mm}-${dd}`;
+        }
+      }
+    }
+  }
+
+  if (!meta.target && !meta.snr && !meta.depth && !meta.depthErr && !meta.date && !meta.data) {
+    return null;
+  }
+
+  return meta;
+}
 
     function clearForm() {
       // Clear all inputs
