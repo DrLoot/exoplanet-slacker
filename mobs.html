@@ -1,0 +1,604 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MObs Transit Watch | Exoplanet Slacker</title>
+  <meta name="description"
+    content="Daily MicroObservatory transit observation summary for Exoplanet Watch participants." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Orbitron:wght@700&display=swap"
+    rel="stylesheet" />
+  <style>
+    .logo {
+      display: block;
+      margin: 0 auto 20px;
+      max-width: 80px;
+      transition: filter 0.6s ease-in-out;
+    }
+
+    .logo:hover {
+      filter: drop-shadow(0 0 15px #1e90ff) drop-shadow(0 0 40px #1e90ff);
+    }
+
+    :root {
+      --bg: #05060b;
+      --bg-dim: #0a0c14;
+      --card: #0f1220;
+      --glow: #5bc0ff;
+      --accent: #FF6F00;
+      --text: #EAEAEA;
+      --muted: #A9B1C3;
+      --link: #79c8ff;
+      --radius: 16px;
+      --shadow: 0 10px 40px rgba(0, 0, 0, .45);
+      --border: rgba(123, 198, 255, .14);
+      --success: #65f0b7;
+      --warning: #ffd46a;
+    }
+
+    html,
+    body {
+      height: 100%;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    body {
+      margin: 0;
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      line-height: 1.6;
+    }
+
+    .starfield {
+      position: fixed;
+      inset: 0;
+      z-index: -2;
+      overflow: hidden;
+      background: radial-gradient(1200px 800px at 80% -10%, rgba(91, 192, 255, .12), transparent 60%), radial-gradient(1000px 700px at 10% 120%, rgba(255, 111, 0, .08), transparent 60%), linear-gradient(180deg, #070910 0%, #04050a 100%);
+    }
+
+    .stars,
+    .stars:before,
+    .stars:after {
+      content: "";
+      position: absolute;
+      inset: -2000px;
+      background-repeat: repeat;
+    }
+
+    .stars {
+      background-image: radial-gradient(2px 2px at 20px 30px, rgba(255, 255, 255, .7) 50%, transparent 51%), radial-gradient(1.5px 1.5px at 100px 80px, rgba(255, 255, 255, .5) 50%, transparent 51%), radial-gradient(1px 1px at 50px 140px, rgba(255, 255, 255, .4) 50%, transparent 51%);
+      animation: drift 160s linear infinite;
+      opacity: .85;
+    }
+
+    .stars:before {
+      background-image: radial-gradient(1.5px 1.5px at 40px 60px, rgba(255, 255, 255, .35) 50%, transparent 51%), radial-gradient(1px 1px at 80px 120px, rgba(255, 255, 255, .25) 50%, transparent 51%);
+      animation: drift 220s linear infinite;
+    }
+
+    .stars:after {
+      background-image: radial-gradient(1px 1px at 70px 90px, rgba(123, 198, 255, .4) 50%, transparent 51%), radial-gradient(1px 1px at 140px 30px, rgba(255, 171, 64, .35) 50%, transparent 51%);
+      animation: drift 300s linear infinite;
+    }
+
+    @keyframes drift {
+      from {
+        transform: translate3d(0, 0, 0)
+      }
+
+      to {
+        transform: translate3d(2000px, 2000px, 0)
+      }
+    }
+
+    header {
+      padding: clamp(48px, 8vw, 96px) 24px 64px;
+      text-align: center;
+      background: radial-gradient(900px 600px at 80% 20%, rgba(91, 192, 255, .12), transparent 60%);
+    }
+
+    h1 {
+      font-family: Orbitron, Inter, sans-serif;
+      font-size: clamp(32px, 6vw, 64px);
+      margin: 0;
+      letter-spacing: .02em;
+    }
+
+    .subtitle {
+      max-width: 860px;
+      margin: 16px auto 28px;
+      color: var(--muted);
+      font-size: clamp(16px, 2.2vw, 18px)
+    }
+
+    .cta,
+    .buttons-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: center;
+    }
+
+    .buttons-row {
+      justify-content: flex-start;
+      margin-top: 16px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 18px;
+      border-radius: 999px;
+      border: 1px solid #1f2a44;
+      background: linear-gradient(180deg, #133252, #0c1b2e);
+      color: var(--text);
+      text-decoration: none;
+      box-shadow: var(--shadow);
+      transition: transform .15s ease, box-shadow .15s ease;
+      cursor: pointer;
+      font: inherit;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 12px 50px rgba(91, 192, 255, .18);
+    }
+
+    main {
+      padding: 24px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .grid {
+      display: grid;
+      gap: 18px;
+      grid-template-columns: repeat(12, 1fr);
+    }
+
+    .card {
+      grid-column: span 12;
+      background: linear-gradient(180deg, rgba(16, 20, 40, .7), rgba(10, 12, 20, .8));
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 22px;
+      box-shadow: var(--shadow);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(600px 220px at 10% 0%, rgba(91, 192, 255, .08), transparent 60%);
+      pointer-events: none;
+    }
+
+    .card>* {
+      position: relative;
+      z-index: 1;
+    }
+
+    .section-title {
+      margin: 36px 0 8px;
+      font-weight: 800;
+      letter-spacing: .02em;
+    }
+
+    .kicker {
+      color: var(--glow);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .12em;
+      font-size: 12px;
+    }
+
+    .muted {
+      color: var(--muted);
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .stat {
+      background: var(--card);
+      border: 1px solid rgba(123, 198, 255, .12);
+      border-radius: 12px;
+      padding: 14px;
+    }
+
+    .stat-label {
+      color: var(--muted);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+
+    .stat-value {
+      display: block;
+      font-size: 24px;
+      font-weight: 800;
+      margin-top: 4px;
+    }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border-radius: 999px;
+      padding: 6px 12px;
+      border: 1px solid rgba(123, 198, 255, .2);
+      background: rgba(91, 192, 255, .08);
+      color: #d6e5ff;
+      font-size: 13px;
+      margin-top: 10px;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--glow);
+      box-shadow: 0 0 18px rgba(91, 192, 255, .8);
+    }
+
+    .observation-list {
+      display: grid;
+      gap: 14px;
+      margin-top: 16px;
+    }
+
+    .observation-card {
+      background: rgba(15, 18, 32, .82);
+      border: 1px solid rgba(123, 198, 255, .16);
+      border-radius: 14px;
+      padding: 16px;
+    }
+
+    .observation-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 14px;
+      margin-bottom: 12px;
+    }
+
+    .target-name {
+      font-size: 20px;
+      font-weight: 800;
+      margin: 0;
+    }
+
+    .target-date {
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: 2px;
+    }
+
+    .weather-pill {
+      white-space: nowrap;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 212, 106, .25);
+      color: #fff7df;
+      background: rgba(255, 212, 106, .10);
+      padding: 5px 10px;
+      font-size: 12px;
+    }
+
+    .detail-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 10px;
+    }
+
+    .detail {
+      background: rgba(5, 6, 11, .55);
+      border: 1px solid rgba(123, 198, 255, .10);
+      border-radius: 10px;
+      padding: 10px;
+    }
+
+    .detail strong {
+      display: block;
+      font-size: 18px;
+    }
+
+    .detail span {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 30px 14px;
+      color: var(--muted);
+    }
+
+    .empty-state .emoji {
+      font-size: 36px;
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    .note {
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 14px;
+    }
+
+    footer {
+      margin: 56px 0 24px;
+      padding: 0 24px;
+      color: var(--muted);
+      font-size: 14px;
+      text-align: center;
+    }
+
+    footer a,
+    main a {
+      color: var(--link);
+    }
+
+    @media (max-width: 640px) {
+      .observation-header {
+        flex-direction: column;
+      }
+
+      .weather-pill {
+        white-space: normal;
+      }
+
+      .buttons-row .btn {
+        justify-content: center;
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="starfield" aria-hidden="true">
+    <div class="stars"></div>
+  </div>
+
+  <header>
+    <img src="images/ESlogo1.png" alt="Exoplanet Slacker Logo" class="logo" />
+    <h1>MObs Transit Watch</h1>
+    <p class="subtitle">
+      Daily MicroObservatory Cecilia transit summaries for Exoplanet Watch observers — target names, dates, FITS counts,
+      dark calibration counts, and weather at a glance.
+    </p>
+    <nav class="cta" aria-label="Primary">
+      <a class="btn" href="index.html">← Back to Home</a>
+      <a class="btn" href="transitgen.html">Transit Post Generator</a>
+      <a class="btn" href="https://waps.cfa.harvard.edu/microobservatory/MOImageDirectory/ImageDirectory.php" target="_blank" rel="noopener">Open MObs Image Directory</a>
+    </nav>
+  </header>
+
+  <main>
+    <h2 class="section-title"><span class="kicker">Daily Scan</span><br /> Latest Cecilia Transit Check</h2>
+
+    <section class="card" aria-labelledby="summary-heading">
+      <h2 id="summary-heading">Observation Summary</h2>
+      <p class="muted" id="summaryText">Loading latest MicroObservatory transit summary…</p>
+      <div class="status-pill" id="statusPill">
+        <span class="status-dot"></span>
+        <span id="statusText">Checking data feed…</span>
+      </div>
+
+      <div class="summary-grid" aria-label="Summary statistics">
+        <div class="stat">
+          <span class="stat-label">Transit Targets</span>
+          <span class="stat-value" id="targetCount">—</span>
+        </div>
+        <div class="stat">
+          <span class="stat-label">Science FITS</span>
+          <span class="stat-value" id="fitsCount">—</span>
+        </div>
+        <div class="stat">
+          <span class="stat-label">Dark Frames</span>
+          <span class="stat-value" id="darksCount">—</span>
+        </div>
+        <div class="stat">
+          <span class="stat-label">Last Checked</span>
+          <span class="stat-value" id="lastChecked" style="font-size:18px;">—</span>
+        </div>
+      </div>
+
+      <div class="buttons-row">
+        <button type="button" class="btn" id="refreshBtn">Refresh Summary</button>
+      </div>
+
+      <p class="note">
+        This page reads <code>/data/mobs-latest.json</code>. Your 9 AM CT cron should update that JSON after it checks the
+        MicroObservatory Image Directory.
+      </p>
+    </section>
+
+    <h2 class="section-title"><span class="kicker">Targets</span><br /> Available Observations</h2>
+    <section class="card" aria-labelledby="observations-heading">
+      <h2 id="observations-heading">Transit Observation Details</h2>
+      <div id="observationsList" class="observation-list" aria-live="polite"></div>
+    </section>
+  </main>
+
+  <footer>
+    <p>© <span id="y"></span> Exoplanet Slacker — A community resource. <em>Not an official NASA site.</em></p>
+  </footer>
+
+  <script>
+    document.getElementById('y').textContent = new Date().getFullYear();
+
+    const DATA_URL = 'data/mobs-latest.json';
+
+    const summaryText = document.getElementById('summaryText');
+    const statusText = document.getElementById('statusText');
+    const targetCount = document.getElementById('targetCount');
+    const fitsCount = document.getElementById('fitsCount');
+    const darksCount = document.getElementById('darksCount');
+    const lastChecked = document.getElementById('lastChecked');
+    const observationsList = document.getElementById('observationsList');
+    const refreshBtn = document.getElementById('refreshBtn');
+
+    function escapeHtml(value) {
+      return String(value ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    function formatCheckedAt(value) {
+      if (!value) return 'Unknown';
+      const date = new Date(value);
+      if (Number.isNaN(date.getTime())) return value;
+
+      return new Intl.DateTimeFormat('en-US', {
+        timeZone: 'America/Chicago',
+        month: 'short',
+        day: '2-digit',
+        year: 'numeric',
+        hour: 'numeric',
+        minute: '2-digit',
+        timeZoneName: 'short'
+      }).format(date);
+    }
+
+    function numberFromObservation(obs, keys) {
+      for (const key of keys) {
+        const value = obs?.[key];
+        if (value !== undefined && value !== null && value !== '') {
+          const n = Number(value);
+          if (Number.isFinite(n)) return n;
+        }
+      }
+      return 0;
+    }
+
+    function normalizeObservation(obs) {
+      const scienceFiles = Array.isArray(obs.science_files) ? obs.science_files.length : null;
+      const calibrationFiles = Array.isArray(obs.calibration_files) ? obs.calibration_files.length : null;
+
+      return {
+        target: obs.target || obs.object || obs.name || 'Unknown target',
+        date: obs.date_display || obs.date || obs.observationDate || 'Unknown date',
+        fits: scienceFiles ?? numberFromObservation(obs, ['fits', 'scienceFits', 'science_files_count', 'scienceCount']),
+        darks: calibrationFiles ?? numberFromObservation(obs, ['darks', 'darkFits', 'calibration_files_count', 'calibrationCount']),
+        weather: obs.weather || 'Unknown'
+      };
+    }
+
+    function renderEmpty(message) {
+      observationsList.innerHTML = `
+        <div class="empty-state">
+          <span class="emoji">🔭</span>
+          <strong>${escapeHtml(message)}</strong>
+          <div>No transit observations are listed in the latest daily scan.</div>
+        </div>
+      `;
+    }
+
+    function renderObservations(observations) {
+      if (!observations.length) {
+        renderEmpty('No new Cecilia transit observations found.');
+        return;
+      }
+
+      observationsList.innerHTML = observations.map(obs => `
+        <article class="observation-card">
+          <div class="observation-header">
+            <div>
+              <h3 class="target-name">${escapeHtml(obs.target)}</h3>
+              <div class="target-date">${escapeHtml(obs.date)}</div>
+            </div>
+            <div class="weather-pill">${escapeHtml(obs.weather)}</div>
+          </div>
+          <div class="detail-grid">
+            <div class="detail">
+              <strong>${escapeHtml(obs.fits)}</strong>
+              <span>Science FITS</span>
+            </div>
+            <div class="detail">
+              <strong>${escapeHtml(obs.darks)}</strong>
+              <span>Dark Calibration FITS</span>
+            </div>
+            <div class="detail">
+              <strong>${escapeHtml(obs.date)}</strong>
+              <span>Observation Date</span>
+            </div>
+          </div>
+        </article>
+      `).join('');
+    }
+
+    async function loadMobsSummary() {
+      summaryText.textContent = 'Loading latest MicroObservatory transit summary…';
+      statusText.textContent = 'Checking data feed…';
+
+      try {
+        const res = await fetch(`${DATA_URL}?t=${Date.now()}`, { cache: 'no-store' });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+        const data = await res.json();
+        const observationsRaw = Array.isArray(data.observations) ? data.observations : [];
+        const observations = observationsRaw.map(normalizeObservation);
+
+        const totalFits = observations.reduce((sum, obs) => sum + Number(obs.fits || 0), 0);
+        const totalDarks = observations.reduce((sum, obs) => sum + Number(obs.darks || 0), 0);
+        const checkedAt = data.checkedAt || data.lastChecked || data.generatedAt;
+
+        targetCount.textContent = observations.length;
+        fitsCount.textContent = totalFits;
+        darksCount.textContent = totalDarks;
+        lastChecked.textContent = formatCheckedAt(checkedAt);
+
+        if (observations.length) {
+          const names = observations.slice(0, 4).map(obs => obs.target).join(', ');
+          const extra = observations.length > 4 ? ` and ${observations.length - 4} more` : '';
+          summaryText.textContent = `${observations.length} transit observation${observations.length === 1 ? '' : 's'} found: ${names}${extra}.`;
+          statusText.textContent = 'Latest MObs transit scan loaded';
+        } else {
+          summaryText.textContent = 'No new Cecilia transit observations were found in the latest daily scan.';
+          statusText.textContent = 'Daily scan complete';
+        }
+
+        renderObservations(observations);
+      } catch (err) {
+        console.error('Failed to load MObs summary:', err);
+        targetCount.textContent = '—';
+        fitsCount.textContent = '—';
+        darksCount.textContent = '—';
+        lastChecked.textContent = 'Unavailable';
+        summaryText.textContent = 'Could not load the latest MObs summary yet.';
+        statusText.textContent = 'Data feed unavailable';
+        observationsList.innerHTML = `
+          <div class="empty-state">
+            <span class="emoji">🛰️</span>
+            <strong>Waiting for /data/mobs-latest.json</strong>
+            <div>Once your scraper writes the daily JSON file, this page will populate automatically.</div>
+          </div>
+        `;
+      }
+    }
+
+    refreshBtn.addEventListener('click', loadMobsSummary);
+    loadMobsSummary();
+  </script>
+
+  <!-- Cloudflare Web Analytics -->
+  <script defer src='https://static.cloudflareinsights.com/beacon.min.js'
+    data-cf-beacon='{"token": "f0bfe483bc9649128eac59a192620efe"}'></script><!-- End Cloudflare Web Analytics -->
+</body>
+
+</html>
