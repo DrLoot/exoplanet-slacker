@@ -338,6 +338,50 @@
       color: var(--link);
     }
 
+
+    .alert-card {
+      border-color: rgba(255, 111, 0, .28);
+    }
+
+    .alert-options {
+      display: grid;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .alert-option {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .alert-option input {
+      margin-top: 4px;
+      accent-color: var(--accent);
+    }
+
+    .alert-status {
+      margin-top: 14px;
+      padding: 12px 14px;
+      border-radius: 12px;
+      border: 1px solid rgba(123, 198, 255, .14);
+      background: rgba(5, 6, 11, .45);
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .alert-status.good {
+      border-color: rgba(101, 240, 183, .28);
+      color: var(--success);
+    }
+
+    .alert-status.warn {
+      border-color: rgba(255, 212, 106, .28);
+      color: var(--warning);
+    }
+
     @media (max-width: 640px) {
       .observation-header {
         flex-direction: column;
@@ -413,6 +457,34 @@
       </p>
     </section>
 
+    <h2 class="section-title" id="mobs-alerts"><span class="kicker">Alerts</span><br /> Daily MObs Notifications</h2>
+    <section class="card alert-card" aria-labelledby="alerts-heading">
+      <h2 id="alerts-heading">Get the 9 AM CT MObs Update</h2>
+      <p class="muted">
+        Subscribe on this browser to receive a daily notification after the MObs scan runs. The alert will open this
+        page so you can see target names, dates, FITS counts, dark calibration counts, and weather.
+      </p>
+
+      <div class="alert-options" aria-label="Notification preferences">
+        <label class="alert-option">
+          <input type="checkbox" id="notifyWhenNone" checked>
+          <span>Notify me even when no new Cecilia transit observations were found.</span>
+        </label>
+      </div>
+
+      <div class="buttons-row">
+        <button type="button" class="btn" id="enableAlertsBtn">Enable MObs Alerts</button>
+        <button type="button" class="btn" id="disableAlertsBtn">Disable Alerts</button>
+        <button type="button" class="btn" id="testAlertsBtn">Send Test Alert</button>
+      </div>
+
+      <div id="alertsStatus" class="alert-status">Checking notification support…</div>
+
+      <p class="note">
+        Notifications use your browser’s built-in Web Push support. Each browser/device must subscribe separately.
+      </p>
+    </section>
+
     <h2 class="section-title"><span class="kicker">Targets</span><br /> Available Observations</h2>
     <section class="card" aria-labelledby="observations-heading">
       <h2 id="observations-heading">Transit Observation Details</h2>
@@ -437,6 +509,13 @@
     const lastChecked = document.getElementById('lastChecked');
     const observationsList = document.getElementById('observationsList');
     const refreshBtn = document.getElementById('refreshBtn');
+
+    const VAPID_PUBLIC_KEY = 'PASTE_YOUR_PUBLIC_VAPID_KEY_HERE';
+    const enableAlertsBtn = document.getElementById('enableAlertsBtn');
+    const disableAlertsBtn = document.getElementById('disableAlertsBtn');
+    const testAlertsBtn = document.getElementById('testAlertsBtn');
+    const notifyWhenNone = document.getElementById('notifyWhenNone');
+    const alertsStatus = document.getElementById('alertsStatus');
 
     function escapeHtml(value) {
       return String(value ?? '')
@@ -580,8 +659,171 @@
       }
     }
 
+
+    function setAlertsStatus(message, kind = '') {
+      if (!alertsStatus) return;
+      alertsStatus.textContent = message;
+      alertsStatus.classList.remove('good', 'warn');
+      if (kind) alertsStatus.classList.add(kind);
+    }
+
+    function urlBase64ToUint8Array(base64String) {
+      const padding = '='.repeat((4 - base64String.length % 4) % 4);
+      const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+      const rawData = window.atob(base64);
+      return Uint8Array.from([...rawData].map(char => char.charCodeAt(0)));
+    }
+
+    async function getMobsServiceWorkerRegistration() {
+      if (!('serviceWorker' in navigator)) return null;
+      const existing = await navigator.serviceWorker.getRegistration('mobs-sw.js');
+      if (existing) return existing;
+      return navigator.serviceWorker.register('mobs-sw.js');
+    }
+
+    async function updateAlertsStatus() {
+      if (!('Notification' in window) || !('serviceWorker' in navigator) || !('PushManager' in window)) {
+        setAlertsStatus('Push notifications are not supported in this browser.', 'warn');
+        enableAlertsBtn.disabled = true;
+        disableAlertsBtn.disabled = true;
+        testAlertsBtn.disabled = true;
+        return;
+      }
+
+      if (Notification.permission === 'denied') {
+        setAlertsStatus('Notifications are blocked for this site. Re-enable them in your browser settings to subscribe.', 'warn');
+        return;
+      }
+
+      const reg = await navigator.serviceWorker.getRegistration('mobs-sw.js');
+      const subscription = reg ? await reg.pushManager.getSubscription() : null;
+
+      if (subscription) {
+        setAlertsStatus('MObs alerts are enabled on this browser/device.', 'good');
+      } else if (Notification.permission === 'granted') {
+        setAlertsStatus('Notifications are allowed, but this browser is not currently subscribed.', 'warn');
+      } else {
+        setAlertsStatus('Alerts are not enabled yet. Click “Enable MObs Alerts” to subscribe this browser.');
+      }
+    }
+
+    async function enableMobsAlerts() {
+      try {
+        if (VAPID_PUBLIC_KEY.includes('PASTE_YOUR_PUBLIC')) {
+          setAlertsStatus('Add your real VAPID public key in mobs.html before enabling push alerts.', 'warn');
+          return;
+        }
+
+        const permission = await Notification.requestPermission();
+        if (permission !== 'granted') {
+          setAlertsStatus('Notification permission was not granted.', 'warn');
+          return;
+        }
+
+        const reg = await getMobsServiceWorkerRegistration();
+        const subscription = await reg.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
+        });
+
+        const res = await fetch('/api/mobs/subscribe', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            subscription,
+            preferences: {
+              notifyWhenNone: !!notifyWhenNone.checked,
+              source: 'mobs.html'
+            }
+          })
+        });
+
+        if (!res.ok) throw new Error(`Subscribe failed: HTTP ${res.status}`);
+        setAlertsStatus('MObs alerts enabled. You’ll get the daily 9 AM CT update on this browser/device.', 'good');
+      } catch (err) {
+        console.error('Failed to enable MObs alerts:', err);
+        setAlertsStatus('Could not enable alerts yet. Check the browser console and backend endpoint.', 'warn');
+      }
+    }
+
+    async function disableMobsAlerts() {
+      try {
+        const reg = await navigator.serviceWorker.getRegistration('mobs-sw.js');
+        const subscription = reg ? await reg.pushManager.getSubscription() : null;
+
+        if (!subscription) {
+          setAlertsStatus('This browser is not currently subscribed.');
+          return;
+        }
+
+        await fetch('/api/mobs/unsubscribe', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ endpoint: subscription.endpoint })
+        });
+
+        await subscription.unsubscribe();
+        setAlertsStatus('MObs alerts disabled for this browser/device.');
+      } catch (err) {
+        console.error('Failed to disable MObs alerts:', err);
+        setAlertsStatus('Could not disable alerts cleanly. Check the browser console.', 'warn');
+      }
+    }
+
+    async function sendTestMobsAlert() {
+      try {
+        const reg = await navigator.serviceWorker.getRegistration('mobs-sw.js');
+        const subscription = reg ? await reg.pushManager.getSubscription() : null;
+
+        if (!subscription) {
+          setAlertsStatus('Subscribe first, then send a test alert.', 'warn');
+          return;
+        }
+
+        const res = await fetch('/api/mobs/send-test', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ endpoint: subscription.endpoint })
+        });
+
+        if (!res.ok) throw new Error(`Test failed: HTTP ${res.status}`);
+        setAlertsStatus('Test alert sent. Watch for a browser notification.', 'good');
+      } catch (err) {
+        console.error('Failed to send test alert:', err);
+        setAlertsStatus('Could not send test alert yet. The /api/mobs/send-test endpoint may not exist.', 'warn');
+      }
+    }
+
+    enableAlertsBtn.addEventListener('click', enableMobsAlerts);
+    disableAlertsBtn.addEventListener('click', disableMobsAlerts);
+    testAlertsBtn.addEventListener('click', sendTestMobsAlert);
+    notifyWhenNone.addEventListener('change', async () => {
+      try {
+        const reg = await navigator.serviceWorker.getRegistration('mobs-sw.js');
+        const subscription = reg ? await reg.pushManager.getSubscription() : null;
+        if (!subscription) return;
+
+        await fetch('/api/mobs/subscribe', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            subscription,
+            preferences: {
+              notifyWhenNone: !!notifyWhenNone.checked,
+              source: 'mobs.html'
+            }
+          })
+        });
+        setAlertsStatus('Notification preference updated.', 'good');
+      } catch (err) {
+        console.error('Failed to update notification preference:', err);
+        setAlertsStatus('Could not update notification preference yet.', 'warn');
+      }
+    });
+
     refreshBtn.addEventListener('click', loadMobsSummary);
     loadMobsSummary();
+    updateAlertsStatus();
   </script>
 
   <!-- Cloudflare Web Analytics -->
