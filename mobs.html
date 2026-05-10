@@ -437,6 +437,7 @@
     document.getElementById('y').textContent = new Date().getFullYear();
 
     const DATA_URL = 'https://lost-matrix-relics.vercel.app/data/mobs-latest.json';
+    const API_BASE = 'https://lost-matrix-relics.vercel.app';
 
     const summaryText = document.getElementById('summaryText');
     const statusText = document.getElementById('statusText');
@@ -641,7 +642,7 @@
           applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
         });
 
-        const res = await fetch('/api/mobs/subscribe', {
+        const res = await fetch(`${API_BASE}/api/mobs/subscribe`, {
           method: 'POST', headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ subscription, preferences: { notifyWhenNone: !!notifyWhenNone.checked, source: 'mobs.html' } })
         });
@@ -664,7 +665,7 @@
           return;
         }
 
-        await fetch('/api/mobs/unsubscribe', {
+        await fetch(`${API_BASE}/api/mobs/unsubscribe`, {
           method: 'POST', headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ endpoint: subscription.endpoint })
         });
@@ -687,7 +688,7 @@
           return;
         }
 
-        const res = await fetch('/api/mobs/send-test', {
+        const res = await fetch(`${API_BASE}/api/mobs/send-test`, {
           method: 'POST', headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ endpoint: subscription.endpoint })
         });
@@ -709,7 +710,7 @@
         const subscription = reg ? await reg.pushManager.getSubscription() : null;
         if (!subscription) return;
 
-        await fetch('/api/mobs/subscribe', {
+        await fetch(`${API_BASE}/api/mobs/subscribe`, {
           method: 'POST', headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ subscription, preferences: { notifyWhenNone: !!notifyWhenNone.checked, source: 'mobs.html' } })
         });
