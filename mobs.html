@@ -393,14 +393,7 @@
       </div>
 
       <div class="observation-list" id="observationsList" aria-live="polite"></div>
-
-      <div class="buttons-row">
-        <button type="button" class="btn" id="refreshBtn">Refresh Observations</button>
-      </div>
-
-      <p class="note" id="windowNote">
-        This page reads <code>/data/mobs-latest.json</code>. The scraper should write only yesterday/today observations from the latest scrape.
-      </p>
+      
     </section>
 
     <h2 class="section-title" id="mobs-alerts"><span class="kicker">Alerts</span><br /> Daily MObs Notifications</h2>
@@ -445,8 +438,6 @@
     const fitsCount = document.getElementById('fitsCount');
     const lastChecked = document.getElementById('lastChecked');
     const observationsList = document.getElementById('observationsList');
-    const refreshBtn = document.getElementById('refreshBtn');
-    const windowNote = document.getElementById('windowNote');
 
     const VAPID_PUBLIC_KEY = 'BKxYFuVDiLpxzdUP9Y6CEC91aQLqH2OZNKIt7Rx2v-BP1ljlj9wOFfgYFHZoxQ6OijplVUig0KKdzGwGnwZjTYQ';
     const enableAlertsBtn = document.getElementById('enableAlertsBtn');
@@ -550,7 +541,6 @@
         targetCount.textContent = observations.length;
         fitsCount.textContent = totalFits;
         lastChecked.textContent = formatCheckedAt(checkedAt);
-        windowNote.innerHTML = `Showing observations from <strong>${escapeHtml(windowLabel)}</strong>. Data source: <code>/data/mobs-latest.json</code>.`;
 
         if (observations.length) {
           const names = observations.slice(0, 5).map(obs => obs.target).join(', ');
@@ -721,7 +711,6 @@
       }
     });
 
-    refreshBtn.addEventListener('click', loadMobsSummary);
     loadMobsSummary();
     updateAlertsStatus();
   </script>
