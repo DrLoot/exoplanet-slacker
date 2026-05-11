@@ -367,7 +367,7 @@
   <header>
     <h1>MObs Transit Watch</h1>
     <p class="subtitle">
-      Daily MicroObservatory Cecilia transit summaries for Exoplanet Watch observers — target totals and quick FITS/darks counts from the latest scrape.
+      Daily MicroObservatory Cecilia transit summaries for Exoplanet Watch observers.
     </p>
     <nav class="cta" aria-label="Primary">
       <a class="btn" href="index.html">← Back to Home</a>
@@ -413,7 +413,6 @@
       <div class="buttons-row">
         <button type="button" class="btn" id="enableAlertsBtn">Enable MObs Alerts</button>
         <button type="button" class="btn" id="disableAlertsBtn">Disable Alerts</button>
-        <button type="button" class="btn" id="testAlertsBtn">Send Test Alert</button>
       </div>
 
       <div id="alertsStatus" class="alert-status">Checking notification support…</div>
@@ -442,7 +441,6 @@
     const VAPID_PUBLIC_KEY = 'BKxYFuVDiLpxzdUP9Y6CEC91aQLqH2OZNKIt7Rx2v-BP1ljlj9wOFfgYFHZoxQ6OijplVUig0KKdzGwGnwZjTYQ';
     const enableAlertsBtn = document.getElementById('enableAlertsBtn');
     const disableAlertsBtn = document.getElementById('disableAlertsBtn');
-    const testAlertsBtn = document.getElementById('testAlertsBtn');
     const notifyWhenNone = document.getElementById('notifyWhenNone');
     const alertsStatus = document.getElementById('alertsStatus');
 
@@ -564,7 +562,7 @@
           <div class="empty-state">
             <span class="emoji">🛰️</span>
             <strong>Waiting for /data/mobs-latest.json</strong>
-            <div>Once your scraper writes the daily JSON file, last night’s observations will populate here.</div>
+            <div>Once scanning is complete, last night’s observations will populate here.</div>
           </div>
         `;
       }
@@ -596,7 +594,6 @@
         setAlertsStatus('Push notifications are not supported in this browser.', 'warn');
         enableAlertsBtn.disabled = true;
         disableAlertsBtn.disabled = true;
-        testAlertsBtn.disabled = true;
         return;
       }
 
@@ -693,7 +690,6 @@
 
     enableAlertsBtn.addEventListener('click', enableMobsAlerts);
     disableAlertsBtn.addEventListener('click', disableMobsAlerts);
-    testAlertsBtn.addEventListener('click', sendTestMobsAlert);
     notifyWhenNone.addEventListener('change', async () => {
       try {
         const reg = await navigator.serviceWorker.getRegistration('mobs-sw.js');
