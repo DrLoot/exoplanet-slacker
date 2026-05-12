@@ -558,7 +558,7 @@
       statusText.textContent = 'Checking data feed…';
 
       try {
-        const res = await fetch(`${DATA_URL}?t=${Date.now()}`, { cache: 'no-store' });
+        const res = await fetch(DATA_URL);
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
         const data = await res.json();
@@ -593,7 +593,7 @@
         observationsList.innerHTML = `
           <div class="empty-state">
             <span class="emoji">🛰️</span>
-            <strong>Waiting for /data/mobs-latest.json</strong>
+            <strong>Waiting for data.</strong>
             <div>Once scanning is complete, last night’s observations will populate here.</div>
           </div>
         `;
@@ -695,30 +695,7 @@
         console.error('Failed to disable MObs alerts:', err);
         setAlertsStatus('Could not disable alerts cleanly. Check the browser console.', 'warn');
       }
-    }
-
-    async function sendTestMobsAlert() {
-      try {
-        const reg = await navigator.serviceWorker.getRegistration('mobs-sw.js');
-        const subscription = reg ? await reg.pushManager.getSubscription() : null;
-
-        if (!subscription) {
-          setAlertsStatus('Subscribe first, then send a test alert.', 'warn');
-          return;
-        }
-
-        const res = await fetch(`${API_BASE}/api/mobs/send-test`, {
-          method: 'POST', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ endpoint: subscription.endpoint })
-        });
-
-        if (!res.ok) throw new Error(`Test failed: HTTP ${res.status}`);
-        setAlertsStatus('Test alert sent. Watch for a browser notification.', 'good');
-      } catch (err) {
-        console.error('Failed to send test alert:', err);
-        setAlertsStatus('Could not send test alert yet. The /api/mobs/send-test endpoint may not exist.', 'warn');
-      }
-    }
+    }    
 
     enableAlertsBtn.addEventListener('click', enableMobsAlerts);
     disableAlertsBtn.addEventListener('click', disableMobsAlerts);
