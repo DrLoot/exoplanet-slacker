@@ -139,6 +139,50 @@
       box-shadow: 0 12px 50px rgba(91, 192, 255, .18);
     }
 
+    .btn.new-btn {
+      position: relative;
+      overflow: visible;
+    }
+
+    .new-badge {
+      position: absolute;
+      top: -8px;
+      left: -8px;
+      background: linear-gradient(180deg, #00ff99, #00cc66);
+      color: #001b0d;
+      font-size: 11px;
+      font-weight: 800;
+      padding: 3px 8px;
+      border-radius: 999px;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      box-shadow:
+        0 0 10px rgba(0, 255, 153, 0.9),
+        0 0 20px rgba(0, 255, 153, 0.6),
+        0 0 35px rgba(0, 255, 153, 0.4);
+      animation: pulseGlow 1.8s infinite ease-in-out;
+    }
+
+    @keyframes pulseGlow {
+
+      0%,
+      100% {
+        transform: scale(1);
+        box-shadow:
+          0 0 10px rgba(0, 255, 153, 0.9),
+          0 0 20px rgba(0, 255, 153, 0.6),
+          0 0 35px rgba(0, 255, 153, 0.4);
+      }
+
+      50% {
+        transform: scale(1.08);
+        box-shadow:
+          0 0 16px rgba(0, 255, 153, 1),
+          0 0 28px rgba(0, 255, 153, 0.9),
+          0 0 45px rgba(0, 255, 153, 0.7);
+      }
+    }
+
     main {
       padding: 24px;
       max-width: 1100px;
@@ -255,6 +299,10 @@
     <p class="subtitle">Your community hub for <strong>NASA Exoplanet Watch</strong> — tutorials, Slack digests, mission
       highlights, interactive games, and trivia.</p>
     <nav class="cta" aria-label="Primary">
+      <a class="btn new-btn" href="mobs.html">
+        <span class="new-badge">New</span>
+        MObs Transit Watch
+      </a>
       <a class="btn" href="https://exoplanets.nasa.gov/exoplanet-watch/about-exoplanet-watch/overview/">Learn about the
         project</a>
       <a class="btn" href="tutorials.html">Tutorials</a>
@@ -316,8 +364,8 @@
         <div class="badge">📢</div>
         <div><strong>Next Teams Meeting:</strong> Sometime in January 2026.
           <br><br>Latest Teams
-          meeting: Mount Wilson! <br><a
-            href="https://drloot.github.io/exoplanet-slacker/index.html">12 Dec 2025 Teams Meeting</a>
+          meeting: Mount Wilson! <br><a href="https://drloot.github.io/exoplanet-slacker/index.html">12 Dec 2025 Teams
+            Meeting</a>
         </div>
       </div>
       <div class="feature-item">
