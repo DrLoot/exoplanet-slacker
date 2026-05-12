@@ -5,10 +5,12 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>MObs Transit Watch | Exoplanet Slacker</title>
-  <meta name="description" content="Daily MicroObservatory transit observation summary for Exoplanet Watch participants." />
+  <meta name="description"
+    content="Daily MicroObservatory transit observation summary for Exoplanet Watch participants." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Orbitron:wght@700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Orbitron:wght@700&display=swap"
+    rel="stylesheet" />
   <style>
     :root {
       --bg: #05060b;
@@ -73,8 +75,13 @@
     }
 
     @keyframes drift {
-      from { transform: translate3d(0, 0, 0) }
-      to { transform: translate3d(2000px, 2000px, 0) }
+      from {
+        transform: translate3d(0, 0, 0)
+      }
+
+      to {
+        transform: translate3d(2000px, 2000px, 0)
+      }
     }
 
     header {
@@ -175,7 +182,9 @@
       font-size: 12px;
     }
 
-    .muted { color: var(--muted); }
+    .muted {
+      color: var(--muted);
+    }
 
     .status-pill {
       display: inline-flex;
@@ -296,7 +305,9 @@
       margin-top: 14px;
     }
 
-    .alert-card { border-color: rgba(255, 111, 0, .28); }
+    .alert-card {
+      border-color: rgba(255, 111, 0, .28);
+    }
 
     .alert-options {
       display: grid;
@@ -346,23 +357,37 @@
     }
 
     footer a,
-    main a { color: var(--link); }
+    main a {
+      color: var(--link);
+    }
 
     @media (max-width: 760px) {
+
       .observation-row,
       .observation-row.header-row {
         grid-template-columns: 1fr;
       }
 
-      .observation-row.header-row { display: none; }
-      .cell-label { display: block; }
-      .buttons-row .btn { justify-content: center; width: 100%; }
+      .observation-row.header-row {
+        display: none;
+      }
+
+      .cell-label {
+        display: block;
+      }
+
+      .buttons-row .btn {
+        justify-content: center;
+        width: 100%;
+      }
     }
   </style>
 </head>
 
 <body>
-  <div class="starfield" aria-hidden="true"><div class="stars"></div></div>
+  <div class="starfield" aria-hidden="true">
+    <div class="stars"></div>
+  </div>
 
   <header>
     <h1>MObs Transit Watch</h1>
@@ -372,7 +397,11 @@
     <nav class="cta" aria-label="Primary">
       <a class="btn" href="index.html">← Back to Home</a>
       <a class="btn" href="transitgen.html">Transit Post Generator</a>
-      <a class="btn" href="https://waps.cfa.harvard.edu/microobservatory/MOImageDirectory/ImageDirectory.php" target="_blank" rel="noopener">Open MObs Image Directory</a>
+      <a class="btn" href="https://waps.cfa.harvard.edu/microobservatory/MOImageDirectory/ImageDirectory.php"
+        target="_blank" rel="noopener">Open MObs Image Directory</a>
+      <a class="btn" href="#mobs-alerts">
+        Get Notified
+      </a>
     </nav>
   </header>
 
@@ -389,18 +418,20 @@
       <div class="quick-stats" aria-label="Quick observation statistics">
         <div class="quick-stat"><span>Targets</span><strong id="targetCount">—</strong></div>
         <div class="quick-stat"><span>Science FITS</span><strong id="fitsCount">—</strong></div>
-        <div class="quick-stat"><span>Last Checked</span><strong id="lastChecked" style="font-size:16px;">—</strong></div>
+        <div class="quick-stat"><span>Last Checked</span><strong id="lastChecked" style="font-size:16px;">—</strong>
+        </div>
       </div>
 
       <div class="observation-list" id="observationsList" aria-live="polite"></div>
-      
+
     </section>
 
     <h2 class="section-title" id="mobs-alerts"><span class="kicker">Alerts</span><br /> Daily MObs Notifications</h2>
     <section class="card alert-card" aria-labelledby="alerts-heading">
       <h2 id="alerts-heading">Get the 9 AM CT MObs Update</h2>
       <p class="muted">
-        Subscribe on this browser to receive a daily notification after the MObs scan runs. The alert opens this page so you can quickly see available targets, total FITS, and per-target FITS/darks counts.
+        Subscribe on this browser to receive a daily notification after the MObs scan runs. The alert opens this page so
+        you can quickly see available targets, total FITS, and per-target FITS/darks counts.
       </p>
 
       <div class="alert-options" aria-label="Notification preferences">
@@ -417,7 +448,8 @@
 
       <div id="alertsStatus" class="alert-status">Checking notification support…</div>
 
-      <p class="note">Notifications use your browser’s built-in Web Push support. Each browser/device must subscribe separately.</p>
+      <p class="note">Notifications use your browser’s built-in Web Push support. Each browser/device must subscribe
+        separately.</p>
     </section>
   </main>
 
@@ -711,7 +743,8 @@
     updateAlertsStatus();
   </script>
 
-  <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "f0bfe483bc9649128eac59a192620efe"}'></script>
+  <script defer src='https://static.cloudflareinsights.com/beacon.min.js'
+    data-cf-beacon='{"token": "f0bfe483bc9649128eac59a192620efe"}'></script>
 </body>
 
 </html>
