@@ -1369,12 +1369,17 @@
         let parts = [];
         if (humanDate) parts.push(humanDate);
         if (includeData && data) parts.push(data);
-        if (includeExoticVersion && exoticVersion) parts.push(exoticVersion);
-        if (includeGuiVersion && guiVersion) parts.push(guiVersion);
         const line3 = parts.join(', ');
         if (line3) lines.push(line3);
 
-        // Photometry sentence after the date/data line
+        // EXOTIC + GUI versions on their own line before Photometry
+        let versionParts = [];
+        if (includeExoticVersion && exoticVersion) versionParts.push(exoticVersion);
+        if (includeGuiVersion && guiVersion) versionParts.push(guiVersion);
+        const versionLine = versionParts.join(', ');
+        if (versionLine) lines.push(versionLine);
+
+        // Photometry sentence after the EXOTIC / GUI line
         if (includePhotometry) {
           let photLine = 'Transit and XX stellar variabilities uploaded to AAVSO! :aavso:';
           if (photometryCount) {
@@ -1401,9 +1406,13 @@
         let meta = [];
         if (humanDate) meta.push(humanDate);
         if (includeData && data) meta.push(data);
-        if (includeExoticVersion && exoticVersion) meta.push(exoticVersion);
-        if (includeGuiVersion && guiVersion) meta.push(guiVersion);
         if (meta.length) lines.push(meta.join(' — '));
+
+        // EXOTIC + GUI versions on their own line before Photometry
+        let versionMeta = [];
+        if (includeExoticVersion && exoticVersion) versionMeta.push(exoticVersion);
+        if (includeGuiVersion && guiVersion) versionMeta.push(guiVersion);
+        if (versionMeta.length) lines.push(versionMeta.join(' — '));
 
         // Photometry sentence as its own line
         if (includePhotometry) {
@@ -1429,8 +1438,14 @@
         }
         if (humanDate) line += ` — ${humanDate}`;
         if (includeData && data) line += ` — ${data}`;
-        if (includeExoticVersion && exoticVersion) line += ` — ${exoticVersion}`;
-        if (includeGuiVersion && guiVersion) line += ` — ${guiVersion}`;
+
+        lines.push(line);
+
+        // EXOTIC + GUI versions on their own line before Photometry
+        let versionParts = [];
+        if (includeExoticVersion && exoticVersion) versionParts.push(exoticVersion);
+        if (includeGuiVersion && guiVersion) versionParts.push(guiVersion);
+        if (versionParts.length) lines.push(versionParts.join(' — '));
 
         if (includePhotometry) {
           let photSentence = 'Transit and XX stellar variabilities uploaded to AAVSO! :aavso:';
@@ -1439,13 +1454,10 @@
           } else {
             photSentence = photSentence.replace('XX ', '');
           }
-          // Append as a second sentence
           if (photSentence) {
-            line += (line ? ' ' : '') + photSentence;
+            lines.push(photSentence);
           }
         }
-
-        lines.push(line);
       }
 
       const post = lines.join('\n');
