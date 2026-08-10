@@ -501,7 +501,7 @@
             <div id="lcFileName" class="muted" style="font-size:12px; margin-top:4px;"></div>
           </div>
           <div>
-            <label for="target">Target name</label>
+            <label for="target">Target Name</label>
             <div style="display:flex; gap:8px; align-items:center;">
               <input id="target" name="target" placeholder="HAT-P-32 b" required style="flex:1 1 auto;" />
               <button type="button" id="infoCardBtn" class="btn"
@@ -533,19 +533,37 @@
           </div>
 
           <div>
-            <label for="obsDate">Observation date</label>
+            <label for="obsDate">Observation Date</label>
             <input id="obsDate" name="obsDate" type="date" />
           </div>
 
           <div>
-            <label for="data">Data</label>
+            <label for="data">Image Data</label>
             <select id="data" name="data">
-              <option value="">Select data type…</option>
+              <option value="">Select Image Data...</option>
               <option>EpW/MObs Checkout Data</option>
               <option>MObs Image Directory</option>
               <option>LCO</option>
               <option>Backyard Rig</option>
               <option>Other</option>
+            </select>
+          </div>
+          <div>
+            <label for="exoticVersion">EXOTIC Version</label>
+            <select id="exoticVersion" name="exoticVersion">
+              <option value="">Select EXOTIC version…</option>
+              <option>EXOTIC Standard 4.3.1</option>
+              <option>EXOTIC Advanced 4.3.1</option>
+              <option>EXOTIC Local 4.3.1</option>
+              <option>EXOTIC WBoM 4.3.2</option>
+            </select>
+          </div>
+          <div>
+            <label for="guiVersion">GUI Version</label>
+            <select id="guiVersion" name="guiVersion">
+              <option value="">Select GUI version…</option>
+              <option>TransitLab 2.8.0</option>
+              <option>TransitLab 2.8.1</option>
             </select>
           </div>
           <div>
@@ -617,11 +635,13 @@
         </div>
 
         <div class="inline-options" aria-label="Content options">
-          <label><input type="checkbox" id="includeSNR" checked /> Include SNR line</label>
-          <label><input type="checkbox" id="includeRank" checked /> Include rank</label>
-          <label><input type="checkbox" id="includeData" checked /> Include Data</label>
-          <label><input type="checkbox" id="includeFlair" checked /> Include flair emojis</label>
-          <label><input type="checkbox" id="includePhotometry" /> Include Photometry</label>
+          <label><input type="checkbox" id="includeSNR" checked /> Include SNR</label>
+          <label><input type="checkbox" id="includeRank" checked /> Include Rank</label>
+          <label><input type="checkbox" id="includeData" checked /> Include Image Data</label>
+          <label><input type="checkbox" id="includeExoticVersion" checked /> Include EXOTIC Version</label>
+          <label><input type="checkbox" id="includeGuiVersion" checked /> Include GUI Version</label>
+          <label><input type="checkbox" id="includeFlair" checked /> Include Flair</label>
+          <label><input type="checkbox" id="includePhotometry" checked /> Include Photometry</label>
         </div>
 
         <div class="buttons-row">
@@ -1299,12 +1319,16 @@
       const snr = document.getElementById('snr').value.trim();
       const obsDate = document.getElementById('obsDate').value;
       const data = document.getElementById('data').value;
+      const exoticVersion = document.getElementById('exoticVersion').value;
+      const guiVersion = document.getElementById('guiVersion').value;
       const photometryRaw = document.getElementById('photometry').value.trim();
 
       const includeSNR = document.getElementById('includeSNR').checked;
       const includeRank = document.getElementById('includeRank').checked;
       const includeFlair = document.getElementById('includeFlair').checked;
       const includeData = document.getElementById('includeData').checked;
+      const includeExoticVersion = document.getElementById('includeExoticVersion').checked;
+      const includeGuiVersion = document.getElementById('includeGuiVersion').checked;
       const includePhotometry = document.getElementById('includePhotometry').checked;
       const template = document.getElementById('template').value;
 
@@ -1345,6 +1369,8 @@
         let parts = [];
         if (humanDate) parts.push(humanDate);
         if (includeData && data) parts.push(data);
+        if (includeExoticVersion && exoticVersion) parts.push(exoticVersion);
+        if (includeGuiVersion && guiVersion) parts.push(guiVersion);
         const line3 = parts.join(', ');
         if (line3) lines.push(line3);
 
@@ -1375,6 +1401,8 @@
         let meta = [];
         if (humanDate) meta.push(humanDate);
         if (includeData && data) meta.push(data);
+        if (includeExoticVersion && exoticVersion) meta.push(exoticVersion);
+        if (includeGuiVersion && guiVersion) meta.push(guiVersion);
         if (meta.length) lines.push(meta.join(' — '));
 
         // Photometry sentence as its own line
@@ -1401,6 +1429,8 @@
         }
         if (humanDate) line += ` — ${humanDate}`;
         if (includeData && data) line += ` — ${data}`;
+        if (includeExoticVersion && exoticVersion) line += ` — ${exoticVersion}`;
+        if (includeGuiVersion && guiVersion) line += ` — ${guiVersion}`;
 
         if (includePhotometry) {
           let photSentence = 'Transit and XX stellar variabilities uploaded to AAVSO! :aavso:';
@@ -1450,11 +1480,15 @@
         const s = JSON.parse(raw);
 
         if (s.data !== undefined) document.getElementById('data').value = s.data;
+        if (s.exoticVersion !== undefined) document.getElementById('exoticVersion').value = s.exoticVersion;
+        if (s.guiVersion !== undefined) document.getElementById('guiVersion').value = s.guiVersion;
         if (s.template !== undefined) document.getElementById('template').value = s.template;
 
         if (s.includeSNR !== undefined) document.getElementById('includeSNR').checked = s.includeSNR;
         if (s.includeRank !== undefined) document.getElementById('includeRank').checked = s.includeRank;
         if (s.includeData !== undefined) document.getElementById('includeData').checked = s.includeData;
+        if (s.includeExoticVersion !== undefined) document.getElementById('includeExoticVersion').checked = s.includeExoticVersion;
+        if (s.includeGuiVersion !== undefined) document.getElementById('includeGuiVersion').checked = s.includeGuiVersion;
         if (s.includeFlair !== undefined) document.getElementById('includeFlair').checked = s.includeFlair;
         if (s.includePhotometry !== undefined) document.getElementById('includePhotometry').checked = s.includePhotometry;
 
@@ -1575,10 +1609,14 @@
     function saveSettings() {
       const settings = {
         data: document.getElementById('data').value,
+        exoticVersion: document.getElementById('exoticVersion').value,
+        guiVersion: document.getElementById('guiVersion').value,
         template: document.getElementById('template').value,
         includeSNR: document.getElementById('includeSNR').checked,
         includeRank: document.getElementById('includeRank').checked,
         includeData: document.getElementById('includeData').checked,
+        includeExoticVersion: document.getElementById('includeExoticVersion').checked,
+        includeGuiVersion: document.getElementById('includeGuiVersion').checked,
         includeFlair: document.getElementById('includeFlair').checked,
         includePhotometry: document.getElementById('includePhotometry').checked,
       };
@@ -1782,6 +1820,21 @@
       // Re-sync button state after clearing
       syncInfoButtonState();
 
+      // Keep the form's original dropdown defaults after form.reset().
+      // Clear Form also resets every content checkbox to its checked default.
+      [
+        'includeSNR',
+        'includeRank',
+        'includeData',
+        'includeExoticVersion',
+        'includeGuiVersion',
+        'includeFlair',
+        'includePhotometry'
+      ].forEach(id => {
+        document.getElementById(id).checked = true;
+      });
+      saveSettings();
+
       // Re-run initial UI updates
       updateAutoFlair();
     }
@@ -1803,14 +1856,17 @@
     document.getElementById('depthErr').addEventListener('input', updateSNRFromDepth);
 
     // Dropdowns
-document.getElementById('data').addEventListener('change', saveSettings);
-document.getElementById('template').addEventListener('change', saveSettings);
+['data', 'exoticVersion', 'guiVersion', 'template'].forEach(id => {
+  document.getElementById(id).addEventListener('change', saveSettings);
+});
 
 // Checkboxes
 [
   'includeSNR',
   'includeRank',
   'includeData',
+  'includeExoticVersion',
+  'includeGuiVersion',
   'includeFlair',
   'includePhotometry'
 ].forEach(id => {
