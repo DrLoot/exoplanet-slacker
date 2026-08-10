@@ -1683,12 +1683,9 @@
           changed = true;
         }
 
-        if (meta.data) {
-          const dataSelect = document.getElementById('data');
-          if (dataSelect) {
-            dataSelect.value = meta.data; // e.g. "EpW/MObs Checkout Data"
-          }
-        }
+        // Preserve the user's remembered Image Data selection when importing a file.
+        // AAVSO/EXOTIC metadata may contain a data source, but importing a file should
+        // not override the dropdown choice the user already selected and saved.
 
         if (changed) {
           updateAutoFlair();
