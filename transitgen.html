@@ -1402,13 +1402,13 @@
         let meta = [];
         if (humanDate) meta.push(humanDate);
         if (includeData && data) meta.push(data);
-        if (meta.length) lines.push(meta.join(' — '));
+        if (meta.length) lines.push(meta.join(' | '));
 
         // EXOTIC + GUI versions on their own line before Photometry
         let versionMeta = [];
         if (includeExoticVersion && exoticVersion) versionMeta.push(exoticVersion);
         if (includeGuiVersion && guiVersion) versionMeta.push(guiVersion);
-        if (versionMeta.length) lines.push(versionMeta.join(' — '));
+        if (versionMeta.length) lines.push(versionMeta.join(' | '));
 
         // Photometry sentence as its own line
         if (includePhotometry) {
@@ -1429,11 +1429,11 @@
           line += ')';
         }
         if (includeSNR && snr) {
-          line += ` — ${snr}σ SNR`;
+          line += ` | ${snr}σ SNR`;
           if (snrEmoji) line += ` ${snrEmoji}`;
         }
-        if (humanDate) line += ` — ${humanDate}`;
-        if (includeData && data) line += ` — ${data}`;
+        if (humanDate) line += ` | ${humanDate}`;
+        if (includeData && data) line += ` | ${data}`;
 
         lines.push(line);
 
@@ -1441,7 +1441,7 @@
         let versionParts = [];
         if (includeExoticVersion && exoticVersion) versionParts.push(exoticVersion);
         if (includeGuiVersion && guiVersion) versionParts.push(guiVersion);
-        if (versionParts.length) lines.push(versionParts.join(' — '));
+        if (versionParts.length) lines.push(versionParts.join(' | '));
 
         if (includePhotometry) {
           let photSentence = 'Transit and XX stellar variabilities uploaded to AAVSO! :aavso:';
