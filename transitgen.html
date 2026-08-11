@@ -159,12 +159,50 @@
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
       gap: 16px;
-      margin-top: 16px;
     }
 
     /* make some rows span the full grid width */
     .form-grid-row-full {
       grid-column: 1 / -1;
+    }
+
+    /* ---- Observation form grouping ---- */
+    .form-section {
+      margin-top: 18px;
+      padding: 16px;
+      border: 1px solid rgba(123, 198, 255, .16);
+      border-radius: 12px;
+      background: rgba(8, 10, 20, .48);
+    }
+
+    .form-section-title {
+      margin: 0 0 12px;
+      color: #c8d4e8;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .form-section-note {
+      margin: -5px 0 12px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .file-row {
+      margin-bottom: 14px;
+    }
+
+    .post-options-top {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      align-items: flex-end;
+    }
+
+    .post-options-top > div {
+      min-width: 220px;
     }
 
     label {
@@ -228,7 +266,27 @@
       display: flex;
       flex-wrap: wrap;
       gap: 10px;
-      margin-top: 14px;
+      margin-top: 16px;
+      align-items: center;
+    }
+
+    .buttons-row #generateBtn {
+      border-color: rgba(123, 198, 255, .48);
+      background: linear-gradient(180deg, #19466f, #0d2947);
+      font-weight: 600;
+    }
+
+    .buttons-row .btn-secondary {
+      margin-left: auto;
+      background: rgba(10, 12, 20, .45);
+      border-color: rgba(169, 177, 195, .24);
+      color: var(--muted);
+      box-shadow: none;
+    }
+
+    .buttons-row .btn-secondary:hover {
+      color: var(--text);
+      border-color: rgba(169, 177, 195, .42);
     }
 
     .pill {
@@ -370,6 +428,10 @@
         width: 100%;
       }
 
+      .buttons-row .btn-secondary {
+        margin-left: 0;
+      }
+
       /* optional: stack the columns vertically on very small screens */
       .flair-columns {
         flex-direction: column;
@@ -491,161 +553,184 @@
         compute it from Rp²/Rs² and its uncertainty.</p>
 
       <form id="transitForm" autocomplete="off">
-        <div class="form-grid">
-          <div class="form-grid-row-full">
-            <br>
-            <label class="btn" style="padding:6px 12px; font-size:12px; cursor:pointer; margin-top:6px;">
+        <section class="form-section" aria-labelledby="observation-section-title">
+          <h3 class="form-section-title" id="observation-section-title">Observation</h3>
+
+          <div class="file-row">
+            <label class="btn" style="padding:6px 12px; font-size:12px; cursor:pointer; margin-top:2px;">
               Choose file…
               <input id="lcFile" type="file" accept=".txt" style="display:none;">
             </label>
             <div id="lcFileName" class="muted" style="font-size:12px; margin-top:4px;"></div>
           </div>
-          <div>
-            <label for="target">Target Name</label>
-            <div style="display:flex; gap:8px; align-items:center;">
-              <input id="target" name="target" placeholder="HAT-P-32 b" required style="flex:1 1 auto;" />
-              <button type="button" id="infoCardBtn" class="btn"
-                style="padding:6px 10px;font-size:11px;white-space:nowrap;" disabled>
-                Planet info
-              </button>
-              <!-- NEW: spinner shown while target name is resolving -->
-              <span id="targetSpinner" class="spinner" style="display:none;"></span>
+
+          <div class="form-grid">
+            <div>
+              <label for="target">Target Name</label>
+              <div style="display:flex; gap:8px; align-items:center;">
+                <input id="target" name="target" placeholder="HAT-P-32 b" required style="flex:1 1 auto;" />
+                <button type="button" id="infoCardBtn" class="btn"
+                  style="padding:6px 10px;font-size:11px;white-space:nowrap;" disabled>
+                  Planet info
+                </button>
+                <span id="targetSpinner" class="spinner" style="display:none;"></span>
+              </div>
+            </div>
+
+            <div>
+              <label for="obsDate">Observation Date</label>
+              <input id="obsDate" name="obsDate" type="date" />
+            </div>
+
+            <div>
+              <label for="rank">Rank (NASA list)</label>
+              <input id="rank" name="rank" type="text" inputmode="numeric" placeholder="900" />
             </div>
           </div>
-          <div>
-            <label for="rank">Rank (NASA list)</label>
-            <input id="rank" name="rank" type="text" inputmode="numeric" placeholder="900" />
+        </section>
+
+        <section class="form-section" aria-labelledby="transit-results-section-title">
+          <h3 class="form-section-title" id="transit-results-section-title">Transit Results</h3>
+
+          <div class="form-grid">
+            <div>
+              <label for="depth">Rp²/Rs² (depth)</label>
+              <input id="depth" name="depth" type="number" step="0.0001" placeholder="0.0256" />
+            </div>
+
+            <div>
+              <label for="depthErr">σ(Rp²/Rs²) (uncertainty)</label>
+              <input id="depthErr" name="depthErr" type="number" step="0.0001" placeholder="0.0012" />
+            </div>
+
+            <div>
+              <label for="snr">Transit SNR (σ)</label>
+              <input id="snr" name="snr" type="number" step="0.1" placeholder="21.3" />
+            </div>
+
+            <div>
+              <label for="photometry">Photometry (stellar variabilities)</label>
+              <input id="photometry" name="photometry" type="number" inputmode="numeric" min="0" max="200" step="1"
+                placeholder="" />
+            </div>
+          </div>
+        </section>
+
+        <section class="form-section" aria-labelledby="reduction-section-title">
+          <h3 class="form-section-title" id="reduction-section-title">Reduction Details</h3>
+
+          <div class="form-grid">
+            <div>
+              <label for="data">Image Data</label>
+              <select id="data" name="data">
+                <option value="">Select Image Data...</option>
+                <option>EpW/MObs Checkout Data</option>
+                <option>MObs Image Directory</option>
+                <option>LCO</option>
+                <option>Backyard Rig</option>
+                <option>Other</option>
+              </select>
+            </div>
+
+            <div>
+              <label for="exoticVersion">EXOTIC Version</label>
+              <select id="exoticVersion" name="exoticVersion">
+                <option value="">Select EXOTIC version…</option>
+                <option>EXOTIC Standard 4.3.1</option>
+                <option>EXOTIC Advanced 4.3.1</option>
+                <option>EXOTIC Local 4.3.1</option>
+                <option>EXOTIC WBoM 4.3.2</option>
+              </select>
+            </div>
+
+            <div>
+              <label for="guiVersion">GUI Version</label>
+              <select id="guiVersion" name="guiVersion">
+                <option value="">Select GUI version…</option>
+                <option>TransitLab 2.8.0</option>
+                <option>TransitLab 2.8.1</option>
+              </select>
+            </div>
+          </div>
+        </section>
+
+        <section class="form-section" aria-labelledby="post-options-section-title">
+          <h3 class="form-section-title" id="post-options-section-title">Post Options</h3>
+
+          <div class="post-options-top">
+            <div>
+              <label for="template">Template Style</label>
+              <select id="template" name="template">
+                <option value="short">Short hype (Slack-style)</option>
+                <option value="tech">Technical summary</option>
+                <option value="minimal">Minimal (one-liner)</option>
+              </select>
+            </div>
           </div>
 
-          <div>
-            <label for="depth">Rp²/Rs² (depth)</label>
-            <input id="depth" name="depth" type="number" step="0.0001" placeholder="0.0256" />
-          </div>
+          <div class="flair-wrap">
+            <div class="flair-heading">Automatic flair based on SNR &amp; rank:</div>
 
-          <div>
-            <label for="depthErr">σ(Rp²/Rs²) (uncertainty)</label>
-            <input id="depthErr" name="depthErr" type="number" step="0.0001" placeholder="0.0012" />
-          </div>
-
-          <div>
-            <label for="snr">Transit SNR (σ)</label>
-            <input id="snr" name="snr" type="number" step="0.1" placeholder="21.3" />
-          </div>
-
-          <div>
-            <label for="obsDate">Observation Date</label>
-            <input id="obsDate" name="obsDate" type="date" />
-          </div>
-
-          <div>
-            <label for="data">Image Data</label>
-            <select id="data" name="data">
-              <option value="">Select Image Data...</option>
-              <option>EpW/MObs Checkout Data</option>
-              <option>MObs Image Directory</option>
-              <option>LCO</option>
-              <option>Backyard Rig</option>
-              <option>Other</option>
-            </select>
-          </div>
-          <div>
-            <label for="exoticVersion">EXOTIC Version</label>
-            <select id="exoticVersion" name="exoticVersion">
-              <option value="">Select EXOTIC version…</option>
-              <option>EXOTIC Standard 4.3.1</option>
-              <option>EXOTIC Advanced 4.3.1</option>
-              <option>EXOTIC Local 4.3.1</option>
-              <option>EXOTIC WBoM 4.3.2</option>
-            </select>
-          </div>
-          <div>
-            <label for="guiVersion">GUI Version</label>
-            <select id="guiVersion" name="guiVersion">
-              <option value="">Select GUI version…</option>
-              <option>TransitLab 2.8.0</option>
-              <option>TransitLab 2.8.1</option>
-            </select>
-          </div>
-          <div>
-            <label for="photometry">Photometry (stellar variabilities)</label>
-            <input id="photometry" name="photometry" type="number" inputmode="numeric" min="0" max="200" step="1"
-              placeholder="" />
-          </div>
-        </div>       
-
-        <div class="template-row">
-          <div>
-            <label for="template">Template Style</label>
-            <select id="template" name="template">
-              <option value="short">Short hype (Slack-style)</option>
-              <option value="tech">Technical summary</option>
-              <option value="minimal">Minimal (one-liner)</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="flair-wrap">
-          <div class="flair-heading">Automatic flair based on SNR &amp; rank:</div>
-
-          <div class="flair-columns">
-            <div class="flair-column">
-              <div class="flair-title">SNR Flair</div>
-              <div class="flair-rows">
-                <div class="flair-row snr-tier" data-tier="20">
-                  <span class="flair-label">SNR 20σ+ </span><span>🚀</span>
+            <div class="flair-columns">
+              <div class="flair-column">
+                <div class="flair-title">SNR Flair</div>
+                <div class="flair-rows">
+                  <div class="flair-row snr-tier" data-tier="20">
+                    <span class="flair-label">SNR 20σ+ </span><span>🚀</span>
+                  </div>
+                  <div class="flair-row snr-tier" data-tier="10">
+                    <span class="flair-label">SNR 10–19σ </span><span>✨</span>
+                  </div>
+                  <div class="flair-row snr-tier" data-tier="5">
+                    <span class="flair-label">SNR 5–9σ </span><span>🔭</span>
+                  </div>
+                  <div class="flair-row snr-tier" data-tier="0">
+                    <span class="flair-label">SNR 0–4σ </span><span>⚠️</span>
+                  </div>
                 </div>
-                <div class="flair-row snr-tier" data-tier="10">
-                  <span class="flair-label">SNR 10–19σ </span><span>✨</span>
-                </div>
-                <div class="flair-row snr-tier" data-tier="5">
-                  <span class="flair-label">SNR 5–9σ </span><span>🔭</span>
-                </div>
-                <div class="flair-row snr-tier" data-tier="0">
-                  <span class="flair-label">SNR 0–4σ </span><span>⚠️</span>
+              </div>
+
+              <div class="flair-column">
+                <div class="flair-title">Rank Flair</div>
+                <div class="flair-rows">
+                  <div class="flair-row rank-tier" data-tier="100">
+                    <span class="flair-label">Rank 1–100 </span><span>👑</span>
+                  </div>
+                  <div class="flair-row rank-tier" data-tier="500">
+                    <span class="flair-label">Rank 101–500 </span><span>🌛</span>
+                  </div>
+                  <div class="flair-row rank-tier" data-tier="1000">
+                    <span class="flair-label">Rank 501–1000 </span><span>🚀</span>
+                  </div>
+                  <div class="flair-row rank-tier" data-tier="1001">
+                    <span class="flair-label">Rank 1001+ </span><span>🌌</span>
+                  </div>
                 </div>
               </div>
             </div>
 
-            <div class="flair-column">
-              <div class="flair-title">Rank Flair</div>
-              <div class="flair-rows">
-                <div class="flair-row rank-tier" data-tier="100">
-                  <span class="flair-label">Rank 1–100 </span><span>👑</span>
-                </div>
-                <div class="flair-row rank-tier" data-tier="500">
-                  <span class="flair-label">Rank 101–500 </span><span>🌛</span>
-                </div>
-                <div class="flair-row rank-tier" data-tier="1000">
-                  <span class="flair-label">Rank 501–1000 </span><span>🚀</span>
-                </div>
-                <div class="flair-row rank-tier" data-tier="1001">
-                  <span class="flair-label">Rank 1001+ </span><span>🌌</span>
-                </div>
-              </div>
+            <div id="autoFlair" class="flair-note">
+              Enter SNR and/or rank to see which tier is active.
             </div>
           </div>
 
-          <div id="autoFlair" class="flair-note">
-            Enter SNR and/or rank to see which tier is active.
+          <div class="inline-options" aria-label="Content options">
+            <label><input type="checkbox" id="includeSNR" checked /> Include SNR</label>
+            <label><input type="checkbox" id="includeRank" checked /> Include Rank</label>
+            <label><input type="checkbox" id="includeData" checked /> Include Image Data</label>
+            <label><input type="checkbox" id="includeExoticVersion" checked /> Include EXOTIC Version</label>
+            <label><input type="checkbox" id="includeGuiVersion" checked /> Include GUI Version</label>
+            <label><input type="checkbox" id="includeFlair" checked /> Include Flair</label>
+            <label><input type="checkbox" id="includePhotometry" checked /> Include Photometry</label>
           </div>
-        </div>
 
-        <div class="inline-options" aria-label="Content options">
-          <label><input type="checkbox" id="includeSNR" checked /> Include SNR</label>
-          <label><input type="checkbox" id="includeRank" checked /> Include Rank</label>
-          <label><input type="checkbox" id="includeData" checked /> Include Image Data</label>
-          <label><input type="checkbox" id="includeExoticVersion" checked /> Include EXOTIC Version</label>
-          <label><input type="checkbox" id="includeGuiVersion" checked /> Include GUI Version</label>
-          <label><input type="checkbox" id="includeFlair" checked /> Include Flair</label>
-          <label><input type="checkbox" id="includePhotometry" checked /> Include Photometry</label>
-        </div>
-
-        <div class="buttons-row">
-          <button type="button" class="btn" id="generateBtn">Generate Post</button>
-          <button type="button" class="btn" id="copyBtn">Copy to Clipboard</button>
-          <button type="button" class="btn" id="saveBtn">Save to History</button>
-          <button id="clearFormBtn" type="button" class="btn btn-secondary">Clear Form</button>
-        </div>
+          <div class="buttons-row">
+            <button type="button" class="btn" id="generateBtn">Generate Post</button>
+            <button type="button" class="btn" id="copyBtn">Copy to Clipboard</button>
+            <button type="button" class="btn" id="saveBtn">Save to History</button>
+            <button id="clearFormBtn" type="button" class="btn btn-secondary">Clear Form</button>
+          </div>
+        </section>
       </form>
     </section>
 
