@@ -1,15 +1,14 @@
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
 
+<html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Exoplanet News | Exoplanet Slacker</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Orbitron:wght@700&display=swap"
-    rel="stylesheet" />
-  <style>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>Exoplanet News | Exoplanet Slacker</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&amp;family=Orbitron:wght@700&amp;display=swap" rel="stylesheet"/>
+<style>
     .list {
       display: grid;
       gap: 14px;
@@ -173,180 +172,200 @@
       font-size: 14px;
       text-align: center;
     }
+
+    .news-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap: 14px; margin: 18px 0 30px; }
+    .news-item { display: flex; flex-direction: column; gap: 9px; min-height: 126px; padding: 16px; border: 1px solid rgba(123,198,255,.23); border-radius: 12px; background: linear-gradient(145deg, rgba(35,49,78,.7), rgba(15,18,32,.9)); color: var(--text); text-decoration: none; transition: border-color .2s, transform .2s; }
+    .news-item:hover, .news-item:focus-visible { border-color: var(--glow); transform: translateY(-2px); }
+    .news-meta { font-size: 12px; font-weight: 600; color: var(--muted); }
+    .news-title { font-size: 16px; font-weight: 600; line-height: 1.4; }
+    .news-read { margin-top: auto; color: var(--link); font-size: 13px; }
+    .news-empty { color: var(--muted); margin: 12px 0 28px; }
+    .source-heading { margin: 26px 0 0; font-size: 16px; color: var(--muted); }
   </style>
 </head>
-
 <body>
-  <div class="starfield" aria-hidden="true">
-    <div class="stars"></div>
-  </div>
-  <header>
-    <h1>Exoplanet News</h1>
-    <p class="subtitle">Authoritative sources for discoveries, mission updates, and community highlights.</p>
-    <nav class="breadcrumb"><a href="index.html">← Back to Home</a></nav>
-  </header>
-  <main>
-    <!-- Exoplanet News Section -->
-    <section class="card">
-      <h2>Exoplanet News</h2>
-      <div class="list">
-        <div class="item">
-          <a href="https://exoplanets.nasa.gov/exep/news/" target="_blank" rel="noopener">NASA ExEP News</a>
-          <p>Official updates from NASA’s Exoplanet Exploration Program (ExEP).</p>
-        </div>
-        <div class="item">
-          <a href="https://science.nasa.gov/exoplanets/stories/" target="_blank" rel="noopener">NASA Exoplanet
+<div aria-hidden="true" class="starfield">
+<div class="stars"></div>
+</div>
+<header>
+<h1>Exoplanet News</h1>
+<p class="subtitle">Authoritative sources for discoveries, mission updates, and community highlights.</p>
+<nav class="breadcrumb"><a href="index.html">← Back to Home</a></nav>
+</header>
+<main>
+<!-- Exoplanet News Section -->
+<section class="card">
+<h2>Exoplanet News</h2>
+<h3>Latest news</h3>
+<!-- AUTOMATED NEWS START --><div class="auto-news"><p class="news-empty">No articles dated today or yesterday from these sources yet.</p></div><!-- AUTOMATED NEWS END -->
+<h3 class="source-heading">Sources</h3>
+<div class="list">
+<div class="item">
+<a href="https://exoplanets.nasa.gov/exep/news/" rel="noopener" target="_blank">NASA ExEP News</a>
+<p>Official updates from NASA’s Exoplanet Exploration Program (ExEP).</p>
+</div>
+<div class="item">
+<a href="https://science.nasa.gov/exoplanets/stories/" rel="noopener" target="_blank">NASA Exoplanet
             Stories</a>
-          <p>NASA’s central portal: explainers, discoveries, and missions.</p>
-        </div>
-        <div class="item">
-          <a href="https://exoplanetarchive.ipac.caltech.edu/docs/exonews_archive.html" target="_blank"
-            rel="noopener">NASA Exoplanet Archive – ExoNews</a>
-          <p>Press releases and news curated by the Exoplanet Archive team at Caltech/IPAC.</p>
-        </div>
-        <div class="item">
-          <a href="https://science.nasa.gov/exoplanets/" target="_blank" rel="noopener">NASA Exoplanet
+<p>NASA’s central portal: explainers, discoveries, and missions.</p>
+</div>
+<div class="item">
+<a href="https://exoplanetarchive.ipac.caltech.edu/docs/exonews_archive.html" rel="noopener" target="_blank">NASA Exoplanet Archive – ExoNews</a>
+<p>Press releases and news curated by the Exoplanet Archive team at Caltech/IPAC.</p>
+</div>
+<div class="item">
+<a href="https://science.nasa.gov/exoplanets/" rel="noopener" target="_blank">NASA Exoplanet
             Information</a>
-          <p>Brief overviews of exoplanets and why most of them discovered so far are are mainly in the Milky Way.</p>
-        </div>
-        <div class="item">
-          <a href="https://www.space.com/astronomy/exoplanets/" target="_blank" rel="noopener">Space.com –
+<p>Brief overviews of exoplanets and why most of them discovered so far are are mainly in the Milky Way.</p>
+</div>
+<div class="item">
+<a href="https://www.space.com/astronomy/exoplanets/" rel="noopener" target="_blank">Space.com –
             Exoplanets</a>
-          <p>Coverage of exoplanet discoveries and telescope updates from Space.com.</p>
-        </div>
-      </div>
-    </section>
-
-    <!-- Telescope News Section -->
-    <section class="card" style="margin-top: 32px;">
-      <h2>Telescope News</h2>
-      <div class="list">
-        <div class="item">
-          <a href="https://smallsat.wff.nasa.gov/missions/pandora.php" target="_blank" rel="noopener">NASA Pandora
+<p>Coverage of exoplanet discoveries and telescope updates from Space.com.</p>
+</div>
+</div>
+</section>
+<!-- Telescope News Section -->
+<section class="card" style="margin-top: 32px;">
+<h2>Telescope News</h2>
+<h3>Latest news</h3>
+<!-- AUTOMATED NEWS START --><div class="auto-news"><p class="news-empty">No articles dated today or yesterday from these sources yet.</p></div><!-- AUTOMATED NEWS END -->
+<h3 class="source-heading">Sources</h3>
+<div class="list">
+<div class="item">
+<a href="https://smallsat.wff.nasa.gov/missions/pandora.php" rel="noopener" target="_blank">NASA Pandora
             Mission</a>
-          <p>A SmallSat telescope launching in 2025 to study exoplanet atmospheres.</p>
-        </div>
-        <div class="item">
-          <a href="https://tess.mit.edu/news" target="_blank" rel="noopener">NASA TESS News</a>
-          <p>The Transiting Exoplanet Survey Satellite scanning the sky for thousands of exoplanets.</p>
-        </div>
-        <div class="item">
-          <a href="https://science.nasa.gov/mission/hubble/hubble-news/" target="_blank" rel="noopener">NASA Hubble
+<p>A SmallSat telescope launching in 2025 to study exoplanet atmospheres.</p>
+</div>
+<div class="item">
+<a href="https://tess.mit.edu/news" rel="noopener" target="_blank">NASA TESS News</a>
+<p>The Transiting Exoplanet Survey Satellite scanning the sky for thousands of exoplanets.</p>
+</div>
+<div class="item">
+<a href="https://science.nasa.gov/mission/hubble/hubble-news/" rel="noopener" target="_blank">NASA Hubble
             News</a>
-          <p>Read about the latest Hubble discoveries, most recent images, and explore the archives.</p>
-        </div>
-        <div class="item">
-          <a href="https://science.nasa.gov/mission/webb/latestnews/" target="_blank" rel="noopener">NASA JWST News</a>
-          <p>Check out Webb's latest news blog releases.</p>
-        </div>
-        <div class="item">
-          <a href="https://science.nasa.gov/mission/roman-space-telescope/latest-stories/" target="_blank"
-            rel="noopener">NASA NGRST News</a>
-          <p>Catch up on all the latest Roman Space Telescope news.</p>
-        </div>
-        <div class="item">
-          <a href="https://rubinobservatory.org/news/" target="_blank" rel="noopener">Vera C. Rubin Observatory News</a>
-          <p>Discover the latest findings from the Rubin Observator in Chile.</p>
-        </div>
-        <div class="item">
-          <a href="https://www.seti.org/news/" target="_blank" rel="noopener">SETI News</a>
-          <p>Are we alone? Let’s find out! Leading the search for life beyond Earth.</p>
-        </div>
-      </div>
-    </section>
-    <!-- Space News Section -->
-    <section class="card" style="margin-top: 32px;">
-      <h2>Space News</h2>
-      <div class="list">
-        <div class="item">
-          <a href="https://science.nasa.gov/blogs/voyager/" target="_blank" rel="noopener">NASA Voyager Mission</a>
-          <p>Blog posts and archives of the Voyager satellite missions.</p>
-        </div>
-        <div class="item">
-          <a href="https://www.nasa.gov/news/recently-published/" target="_blank" rel="noopener">NASA News - Recently
+<p>Read about the latest Hubble discoveries, most recent images, and explore the archives.</p>
+</div>
+<div class="item">
+<a href="https://science.nasa.gov/mission/webb/latestnews/" rel="noopener" target="_blank">NASA JWST News</a>
+<p>Check out Webb's latest news blog releases.</p>
+</div>
+<div class="item">
+<a href="https://science.nasa.gov/mission/roman-space-telescope/latest-stories/" rel="noopener" target="_blank">NASA NGRST News</a>
+<p>Catch up on all the latest Roman Space Telescope news.</p>
+</div>
+<div class="item">
+<a href="https://rubinobservatory.org/news/" rel="noopener" target="_blank">Vera C. Rubin Observatory News</a>
+<p>Discover the latest findings from the Rubin Observator in Chile.</p>
+</div>
+<div class="item">
+<a href="https://www.seti.org/news/" rel="noopener" target="_blank">SETI News</a>
+<p>Are we alone? Let’s find out! Leading the search for life beyond Earth.</p>
+</div>
+</div>
+</section>
+<!-- Space News Section -->
+<section class="card" style="margin-top: 32px;">
+<h2>Space News</h2>
+<h3>Latest news</h3>
+<!-- AUTOMATED NEWS START --><div class="auto-news"><div class="news-grid">
+<a class="news-item" href="https://www.astronomy.com/observing/the-sky-today-friday-september-25-2026/" rel="noopener noreferrer" target="_blank"><span class="news-meta">Astronomy.com News · Today, Sep 25</span><span class="news-title">The Sky Today on Friday, September 25: Neptune at opposition</span><span class="news-read">Read article →</span></a>
+<a class="news-item" href="https://www.nature.com/articles/s41550-026-02984-6" rel="noopener noreferrer" target="_blank"><span class="news-meta">Nature.com - Astronomy · Today, Sep 25</span><span class="news-title">Volatile depletion in rocky planets as a chemical fingerprint of hybrid accretion</span><span class="news-read">Read article →</span></a>
+<a class="news-item" href="https://www.astronomy.com/the-sky-this-week/the-sky-this-week-from-september-25-to-october-2-2026/" rel="noopener noreferrer" target="_blank"><span class="news-meta">Astronomy.com News · Today, Sep 25</span><span class="news-title">The Sky This Week from September 25 to October 2: Neptune at opposition</span><span class="news-read">Read article →</span></a>
+<a class="news-item" href="https://www.nature.com/articles/s41550-026-02977-5" rel="noopener noreferrer" target="_blank"><span class="news-meta">Nature.com - Astronomy · Today, Sep 25</span><span class="news-title">Λ CDM in a courtroom</span><span class="news-read">Read article →</span></a>
+<a class="news-item" href="https://www.nasa.gov/organizations/oiir/nasa-welcomes-cote-divoire-as-newest-artemis-accords-signatory/" rel="noopener noreferrer" target="_blank"><span class="news-meta">NASA News - Recently Published · Yesterday, Sep 24</span><span class="news-title">NASA Welcomes Côte d’Ivoire as Newest Artemis Accords Signatory</span><span class="news-read">Read article →</span></a>
+<a class="news-item" href="https://www.nasa.gov/news-release/nasa-shares-spacex-crew-14-assignments-for-space-station-mission/" rel="noopener noreferrer" target="_blank"><span class="news-meta">NASA News - Recently Published · Yesterday, Sep 24</span><span class="news-title">NASA Shares SpaceX Crew-14 Assignments for Space Station Mission</span><span class="news-read">Read article →</span></a>
+</div></div><!-- AUTOMATED NEWS END -->
+<h3 class="source-heading">Sources</h3>
+<div class="list">
+<div class="item">
+<a href="https://science.nasa.gov/blogs/voyager/" rel="noopener" target="_blank">NASA Voyager Mission</a>
+<p>Blog posts and archives of the Voyager satellite missions.</p>
+</div>
+<div class="item">
+<a href="https://www.nasa.gov/news/recently-published/" rel="noopener" target="_blank">NASA News - Recently
             Published</a>
-          <p>All the latest NASA news.</p>
-        </div>
-        <div class="item">
-          <a href="https://www.nasa.gov/latest-goddard-news/" target="_blank" rel="noopener">NASA Goddard News</a>
-          <p>News releases from NASA’s Goddard Space Flight Center.</p>
-        </div>
-        <div class="item">
-          <a href="https://www.nasa.gov/ames/ames-research-center-news/" target="_blank" rel="noopener">NASA Ames
+<p>All the latest NASA news.</p>
+</div>
+<div class="item">
+<a href="https://www.nasa.gov/latest-goddard-news/" rel="noopener" target="_blank">NASA Goddard News</a>
+<p>News releases from NASA’s Goddard Space Flight Center.</p>
+</div>
+<div class="item">
+<a href="https://www.nasa.gov/ames/ames-research-center-news/" rel="noopener" target="_blank">NASA Ames
             Research News</a>
-          <p>Ames Research Center – Latest Articles.</p>
-        </div>
-        <div class="item">
-          <a href="https://www.jpl.nasa.gov/news/" target="_blank" rel="noopener">NASA JPL News</a>
-          <p>NASA Jet Propulsion Laboratory News. California Institute for Technology.</p>
-        </div>
-        <div class="item">
-          <a href="https://www.ipac.caltech.edu/news" target="_blank" rel="noopener">ipac Caltech News</a>
-          <p>Latest news from IPAC at Caltech which partners with NASA, NSF, JPL and the world-wide research community.
+<p>Ames Research Center – Latest Articles.</p>
+</div>
+<div class="item">
+<a href="https://www.jpl.nasa.gov/news/" rel="noopener" target="_blank">NASA JPL News</a>
+<p>NASA Jet Propulsion Laboratory News. California Institute for Technology.</p>
+</div>
+<div class="item">
+<a href="https://www.ipac.caltech.edu/news" rel="noopener" target="_blank">ipac Caltech News</a>
+<p>Latest news from IPAC at Caltech which partners with NASA, NSF, JPL and the world-wide research community.
           </p>
-        </div>
-        <div class="item">
-          <a href="https://www.cfa.harvard.edu/news" target="_blank" rel="noopener">Center for Astrophysics | Harvard &
+</div>
+<div class="item">
+<a href="https://www.cfa.harvard.edu/news" rel="noopener" target="_blank">Center for Astrophysics | Harvard &amp;
             Smithsonian</a>
-          <p>The latest news and research from Harvard & Smithsonian.</p>
-        </div>
-        <div class="item">
-          <a href="https://www.nature.com/natastron/" target="_blank" rel="noopener">Nature.com - Astronomy</a>
-          <p>Stop by for the latest content, journals, and publications.</p>
-        </div>
-        <div class="item">
-          <a href="https://www.skyatnightmagazine.com/" target="_blank" rel="noopener">BBC Skya at Night Magazine</a>
-          <p>Science, Astronomy, and Astrophotography news.</p>
-        </div>
-        <div class="item">
-          <a href="https://aasnova.org/" target="_blank" rel="noopener">American Astronomical Society - NOVA</a>
-          <p>Sharing current news and astrophysical research published in the AAS journals.</p>
-        </div>
-        <div class="item">
-          <a href="https://starwalk.space/en/news" target="_blank" rel="noopener">Stark Walk Space News</a>
-          <p>Never miss an exciting event in the night sky with the Star Walk space news.</p>
-        </div>
-        <div class="item">
-          <a href="https://www.stsci.edu/news" target="_blank" rel="noopener">Space Telescope Science Institute News</a>
-          <p>The Space Telescope Science Institute (STScI) helps humanity explore the universe with advanced space
+<p>The latest news and research from Harvard &amp; Smithsonian.</p>
+</div>
+<div class="item">
+<a href="https://www.nature.com/natastron/" rel="noopener" target="_blank">Nature.com - Astronomy</a>
+<p>Stop by for the latest content, journals, and publications.</p>
+</div>
+<div class="item">
+<a href="https://www.skyatnightmagazine.com/" rel="noopener" target="_blank">BBC Skya at Night Magazine</a>
+<p>Science, Astronomy, and Astrophotography news.</p>
+</div>
+<div class="item">
+<a href="https://aasnova.org/" rel="noopener" target="_blank">American Astronomical Society - NOVA</a>
+<p>Sharing current news and astrophysical research published in the AAS journals.</p>
+</div>
+<div class="item">
+<a href="https://starwalk.space/en/news" rel="noopener" target="_blank">Stark Walk Space News</a>
+<p>Never miss an exciting event in the night sky with the Star Walk space news.</p>
+</div>
+<div class="item">
+<a href="https://www.stsci.edu/news" rel="noopener" target="_blank">Space Telescope Science Institute News</a>
+<p>The Space Telescope Science Institute (STScI) helps humanity explore the universe with advanced space
             telescopes and ever-growing data archives.</p>
-        </div>
-        <div class="item">
-          <a href="https://skyandtelescope.org/astronomy-news/" target="_blank" rel="noopener">Sky & Telescope News</a>
-          <p>Sky & Telescope has been bringing the sky and skygazers together since 1941. You're in the right place!</p>
-        </div>
-        <div class="item">
-          <a href="https://www.astronomy.com/tags/news/" target="_blank" rel="noopener">Astronomy.com News</a>
-          <p>Browse all the latest astronomy and space news on planets, stars, galaxies, cosmology, observing events,
+</div>
+<div class="item">
+<a href="https://skyandtelescope.org/astronomy-news/" rel="noopener" target="_blank">Sky &amp; Telescope News</a>
+<p>Sky &amp; Telescope has been bringing the sky and skygazers together since 1941. You're in the right place!</p>
+</div>
+<div class="item">
+<a href="https://www.astronomy.com/tags/news/" rel="noopener" target="_blank">Astronomy.com News</a>
+<p>Browse all the latest astronomy and space news on planets, stars, galaxies, cosmology, observing events,
             space missions, and more.</p>
-        </div>
-        <div class="item">
-          <a href="https://www.bbc.com/news/topics/cml9e982d1dt" target="_blank" rel="noopener">BBC Space News</a>
-          <p>All the latest space news curated by the BBC.</p>
-        </div>
-        <div class="item">
-          <a href="https://www.sciencenews.org/topic/astronomy" target="_blank" rel="noopener">ScienceNews.org News</a>
-          <p>Science News was founded in 1921 as an independent, nonprofit source of accurate information on the latest
+</div>
+<div class="item">
+<a href="https://www.bbc.com/news/topics/cml9e982d1dt" rel="noopener" target="_blank">BBC Space News</a>
+<p>All the latest space news curated by the BBC.</p>
+</div>
+<div class="item">
+<a href="https://www.sciencenews.org/topic/astronomy" rel="noopener" target="_blank">ScienceNews.org News</a>
+<p>Science News was founded in 1921 as an independent, nonprofit source of accurate information on the latest
             news of science, medicine and technology.</p>
-        </div>
-        <div class="item">
-          <a href="https://astrobiology.com/" target="_blank" rel="noopener">Astrobiolgy.com News</a>
-          <p>News from several science categories like astrobiology, astronomy, exoplanets, and more.</p>
-        </div>
-        <div class="item">
-          <a href="https://spacenews.com/" target="_blank" rel="noopener">SpaceNews.com News</a>
-          <p>SpaceNews is the most trusted and comprehensive source of news and analysis of the companies, agencies,
+</div>
+<div class="item">
+<a href="https://astrobiology.com/" rel="noopener" target="_blank">Astrobiolgy.com News</a>
+<p>News from several science categories like astrobiology, astronomy, exoplanets, and more.</p>
+</div>
+<div class="item">
+<a href="https://spacenews.com/" rel="noopener" target="_blank">SpaceNews.com News</a>
+<p>SpaceNews is the most trusted and comprehensive source of news and analysis of the companies, agencies,
             technologies and trends shaping the global space industry.</p>
-        </div>
-  </main>
-
-  <footer>
-    <p>© <span id="y"></span> Exoplanet Slacker — A community resource. <em>Not an official NASA site.</em></p>
-  </footer>
-  <script>document.getElementById('y').textContent = new Date().getFullYear();</script>
-  <!-- Cloudflare Web Analytics -->
-  <script defer src='https://static.cloudflareinsights.com/beacon.min.js'
-    data-cf-beacon='{"token": "f0bfe483bc9649128eac59a192620efe"}'></script><!-- End Cloudflare Web Analytics -->
+</div>
+</div>
+</section>
+</main>
+<footer>
+<p>© <span id="y"></span> Exoplanet Slacker — A community resource. <em>Not an official NASA site.</em></p>
+</footer>
+<script>document.getElementById('y').textContent = new Date().getFullYear();</script>
+<!-- Cloudflare Web Analytics -->
+<script data-cf-beacon='{"token": "f0bfe483bc9649128eac59a192620efe"}' defer="" src="https://static.cloudflareinsights.com/beacon.min.js"></script><!-- End Cloudflare Web Analytics -->
 </body>
-
 </html>
