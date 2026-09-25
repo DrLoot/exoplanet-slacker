@@ -1,0 +1,33 @@
+name: Refresh exoplanet news
+
+on:
+  schedule:
+    # Every two hours, including shortly after midnight in both CST and CDT.
+    - cron: '15 */2 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: refresh-exoplanet-news
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install -r requirements-news.txt
+      - run: python update_news.py
+      - name: Commit new article cards
+        run: |
+          if git diff --quiet -- exoplanetnews.html; then exit 0; fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add exoplanetnews.html
+          git commit -m 'Refresh exoplanet news cards'
+          git push
